@@ -27,8 +27,8 @@ export function NewChatButton() {
         }}
       >
         <PlusIcon />
-        <span>New Chat</span>
-        <span className="ml-auto text-muted-foreground text-xs">
+        <span className="transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">New Chat</span>
+        <span className="ml-auto text-muted-foreground text-xs transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
           {shortcutText}
         </span>
       </Link>
