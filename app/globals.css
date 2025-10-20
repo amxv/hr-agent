@@ -72,6 +72,9 @@
   --animate-shimmer: shimmer 2s linear infinite;
   --animate-spinner-fade: spinner-fade 0.8s ease-in-out infinite;
 
+  --ease-sheet-open: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-sheet-close: cubic-bezier(0.4, 0, 0.68, 0.06);
+
   @keyframes accordion-down {
     from {
       height: 0;
