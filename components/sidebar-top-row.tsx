@@ -18,7 +18,7 @@ export function SidebarTopRow() {
         refreshChatID();
       }}
     >
-      <span className="flex cursor-pointer items-center gap-2 rounded-md p-1 font-semibold text-lg hover:bg-muted group-data-[collapsible=icon]:w-fit">
+      <span className="flex cursor-pointer items-center gap-2 rounded-md p-1 font-semibold text-lg group-data-[collapsible=icon]:w-fit group-data-[state=expanded]:hover:bg-muted">
         <Image
           alt="AgentDune Chat"
           className="h-6 w-6 shrink-0"
