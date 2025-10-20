@@ -39,7 +39,7 @@ export function AppSidebar() {
               <SidebarMenuButton asChild tooltip="Models">
                 <Link href="/models">
                   <Cpu className="size-4" />
-                  <span className="group-data-[collapsible=icon]:hidden">
+                  <span className="transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
                     Models
                   </span>
                 </Link>
