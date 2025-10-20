@@ -7,6 +7,7 @@ import { useCopyToClipboard } from "usehooks-ts";
 import { Action, Actions } from "@/components/ai-elements/actions";
 import { useIsMobile } from "@/hooks/use-mobile";
 import type { Vote } from "@/lib/db/schema";
+import { env } from "@/lib/env";
 import { useChatStoreApi } from "@/lib/stores/chat-store-context";
 import { useMessageById, useMessageRoleById } from "@/lib/stores/hooks";
 import { useSession } from "@/providers/session-provider";
@@ -168,7 +169,9 @@ export function PureMessageActions({
           </Action>
 
           {!isReadOnly && <RetryButton messageId={messageId} />}
-          <SelectedModelId messageId={messageId} />
+          {!env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && (
+            <SelectedModelId messageId={messageId} />
+          )}
         </>
       )}
     </Actions>

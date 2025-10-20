@@ -88,9 +88,7 @@ export const config = {
      * - favicon.ico, opengraph-image (favicon and og image)
      * - manifest files (.json, .webmanifest)
      * - Images and other static assets (.svg, .png, .jpg, .jpeg, .gif, .webp, .ico)
-     * - models
-     * - compare
      */
-    "/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|manifest|models|compare|privacy|terms|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|webmanifest)$).*)",
+    "/((?!api|_next/static|_next/image|favicon.ico|opengraph-image|manifest|privacy|terms|.*\\.(?:svg|png|jpg|jpeg|gif|webp|ico|json|webmanifest)$).*)",
   ],
 };
