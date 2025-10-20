@@ -1,0 +1,145 @@
+{
+  "$schema": "./node_modules/@biomejs/biome/configuration_schema.json",
+  "extends": ["ultracite"],
+  "files": {
+    "includes": [
+      "**/*",
+      "!components/ui",
+      "!lib/utils.ts",
+      "!hooks/use-mobile.ts"
+    ]
+  },
+  "linter": {
+    "rules": {
+      "suspicious": {
+        /* Needs more work to fix */
+        "noExplicitAny": "off",
+
+        /* Allow for Tailwind @ rules */
+        "noUnknownAtRules": "off",
+
+        /* Allowing console for debugging */
+        "noConsole": "off",
+
+        /* Needed for generateUUID() */
+        "noBitwiseOperators": "off",
+
+        /* 26 errors */
+        "useAwait": "off",
+
+        /* 6 errors */
+        "useIterableCallbackReturn": "off",
+
+        /* 17 errors */
+        "noArrayIndexKey": "off",
+
+        /* 7 errors */
+        "noEmptyBlockStatements": "off",
+
+        /* 1 error */
+        "noDuplicateProperties": "off",
+
+        /* 3 errors */
+        "noEvolvingTypes": "off"
+      },
+      "style": {
+        /* Allowing magic numbers */
+        "noMagicNumbers": "off",
+
+        /* Needs more work to fix */
+        "noNestedTernary": "off",
+
+        "useUnifiedTypeSignatures": "off",
+
+        /* 6 errors */
+        "useConsistentMemberAccessibility": "off",
+
+        /* 13 errors */
+        "useFilenamingConvention": "off",
+
+        /* 2 errors */
+        "noExportedImports": "off",
+
+        /* 2 errors */
+        "useForOf": "off",
+
+        /* 2 errors */
+        "noParameterProperties": "off",
+
+        /* 2 errors */
+        "useCollapsedElseIf": "off",
+
+        /* 6 errors */
+        "useCollapsedIf": "off",
+
+        /* 4 errors */
+        "useDefaultSwitchClause": "off"
+      },
+      "nursery": {
+        /* Too many false positives */
+        "noUnnecessaryConditions": "off",
+
+        /* 8 errors */
+        "noDeprecatedImports": "off",
+
+        /* 28 errors */
+        "noShadow": "off",
+
+        /* 8 errors */
+        "useMaxParams": "off",
+
+        /* 5 errors */
+        "useImageSize": "off"
+      },
+      "complexity": {
+        /* Needs more work to fix */
+        "noExcessiveCognitiveComplexity": "off",
+
+        /* This one has false positives. It's a bit... iffy 😉 */
+        "useSimplifiedLogicExpression": "off",
+
+        /* 23 errors */
+        "noForEach": "off",
+
+        /* 5 errors */
+        "noVoid": "off",
+
+        /* 5 errors */
+        "noStaticOnlyClass": "off"
+      },
+      "a11y": {
+        /* Needs more work to fix */
+        "noSvgWithoutTitle": "off",
+
+        /* 2 errors */
+        "noNoninteractiveElementInteractions": "off",
+
+        /* 1 error */
+        "useKeyWithClickEvents": "off",
+
+        /* 1 error */
+        "useSemanticElements": "off",
+
+        /* 1 error */
+        "useFocusableInteractive": "off"
+      },
+      /* noInvalidPositionAtImport: 1 error */
+      "correctness": "off",
+
+      "security": {
+        /* 6 errors */
+        "noDangerouslySetInnerHtml": "off"
+      },
+      "performance": {
+        /* 22 errors */
+        "useTopLevelRegex": "off",
+
+        /* 5 errors */
+        "noBarrelFile": "off",
+
+        /* 2 errors */
+        "noNamespaceImport": "off"
+      }
+    }
+  }
+}

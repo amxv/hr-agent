@@ -1,0 +1,11 @@
+{
+  "$schema": "https://openapi.vercel.sh/vercel.json",
+  "installCommand": "bun install",
+  "buildCommand": "bun run build",
+  "crons": [
+    {
+      "path": "/api/cron/cleanup",
+      "schedule": "0 2 * * *"
+    }
+  ]
+}
