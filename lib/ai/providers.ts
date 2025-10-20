@@ -7,6 +7,7 @@ import type { ImageModelId, ModelId } from "../../packages/models";
 import { getModelAndProvider } from "../../packages/models";
 import type { AppModelId } from "./app-models";
 import { getAppModelDefinition, getImageModelDefinition } from "./app-models";
+import { env } from "@/lib/env";
 
 const _telemetryConfig = {
   telemetry: {
@@ -17,7 +18,9 @@ const _telemetryConfig = {
 
 export const getLanguageModel = (modelId: ModelId) => {
   const model = getAppModelDefinition(modelId);
-  const languageProvider = gateway(model.id);
+  const languageProvider = gateway(model.id, {
+    apiKey: env.AI_GATEWAY_API_KEY,
+  });
 
   // Wrap with reasoning middleware if the model supports reasoning
   if (model.reasoning && model.owned_by === "xai") {
