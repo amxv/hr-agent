@@ -55,7 +55,16 @@ export function createDeepResearchConfig(
 export function loadConfigFromEnv(): DeepResearchConfig {
   const envConfig: Partial<DeepResearchConfig> = {};
 
-  // Map env vars to config fields
+  // If DEEPRESEARCH_MODEL is set, use it for all research operations
+  if (process.env.DEEPRESEARCH_MODEL) {
+    envConfig.research_model = process.env.DEEPRESEARCH_MODEL;
+    envConfig.summarization_model = process.env.DEEPRESEARCH_MODEL;
+    envConfig.compression_model = process.env.DEEPRESEARCH_MODEL;
+    envConfig.final_report_model = process.env.DEEPRESEARCH_MODEL;
+    envConfig.status_update_model = process.env.DEEPRESEARCH_MODEL;
+  }
+
+  // Map env vars to config fields (individual model overrides take precedence)
   const envMappings: Record<string, keyof DeepResearchConfig> = {
     SEARCH_API: "search_api",
     RESEARCH_MODEL: "research_model",

@@ -177,7 +177,16 @@ export async function POST(request: NextRequest) {
     }
 
     // Extract selectedModel from user message metadata
-    const selectedModelId = userMessage.metadata?.selectedModel as AppModelId;
+    let selectedModelId = userMessage.metadata?.selectedModel as AppModelId;
+
+    // Override with env model if DISABLE_MODEL_SELECTION is enabled
+    if (env.DISABLE_MODEL_SELECTION && env.CHAT_MODEL) {
+      selectedModelId = env.CHAT_MODEL as AppModelId;
+      log.info(
+        { forcedModel: selectedModelId },
+        "Model selection disabled - using configured CHAT_MODEL"
+      );
+    }
 
     if (!selectedModelId) {
       log.warn("No selectedModel in user message metadata");

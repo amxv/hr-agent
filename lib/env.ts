@@ -28,6 +28,12 @@ export const env = createEnv({
     FIRECRAWL_API_KEY: z.string().optional(),
     SANDBOX_TEMPLATE_ID: z.string().optional(),
 
+    // Model selection control
+    DISABLE_MODEL_SELECTION: z.boolean().optional().default(false),
+    CHAT_MODEL: z.string().optional(),
+    DEEPRESEARCH_MODEL: z.string().optional(),
+    IMAGE_GEN_MODEL: z.string().optional(),
+
     // Misc / platform
     LOG_LEVEL: z.string().optional(),
     VERCEL_URL: z.string().optional(),
@@ -41,6 +47,8 @@ export const env = createEnv({
     NEXT_PUBLIC_EXA_AVAILABLE: z.boolean().optional(),
     NEXT_PUBLIC_FIRECRAWL_AVAILABLE: z.boolean().optional(),
     NEXT_PUBLIC_NODE_ENV: z.string().optional(),
+    NEXT_PUBLIC_DISABLE_MODEL_SELECTION: z.boolean().optional(),
+    NEXT_PUBLIC_CHAT_MODEL: z.string().optional(),
   },
   runtimeEnv: {
     POSTGRES_URL: process.env.POSTGRES_URL,
@@ -58,6 +66,10 @@ export const env = createEnv({
     EXA_API_KEY: process.env.EXA_API_KEY,
     FIRECRAWL_API_KEY: process.env.FIRECRAWL_API_KEY,
     SANDBOX_TEMPLATE_ID: process.env.SANDBOX_TEMPLATE_ID,
+    DISABLE_MODEL_SELECTION: process.env.DISABLE_MODEL_SELECTION === "true",
+    CHAT_MODEL: process.env.CHAT_MODEL,
+    DEEPRESEARCH_MODEL: process.env.DEEPRESEARCH_MODEL,
+    IMAGE_GEN_MODEL: process.env.IMAGE_GEN_MODEL,
     LOG_LEVEL: process.env.LOG_LEVEL,
     NEXT_PUBLIC_NODE_ENV: process.env.NODE_ENV,
     VERCEL_URL: process.env.VERCEL_URL,
@@ -69,5 +81,7 @@ export const env = createEnv({
     NEXT_PUBLIC_OPENAI_AVAILABLE: Boolean(process.env.OPENAI_API_KEY),
     NEXT_PUBLIC_EXA_AVAILABLE: Boolean(process.env.EXA_API_KEY),
     NEXT_PUBLIC_FIRECRAWL_AVAILABLE: Boolean(process.env.FIRECRAWL_API_KEY),
+    NEXT_PUBLIC_DISABLE_MODEL_SELECTION: process.env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION === "true",
+    NEXT_PUBLIC_CHAT_MODEL: process.env.NEXT_PUBLIC_CHAT_MODEL,
   },
 });

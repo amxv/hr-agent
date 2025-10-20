@@ -13,6 +13,7 @@ import {
   SidebarMenuItem,
   SidebarSeparator,
 } from "@/components/ui/sidebar";
+import { env } from "@/lib/env";
 import { AppSidebarFooterConditional } from "./app-sidebar-footer-conditional";
 import { AppSidebarHistoryConditional } from "./app-sidebar-history-conditional";
 
@@ -33,16 +34,18 @@ export function AppSidebar() {
           <SidebarMenuItem>
             <SearchChatsButton />
           </SidebarMenuItem>
-          <SidebarMenuItem>
-            <SidebarMenuButton asChild tooltip="Models">
-              <Link href="/models">
-                <Cpu className="size-4" />
-                <span className="group-data-[collapsible=icon]:hidden">
-                  Models
-                </span>
-              </Link>
-            </SidebarMenuButton>
-          </SidebarMenuItem>
+          {!env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && (
+            <SidebarMenuItem>
+              <SidebarMenuButton asChild tooltip="Models">
+                <Link href="/models">
+                  <Cpu className="size-4" />
+                  <span className="group-data-[collapsible=icon]:hidden">
+                    Models
+                  </span>
+                </Link>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          )}
         </SidebarMenu>
       </SidebarHeader>
       <SidebarSeparator />
