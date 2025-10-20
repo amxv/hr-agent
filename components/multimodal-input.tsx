@@ -31,6 +31,7 @@ import {
   getAppModelDefinition,
 } from "@/lib/ai/app-models";
 import type { Attachment, ChatMessage, UiToolName } from "@/lib/ai/types";
+import { env } from "@/lib/env";
 import { processFilesForUpload } from "@/lib/files/upload-prep";
 import { useChatStoreApi } from "@/lib/stores/chat-store-context";
 import {
@@ -702,11 +703,13 @@ function PureChatInputBottomControls({
     <PromptInputToolbar className="flex w-full min-w-0 flex-row justify-between @[400px]:gap-2 gap-1 border-t">
       <PromptInputTools className="flex min-w-0 items-center @[400px]:gap-2 gap-1">
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
-        <ModelSelector
-          className="@[400px]:h-10 h-8 w-fit max-w-none shrink justify-start truncate @[400px]:px-3 px-2 @[400px]:text-sm text-xs"
-          onModelChangeAction={onModelChange}
-          selectedModelId={selectedModelId}
-        />
+        {!env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && (
+          <ModelSelector
+            className="@[400px]:h-10 h-8 w-fit max-w-none shrink justify-start truncate @[400px]:px-3 px-2 @[400px]:text-sm text-xs"
+            onModelChangeAction={onModelChange}
+            selectedModelId={selectedModelId}
+          />
+        )}
         <ResponsiveTools
           selectedModelId={selectedModelId}
           setTools={setSelectedTool}

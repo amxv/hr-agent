@@ -10,6 +10,7 @@ import {
 } from "react";
 import { toast } from "sonner";
 import type { AppModelId } from "@/lib/ai/app-models";
+import { env } from "@/lib/env";
 
 type DefaultModelContextType = {
   defaultModel: AppModelId;
@@ -29,10 +30,21 @@ export function DefaultModelProvider({
   children,
   defaultModel: initialModel,
 }: DefaultModelClientProviderProps) {
-  const [currentModel, setCurrentModel] = useState<AppModelId>(initialModel);
+  // Use fixed model from env if DISABLE_MODEL_SELECTION is enabled
+  const fixedModel =
+    env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && env.NEXT_PUBLIC_CHAT_MODEL
+      ? (env.NEXT_PUBLIC_CHAT_MODEL as AppModelId)
+      : initialModel;
+
+  const [currentModel, setCurrentModel] = useState<AppModelId>(fixedModel);
 
   const changeModel = useCallback(
     async (modelId: AppModelId) => {
+      // If model selection is disabled, don't allow changes
+      if (env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION) {
+        return;
+      }
+
       // Update local state immediately
       setCurrentModel(modelId);
 

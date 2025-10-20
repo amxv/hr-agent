@@ -13,6 +13,7 @@ import {
   DropdownMenuItem,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { env } from "@/lib/env";
 import { cn } from "@/lib/utils";
 import { useSession } from "@/providers/session-provider";
 
@@ -60,25 +61,29 @@ function PureModelsHeader({ className }: { className?: string }) {
         >
           Chat
         </Link>
-        <Link
-          className={cn(
-            "font-medium text-sm transition-colors hover:text-foreground",
-            isActive("/models") ? "text-foreground" : "text-muted-foreground"
-          )}
-          href="/models"
-        >
-          Models
-        </Link>
-        <Link
-          className={cn(
-            "font-medium text-sm transition-colors hover:text-foreground",
-            isActive("/compare") ? "text-foreground" : "text-muted-foreground"
-          )}
-          // @ts-expect-error - Compare is a valid route
-          href="/compare"
-        >
-          Compare
-        </Link>
+        {!env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && (
+          <>
+            <Link
+              className={cn(
+                "font-medium text-sm transition-colors hover:text-foreground",
+                isActive("/models") ? "text-foreground" : "text-muted-foreground"
+              )}
+              href="/models"
+            >
+              Models
+            </Link>
+            <Link
+              className={cn(
+                "font-medium text-sm transition-colors hover:text-foreground",
+                isActive("/compare") ? "text-foreground" : "text-muted-foreground"
+              )}
+              // @ts-expect-error - Compare is a valid route
+              href="/compare"
+            >
+              Compare
+            </Link>
+          </>
+        )}
       </nav>
 
       {/* Right side: actions + mobile menu */}
@@ -106,23 +111,27 @@ function PureModelsHeader({ className }: { className?: string }) {
                   Chat
                 </Link>
               </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  className={cn(isActive("/models") && "font-semibold")}
-                  href="/models"
-                >
-                  Models
-                </Link>
-              </DropdownMenuItem>
-              <DropdownMenuItem asChild>
-                <Link
-                  className={cn(isActive("/compare") && "font-semibold")}
-                  // @ts-expect-error - Compare is a valid route
-                  href="/compare"
-                >
-                  Compare
-                </Link>
-              </DropdownMenuItem>
+              {!env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && (
+                <>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      className={cn(isActive("/models") && "font-semibold")}
+                      href="/models"
+                    >
+                      Models
+                    </Link>
+                  </DropdownMenuItem>
+                  <DropdownMenuItem asChild>
+                    <Link
+                      className={cn(isActive("/compare") && "font-semibold")}
+                      // @ts-expect-error - Compare is a valid route
+                      href="/compare"
+                    >
+                      Compare
+                    </Link>
+                  </DropdownMenuItem>
+                </>
+              )}
             </DropdownMenuContent>
           </DropdownMenu>
         </div>

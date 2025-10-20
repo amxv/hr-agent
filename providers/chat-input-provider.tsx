@@ -14,6 +14,7 @@ import type { LexicalChatInputRef } from "@/components/lexical-chat-input";
 import type { AppModelId } from "@/lib/ai/app-models";
 import { getAppModelDefinition } from "@/lib/ai/app-models";
 import type { Attachment, UiToolName } from "@/lib/ai/types";
+import { env } from "@/lib/env";
 import { useDefaultModel, useModelChange } from "./default-model-provider";
 
 type ChatInputContextType = {
@@ -81,9 +82,15 @@ export function ChatInputProvider({
   const defaultModel = useDefaultModel();
   const changeModel = useModelChange();
 
-  // Initialize selectedModelId from override or default model
+  // Use fixed model from env if DISABLE_MODEL_SELECTION is enabled
+  const fixedModel =
+    env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && env.NEXT_PUBLIC_CHAT_MODEL
+      ? (env.NEXT_PUBLIC_CHAT_MODEL as AppModelId)
+      : defaultModel;
+
+  // Initialize selectedModelId from override or fixed/default model
   const [selectedModelId, setSelectedModelId] = useState<AppModelId>(
-    overrideModelId || defaultModel
+    overrideModelId || fixedModel
   );
 
   const [selectedTool, setSelectedTool] = useState<UiToolName | null>(

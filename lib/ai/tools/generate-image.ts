@@ -18,6 +18,10 @@ const openaiClient = new OpenAI({
 
 const log = createModuleLogger("ai.tools.generate-image");
 
+// Use IMAGE_GEN_MODEL from env if available, otherwise use default
+const imageModel = (env.IMAGE_GEN_MODEL ||
+  DEFAULT_IMAGE_MODEL) as typeof DEFAULT_IMAGE_MODEL;
+
 export const generateImage = ({
   attachments = [],
   lastGeneratedImage = null,
@@ -130,7 +134,7 @@ Use for:
 
         // Non-edit case: use experimental_generateImage
         const res = await experimental_generateImage({
-          model: getImageModel(DEFAULT_IMAGE_MODEL),
+          model: getImageModel(imageModel),
           prompt,
           n: 1,
           providerOptions: {

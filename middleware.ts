@@ -1,6 +1,7 @@
 import type { NextRequest } from "next/server";
 import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { env } from "@/lib/env";
 
 export const runtime = "nodejs";
 
@@ -52,6 +53,10 @@ export default async function middleware(req: NextRequest) {
     return;
   }
   if (isOnModels || isOnCompare) {
+    // Redirect to home if model selection is disabled
+    if (env.DISABLE_MODEL_SELECTION) {
+      return NextResponse.redirect(new URL("/", url));
+    }
     return;
   }
   if (isOnPrivacyPage || isOnTermsPage) {
