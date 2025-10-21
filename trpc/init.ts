@@ -133,3 +133,38 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
     },
   });
 });
+
+/**
+ * Admin-only procedure
+ *
+ * Verifies user is authenticated AND has admin role.
+ * Use this for operations that should only be accessible to administrators.
+ */
+export const adminProcedure = t.procedure.use(({ ctx, next }) => {
+  // Check authentication (must be logged in)
+  if (!ctx.user) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  const { id, role, ...rest } = ctx.user;
+
+  // Check user ID exists
+  if (!id) {
+    throw new TRPCError({ code: "UNAUTHORIZED" });
+  }
+
+  // Check admin role
+  if (role !== "admin") {
+    throw new TRPCError({
+      code: "FORBIDDEN",
+      message: "Admin access required",
+    });
+  }
+
+  // Pass through with guaranteed admin user
+  return next({
+    ctx: {
+      user: { id, role: "admin" as const, ...rest },
+    },
+  });
+});

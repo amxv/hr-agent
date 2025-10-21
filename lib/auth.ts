@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { env } from "@/lib/env";
 import { db } from "./db/client";
 import { schema } from "./db/schema";
@@ -11,6 +12,8 @@ export type Session = {
     name?: string | null;
     email?: string | null;
     image?: string | null;
+    role?: string | null; // "admin" | "user"
+    banned?: boolean | null;
   };
   expires?: string;
 };
@@ -23,29 +26,19 @@ export const auth = betterAuth({
   trustedOrigins: env.VERCEL_URL ? [env.VERCEL_URL] : undefined,
   secret: env.AUTH_SECRET,
 
-  socialProviders: (() => {
-    const googleId = env.AUTH_GOOGLE_ID;
-    const googleSecret = env.AUTH_GOOGLE_SECRET;
-    const githubId = env.AUTH_GITHUB_ID;
-    const githubSecret = env.AUTH_GITHUB_SECRET;
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+  },
 
-    const google =
-      typeof googleId === "string" &&
-      googleId.length > 0 &&
-      typeof googleSecret === "string" &&
-      googleSecret.length > 0
-        ? { clientId: googleId, clientSecret: googleSecret }
-        : undefined;
-
-    const github =
-      typeof githubId === "string" &&
-      githubId.length > 0 &&
-      typeof githubSecret === "string" &&
-      githubSecret.length > 0
-        ? { clientId: githubId, clientSecret: githubSecret }
-        : undefined;
-
-    return { google, github } as const;
-  })(),
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: "user",
+      adminRoles: ["admin"],
+      impersonationSessionDuration: 60 * 60,
+    }),
+  ],
 });

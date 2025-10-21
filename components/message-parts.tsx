@@ -491,12 +491,29 @@ export function PureMessageReasoningParts({
     "reasoning"
   );
 
-  return (
-    <MessageReasoning
-      isLoading={isLoading}
-      reasoning={reasoningParts.map((p) => p.text)}
-    />
-  );
+  // Debug logging to diagnose reasoning display issues
+  console.log("[MessageReasoningParts] Debug info:", {
+    messageId,
+    startIdx,
+    endIdx,
+    isLoading,
+    reasoningPartsCount: reasoningParts.length,
+    reasoningParts,
+    extractedText: reasoningParts.map((p) => ({
+      hasText: "text" in p,
+      textValue: p.text,
+      textType: typeof p.text,
+      textLength: p.text?.length,
+      fullPart: p,
+    })),
+  });
+
+  // Filter out any parts with undefined/empty text and map to text strings
+  const reasoningTexts = reasoningParts
+    .map((p) => p.text)
+    .filter((text): text is string => Boolean(text));
+
+  return <MessageReasoning isLoading={isLoading} reasoning={reasoningTexts} />;
 }
 
 export function PureMessageParts({

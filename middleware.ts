@@ -34,6 +34,25 @@ export default async function middleware(req: NextRequest) {
   const session = await auth.api.getSession({ headers: req.headers });
   const isLoggedIn = !!session?.user;
 
+  // Check for admin routes
+  const isOnAdminRoute = url.pathname.startsWith("/admin");
+
+  if (isOnAdminRoute) {
+    // Require authentication for admin routes
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", url));
+    }
+
+    // Require admin role
+    if (session.user.role !== "admin") {
+      // Redirect non-admins to home with error message
+      return NextResponse.redirect(new URL("/?error=forbidden", url));
+    }
+
+    // Admin authenticated - allow access
+    return;
+  }
+
   const isOnChat = url.pathname.startsWith("/");
   const isOnModels = url.pathname.startsWith("/models");
   const isOnCompare = url.pathname.startsWith("/compare");

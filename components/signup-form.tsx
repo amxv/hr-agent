@@ -1,7 +1,6 @@
 "use client";
 
 import Link from "next/link";
-import { SocialAuthProviders } from "@/components/social-auth-providers";
 import {
   Card,
   CardContent,
@@ -19,17 +18,17 @@ export function SignupForm({
       <Card {...props}>
         <CardHeader className="text-center">
           <CardTitle className="text-xl">Create an account</CardTitle>
-          <CardDescription>Continue with a social provider</CardDescription>
+          <CardDescription>
+            Self-service registration is disabled. Please contact an
+            administrator to create an account.
+          </CardDescription>
         </CardHeader>
         <CardContent>
-          <div className="grid gap-6">
-            <SocialAuthProviders />
-            <div className="text-center text-sm">
-              Already have an account?{" "}
-              <a className="underline underline-offset-4" href="/login">
-                Sign in
-              </a>
-            </div>
+          <div className="text-center text-sm">
+            Already have an account?{" "}
+            <Link className="underline underline-offset-4" href="/login">
+              Sign in
+            </Link>
           </div>
         </CardContent>
       </Card>

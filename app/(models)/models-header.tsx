@@ -66,7 +66,9 @@ function PureModelsHeader({ className }: { className?: string }) {
             <Link
               className={cn(
                 "font-medium text-sm transition-colors hover:text-foreground",
-                isActive("/models") ? "text-foreground" : "text-muted-foreground"
+                isActive("/models")
+                  ? "text-foreground"
+                  : "text-muted-foreground"
               )}
               href="/models"
             >
@@ -75,7 +77,9 @@ function PureModelsHeader({ className }: { className?: string }) {
             <Link
               className={cn(
                 "font-medium text-sm transition-colors hover:text-foreground",
-                isActive("/compare") ? "text-foreground" : "text-muted-foreground"
+                isActive("/compare")
+                  ? "text-foreground"
+                  : "text-muted-foreground"
               )}
               // @ts-expect-error - Compare is a valid route
               href="/compare"
