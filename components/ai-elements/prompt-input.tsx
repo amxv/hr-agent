@@ -178,9 +178,8 @@ export const PromptInputSubmit = ({
 
   return (
     <Button
-      className={cn("gap-1.5 rounded-lg", className)}
+      className={cn("gap-1.5 rounded-2xl", className)}
       data-testid={isStoppable ? "stop-button" : undefined}
-      disabled={props.disabled}
       size={size}
       type="button"
       variant={variant}
