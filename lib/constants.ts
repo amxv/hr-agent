@@ -7,6 +7,6 @@ export const isTestEnvironment = Boolean(
     process.env.CI_PLAYWRIGHT
 );
 
-export const BLOB_FILE_PREFIX = "sparka-ai/files/";
+export const BLOB_FILE_PREFIX = "agentdune/files/";
 
 export const ANONYMOUS_SESSION_COOKIES_KEY = "anonymous-session";

@@ -46,15 +46,15 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  githubUrl: "https://github.com/franciscomoretti/sparka",
-  appPrefix: "sparka-ai",
+  githubUrl: "https://github.com/amxv/agentdune-chat",
+  appPrefix: "agentdune",
 
   appName: "AgentDune Chat",
   organization: {
     name: "AgentDune Chat Ltd",
     contact: {
-      privacyEmail: "privacy@sparka.ai",
-      legalEmail: "legal@sparka.ai",
+      privacyEmail: "privacy@agentdune.com",
+      legalEmail: "legal@agentdune.com",
     },
   },
   services: {
