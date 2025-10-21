@@ -1,5 +1,6 @@
 "use client";
 
+import { useQuery } from "@tanstack/react-query";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -28,12 +29,13 @@ export function UserListTable() {
   const [refetchKey, setRefetchKey] = useState(0);
   const trpc = useTRPC();
 
-  const listUsersQuery = trpc.admin.listUsers.useQuery as any;
-  const { data, isLoading, error } = listUsersQuery({
-    searchValue: searchValue || undefined,
-    searchField: "email" as const,
-    limit: 50,
-    offset: 0,
+  const { data, isLoading, error } = useQuery({
+    ...trpc.admin.listUsers.queryOptions({
+      searchValue: searchValue || undefined,
+      searchField: "email" as const,
+      limit: 50,
+      offset: 0,
+    }),
   });
 
   const invalidate = () => {

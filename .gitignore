@@ -45,3 +45,5 @@ yarn-error.log*
 tsconfig.tsbuildinfo
 
 packages/*/dist
+
+tmp/
