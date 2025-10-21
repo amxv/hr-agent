@@ -2,8 +2,8 @@
 date: 2025-10-21 19:54:33
 feature-slug: 001-admin-user-management
 phase-1-status: completed
-phase-2-status: not_started
-phase-3-status: not_started
+phase-2-status: completed
+phase-3-status: completed
 phase-4-status: not_started
 phase-5-status: not_started
 phase-6-status: not_started
