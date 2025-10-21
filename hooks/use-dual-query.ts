@@ -1,13 +1,11 @@
 "use client";
 
-import type {
-  DefaultError,
-  QueryClient,
-  QueryFunction,
-} from "@tanstack/query-core";
 import {
+  type DefaultError,
   type DefinedInitialDataOptions,
   type DefinedUseQueryResult,
+  type QueryClient,
+  type QueryFunction,
   type QueryKey,
   type UndefinedInitialDataOptions,
   type UseQueryOptions,

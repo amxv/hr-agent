@@ -1,6 +1,7 @@
 import { betterAuth } from "better-auth";
 import { drizzleAdapter } from "better-auth/adapters/drizzle";
 import { nextCookies } from "better-auth/next-js";
+import { admin } from "better-auth/plugins";
 import { env } from "@/lib/env";
 import { db } from "./db/client";
 import { schema } from "./db/schema";
@@ -22,6 +23,13 @@ export const auth = betterAuth({
   }),
   trustedOrigins: env.VERCEL_URL ? [env.VERCEL_URL] : undefined,
   secret: env.AUTH_SECRET,
+
+  emailAndPassword: {
+    enabled: true,
+    requireEmailVerification: false,
+    minPasswordLength: 8,
+    maxPasswordLength: 128,
+  },
 
   socialProviders: (() => {
     const googleId = env.AUTH_GOOGLE_ID;
@@ -47,5 +55,12 @@ export const auth = betterAuth({
 
     return { google, github } as const;
   })(),
-  plugins: [nextCookies()],
+  plugins: [
+    nextCookies(),
+    admin({
+      defaultRole: "user",
+      adminRoles: ["admin"],
+      impersonationSessionDuration: 60 * 60,
+    }),
+  ],
 });
