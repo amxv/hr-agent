@@ -1,5 +1,5 @@
-import { motion } from "motion/react";
 import { Loader2, SearchIcon } from "lucide-react";
+import { motion } from "motion/react";
 import { Badge } from "@/components/ui/badge";
 import { UpdateTitle } from "@/components/update-title";
 import type { ResearchUpdate } from "@/lib/ai/tools/research-updates-schema";

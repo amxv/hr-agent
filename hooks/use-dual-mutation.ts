@@ -1,7 +1,7 @@
 "use client";
 
-import type { DefaultError } from "@tanstack/query-core";
 import {
+  type DefaultError,
   type QueryClient,
   type UseMutationOptions,
   type UseMutationResult,
