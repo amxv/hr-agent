@@ -26,7 +26,7 @@ export function SidebarTopRow() {
           src="/icon.svg"
           width={24}
         />
-        <span className="transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100 overflow-hidden whitespace-nowrap">
+        <span className="overflow-hidden whitespace-nowrap transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
           AgentDune Chat
         </span>
       </span>
