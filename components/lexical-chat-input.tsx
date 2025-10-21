@@ -188,7 +188,7 @@ export const LexicalChatInput = ({
 
   const PlaceholderComponent = React.useCallback(
     () => (
-      <div className="lexical-placeholder pointer-events-none absolute pt-2 pl-3 text-muted-foreground">
+      <div className="lexical-placeholder pointer-events-none absolute pt-[15px] pl-[15px] text-muted-foreground">
         {placeholder}
       </div>
     ),
