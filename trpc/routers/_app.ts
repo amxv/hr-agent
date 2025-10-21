@@ -1,4 +1,5 @@
 import { createCallerFactory, createTRPCRouter } from "@/trpc/init";
+import { adminRouter } from "./admin.router";
 import { chatRouter } from "./chat.router";
 import { creditsRouter } from "./credits.router";
 import { documentRouter } from "./document.router";
@@ -11,6 +12,7 @@ import { voteRouter } from "./vote.router";
  */
 
 export const appRouter = createTRPCRouter({
+  admin: adminRouter,
   chat: chatRouter,
   credits: creditsRouter,
   vote: voteRouter,
