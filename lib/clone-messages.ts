@@ -197,8 +197,8 @@ export async function cloneFileUIPart(part: FileUIPart): Promise<FileUIPart> {
     }
 
     // Remove any existing prefix if it somehow got into the filename
-    if (filename.startsWith("sparka-ai/files/")) {
-      filename = filename.replace("sparka-ai/files/", "");
+    if (filename.startsWith("agentdune/files/")) {
+      filename = filename.replace("agentdune/files/", "");
     }
 
     const newBlob = await uploadFile(

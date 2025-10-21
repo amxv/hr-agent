@@ -1,6 +1,6 @@
 <div align="center">
 
-<img src="public/icon.svg" alt="Sparka AI" width="64" height="64">
+<img src="public/icon.svg" alt="AgentDune Chat" width="64" height="64">
 
 # Production-Ready AI Chat Template
 
@@ -8,11 +8,11 @@ Build your own multi-model AI chat app with 120+ models, authentication, streami
 
 **Next.js 15 • Vercel AI SDK • Shadcn/UI • Better Auth • Drizzle ORM**
 
-[**Live Demo**](https://sparka.ai)
+[**Live Demo**](https://agentdune.com)
 
 </div>
 
-![sparka_gif_demo](https://github.com/user-attachments/assets/34a03eed-58fa-4b1e-b453-384351b1c08c)
+![agentdune_gif_demo](https://github.com/user-attachments/assets/34a03eed-58fa-4b1e-b453-384351b1c08c)
 
 Ship a full-featured AI chat in minutes with Claude, GPT-4, Gemini, Grok, and 120+ models through Vercel AI Gateway.
 
@@ -62,8 +62,8 @@ Ship a full-featured AI chat in minutes with Claude, GPT-4, Gemini, Grok, and 12
 1. **Clone and Install**
 
    ```bash
-   git clone https://github.com/franciscomoretti/sparka.git
-   cd sparka
+   git clone https://github.com/amxv/agentdune-chat.git
+   cd agentdune-chat
    bun install
    ```
 

@@ -7,7 +7,7 @@ export const logger: Logger =
   env.NEXT_PUBLIC_NODE_ENV === "production"
     ? pino({
         level: env.LOG_LEVEL || "info",
-        base: { app: "sparka" },
+        base: { app: "agentdune" },
         timestamp: stdTimeFunctions.isoTime,
         redact: {
           paths: [
@@ -22,7 +22,7 @@ export const logger: Logger =
       })
     : pino({
         level: env.LOG_LEVEL || "debug",
-        base: { app: "sparka" },
+        base: { app: "agentdune" },
         timestamp: stdTimeFunctions.isoTime,
         transport: {
           target: "pino-pretty",
