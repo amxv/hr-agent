@@ -1,6 +1,18 @@
 import "server-only";
 import { del } from "@vercel/blob";
-import { and, asc, desc, eq, gt, gte, inArray } from "drizzle-orm";
+import {
+  and,
+  asc,
+  count,
+  desc,
+  eq,
+  gt,
+  gte,
+  ilike,
+  inArray,
+  isNull,
+  sql,
+} from "drizzle-orm";
 import type { Attachment } from "@/lib/ai/types";
 import type { ArtifactKind } from "../artifacts/artifact-kind";
 import { db } from "./client";
@@ -8,10 +20,13 @@ import {
   chat,
   type DBMessage,
   document,
+  type InsertUploadedDocument,
   message,
   type Suggestion,
   suggestion,
+  type UploadedDocument,
   type User,
+  uploadedDocument,
   user,
   vectorStoreConfig,
   vote,
@@ -745,6 +760,204 @@ export async function setVectorStoreId(vectorStoreId: string): Promise<void> {
       });
   } catch (error) {
     console.error("Failed to set vector store ID in database");
+    throw error;
+  }
+}
+
+// ============================================================================
+// Uploaded Document Queries
+// ============================================================================
+
+/**
+ * Lists documents with optional filters, pagination, excluding soft-deleted documents
+ */
+export async function listDocuments(input: {
+  searchTerm?: string;
+  tags?: string[];
+  status?: "uploading" | "processing" | "ready" | "failed";
+  limit?: number;
+  offset?: number;
+}): Promise<{
+  documents: UploadedDocument[];
+  total: number;
+  hasMore: boolean;
+}> {
+  try {
+    const { searchTerm, tags, status, limit = 50, offset = 0 } = input;
+    const whereConditions = [];
+
+    // Exclude soft-deleted documents
+    whereConditions.push(isNull(uploadedDocument.deletedAt));
+
+    // Search term filter
+    if (searchTerm) {
+      whereConditions.push(ilike(uploadedDocument.filename, `%${searchTerm}%`));
+    }
+
+    // Tags filter using PostgreSQL JSON contains operator
+    if (tags && tags.length > 0) {
+      whereConditions.push(
+        sql`${uploadedDocument.tags}::jsonb @> ${JSON.stringify(tags)}::jsonb`
+      );
+    }
+
+    // Status filter
+    if (status) {
+      whereConditions.push(eq(uploadedDocument.status, status));
+    }
+
+    // Query documents with filters
+    const documents = await db
+      .select()
+      .from(uploadedDocument)
+      .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+      .orderBy(desc(uploadedDocument.uploadedAt))
+      .limit(limit)
+      .offset(offset);
+
+    // Count total with same filters
+    const [totalResult] = await db
+      .select({ count: count() })
+      .from(uploadedDocument)
+      .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+
+    const total = totalResult?.count || 0;
+
+    return {
+      documents,
+      total,
+      hasMore: offset + limit < total,
+    };
+  } catch (error) {
+    console.error("Failed to list documents from database");
+    throw error;
+  }
+}
+
+/**
+ * Retrieves a single uploaded document by ID, excluding soft-deleted
+ */
+export async function getUploadedDocumentById(
+  id: string
+): Promise<UploadedDocument | null> {
+  try {
+    const [document] = await db
+      .select()
+      .from(uploadedDocument)
+      .where(
+        and(eq(uploadedDocument.id, id), isNull(uploadedDocument.deletedAt))
+      )
+      .limit(1);
+
+    return document || null;
+  } catch (error) {
+    console.error("Failed to get uploaded document by id from database");
+    throw error;
+  }
+}
+
+/**
+ * Inserts a new document record after successful upload
+ */
+export async function saveUploadedDocument(
+  input: Omit<InsertUploadedDocument, "id" | "uploadedAt" | "updatedAt">
+): Promise<UploadedDocument> {
+  try {
+    const [doc] = await db
+      .insert(uploadedDocument)
+      .values({
+        ...input,
+        uploadedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .returning();
+
+    return doc;
+  } catch (error) {
+    console.error("Failed to save document in database");
+    throw error;
+  }
+}
+
+/**
+ * Updates document processing status and optional error message
+ */
+export async function updateDocumentStatus(
+  id: string,
+  status: "uploading" | "processing" | "ready" | "failed",
+  errorMessage?: string | null
+): Promise<void> {
+  try {
+    await db
+      .update(uploadedDocument)
+      .set({
+        status,
+        errorMessage,
+        updatedAt: new Date(),
+      })
+      .where(eq(uploadedDocument.id, id));
+  } catch (error) {
+    console.error("Failed to update document status in database");
+    throw error;
+  }
+}
+
+/**
+ * Soft deletes a document by setting deletedAt timestamp
+ */
+export async function softDeleteDocument(id: string): Promise<void> {
+  try {
+    await db
+      .update(uploadedDocument)
+      .set({
+        deletedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(uploadedDocument.id, id));
+  } catch (error) {
+    console.error("Failed to soft delete document from database");
+    throw error;
+  }
+}
+
+/**
+ * Updates the tags array for a document
+ */
+export async function updateDocumentTags(
+  id: string,
+  tags: string[]
+): Promise<void> {
+  try {
+    await db
+      .update(uploadedDocument)
+      .set({
+        tags,
+        updatedAt: new Date(),
+      })
+      .where(eq(uploadedDocument.id, id));
+  } catch (error) {
+    console.error("Failed to update document tags in database");
+    throw error;
+  }
+}
+
+/**
+ * Retrieves all unique tags from non-deleted documents for auto-suggest
+ */
+export async function getAllTags(): Promise<string[]> {
+  try {
+    const documents = await db
+      .select({ tags: uploadedDocument.tags })
+      .from(uploadedDocument)
+      .where(isNull(uploadedDocument.deletedAt));
+
+    // Flatten arrays and deduplicate
+    const allTags = documents.flatMap((d) => (d.tags || []) as string[]);
+    const uniqueTags = [...new Set(allTags)];
+
+    return uniqueTags.sort();
+  } catch (error) {
+    console.error("Failed to get all tags from database");
     throw error;
   }
 }
