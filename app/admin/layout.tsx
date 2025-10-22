@@ -1,7 +1,7 @@
 import { headers } from "next/headers";
+import { auth } from "@/lib/auth";
 import { SessionProvider } from "@/providers/session-provider";
 import { TRPCReactProvider } from "@/trpc/react";
-import { auth } from "@/lib/auth";
 
 export default async function AdminLayout({
   children,
@@ -27,9 +27,7 @@ export default async function AdminLayout({
 
   return (
     <TRPCReactProvider>
-      <SessionProvider initialSession={session}>
-        {children}
-      </SessionProvider>
+      <SessionProvider initialSession={session}>{children}</SessionProvider>
     </TRPCReactProvider>
   );
 }
