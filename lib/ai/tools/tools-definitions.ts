@@ -61,6 +61,16 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
     description: "Research a topic",
     cost: 50,
   },
+  semanticSearch: {
+    name: "semanticSearch",
+    description: "Semantic Search",
+    cost: 3,
+  },
+  fileRetrieve: {
+    name: "fileRetrieve",
+    description: "File Retrieve",
+    cost: 1,
+  },
 };
 
 export const allTools = toolNameSchema.options;

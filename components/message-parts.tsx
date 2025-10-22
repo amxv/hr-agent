@@ -8,14 +8,17 @@ import {
   useMessagePartsByPartRange,
   useMessagePartTypesById,
 } from "@/lib/stores/hooks";
+import { type Citation, Citations } from "./citations";
 import { CodeInterpreterMessage } from "./code-interpreter-message";
 import { DocumentToolCall, DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
+import { FileRetrieveResult } from "./file-retrieve-result";
 import { GeneratedImage } from "./generated-image";
 import { ResearchUpdates } from "./message-annotations";
 import { MessageReasoning } from "./message-reasoning";
 import { ReadDocument } from "./read-document";
 import { Retrieve } from "./retrieve";
+import { SemanticSearchResult } from "./semantic-search-result";
 import { StockChartMessage } from "./stock-chart-message";
 import { TextMessagePart } from "./text-message-part";
 import { Weather } from "./weather";
@@ -25,6 +28,33 @@ type MessagePartsProps = {
   isLoading: boolean;
   isReadonly: boolean;
 };
+
+// Helper function to extract citations from message parts
+function extractCitationsFromParts(parts: ChatMessage["parts"]): Citation[] {
+  const citations: Citation[] = [];
+
+  for (const part of parts) {
+    if (
+      part.type === "tool-semanticSearch" &&
+      part.state === "output-available"
+    ) {
+      const { output } = part;
+      if (output && "results" in output && output.results) {
+        for (const result of output.results) {
+          citations.push({
+            documentId: result.documentId,
+            documentName: result.documentName,
+            pageNumber: result.pageNumber,
+            excerpt: result.chunkContent,
+            blobUrl: result.blobUrl,
+          });
+        }
+      }
+    }
+  }
+
+  return citations;
+}
 
 const isLastArtifact = (
   messages: ChatMessage[],
@@ -467,6 +497,46 @@ function PureMessagePart({
     }
   }
 
+  if (type === "tool-semanticSearch") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <SemanticSearchResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <SemanticSearchResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-fileRetrieve") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <FileRetrieveResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <FileRetrieveResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
   return null;
 }
 
@@ -522,6 +592,7 @@ export function PureMessageParts({
   isReadonly,
 }: MessagePartsProps) {
   const types = useMessagePartTypesById(messageId);
+  const chatStore = useChatStoreApi();
 
   type NonReasoningPartType = Exclude<
     ChatMessage["parts"][number]["type"],
@@ -551,42 +622,57 @@ export function PureMessageParts({
     return result;
   }, [types]);
 
-  return groups.map((group, groupIdx) => {
-    if (group.kind === "reasoning") {
-      const key = `message-${messageId}-reasoning-${groupIdx}`;
-      const isLast = group.endIndex === types.length - 1;
-      return (
-        <PureMessageReasoningParts
-          endIdx={group.endIndex}
-          isLoading={isLoading && isLast}
-          key={key}
-          messageId={messageId}
-          startIdx={group.startIndex}
-        />
-      );
+  // Extract citations from all message parts
+  const citations = useMemo(() => {
+    const messages = chatStore.getState().messages;
+    const message = messages.find((m) => m.id === messageId);
+    if (!message) {
+      return [];
     }
+    return extractCitationsFromParts(message.parts);
+  }, [chatStore, messageId, types]); // Include types in deps to re-extract when parts change
 
-    if (group.kind === "text") {
-      const key = `message-${messageId}-text-${group.index}`;
-      return (
-        <TextMessagePart
-          key={key}
-          messageId={messageId}
-          partIdx={group.index}
-        />
-      );
-    }
+  return (
+    <>
+      {groups.map((group, groupIdx) => {
+        if (group.kind === "reasoning") {
+          const key = `message-${messageId}-reasoning-${groupIdx}`;
+          const isLast = group.endIndex === types.length - 1;
+          return (
+            <PureMessageReasoningParts
+              endIdx={group.endIndex}
+              isLoading={isLoading && isLast}
+              key={key}
+              messageId={messageId}
+              startIdx={group.startIndex}
+            />
+          );
+        }
 
-    const key = `message-${messageId}-part-${group.index}-${group.kind}`;
-    return (
-      <MessagePart
-        isReadonly={isReadonly}
-        key={key}
-        messageId={messageId}
-        partIdx={group.index}
-      />
-    );
-  });
+        if (group.kind === "text") {
+          const key = `message-${messageId}-text-${group.index}`;
+          return (
+            <TextMessagePart
+              key={key}
+              messageId={messageId}
+              partIdx={group.index}
+            />
+          );
+        }
+
+        const key = `message-${messageId}-part-${group.index}-${group.kind}`;
+        return (
+          <MessagePart
+            isReadonly={isReadonly}
+            key={key}
+            messageId={messageId}
+            partIdx={group.index}
+          />
+        );
+      })}
+      {citations.length > 0 && <Citations citations={citations} />}
+    </>
+  );
 }
 
 export const MessageParts = memo(PureMessageParts);

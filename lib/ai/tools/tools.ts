@@ -2,11 +2,13 @@ import type { ModelId } from "@ai-models/vercel-gateway";
 import type { FileUIPart, ModelMessage } from "ai";
 import { codeInterpreter } from "@/lib/ai/tools/code-interpreter";
 import { createDocumentTool } from "@/lib/ai/tools/create-document";
+import { fileRetrieve } from "@/lib/ai/tools/file-retrieve";
 import { generateImage } from "@/lib/ai/tools/generate-image";
 import { getWeather } from "@/lib/ai/tools/get-weather";
 import { readDocument } from "@/lib/ai/tools/read-document";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
 import { retrieve } from "@/lib/ai/tools/retrieve";
+import { semanticSearch } from "@/lib/ai/tools/semantic-search";
 import { stockChart } from "@/lib/ai/tools/stock-chart";
 import { updateDocument } from "@/lib/ai/tools/update-document";
 import { tavilyWebSearch } from "@/lib/ai/tools/web-search";
@@ -82,6 +84,12 @@ export function getTools({
             messageId,
             messages: contextForLLM,
           }),
+        }
+      : {}),
+    ...(env.NEXT_PUBLIC_OPENAI_AVAILABLE
+      ? {
+          semanticSearch: semanticSearch({ dataStream }),
+          fileRetrieve: fileRetrieve({ dataStream }),
         }
       : {}),
   };
