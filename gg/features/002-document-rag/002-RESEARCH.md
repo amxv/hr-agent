@@ -784,19 +784,132 @@ try {
 
 ### PDF Citations and Browser Handling
 
-**Status**: Research not completed (interrupted)
+**Research File**: `gg/agent-outputs/web-researcher/2025-10-22_23-44-34-pdf-citation-navigation.md`
 
-**Basic Knowledge** (to be verified with full research):
-- PDFs can be opened at specific pages using URL fragments: `file.pdf#page=3`
-- Browser support: Most modern browsers support PDF page navigation
-- Fallback strategies: Open at beginning if page doesn't exist
-- Alternative: Use PDF.js for client-side rendering with page control
-- Citations could link to:
-  1. Direct blob storage URL with page fragment
-  2. Client-side viewer with page parameter
-  3. Download link with page reference in filename
+**Purpose**: Enable clickable citations that open PDFs at specific pages in the browser
 
-**Note**: Full research on PDF citation handling should be completed before implementation phase.
+#### Key Findings
+
+**Browser PDF Page Navigation**:
+- URL Fragment Standard: `https://domain.com/file.pdf#page=3` works reliably
+- Browser Compatibility: Excellent support in Chrome, Firefox, and Edge
+- **Safari Limitation**: Desktop Safari does NOT support `#page=` fragments (requires fallback)
+- Graceful Degradation: Unsupported fragments are silently ignored (PDF still opens)
+- ISO 32000-2 Standard includes additional parameters: `#page=5&zoom=150`, `#page=3&view=FitH`
+
+**Fragment Compatibility Matrix**:
+| Parameter | Chrome | Firefox | Edge | Safari | Support Level |
+|-----------|--------|---------|------|--------|---------------|
+| `#page=N` | ✓ | ✓ | ✓ | ✗ | **Excellent** |
+| `#zoom=100` | ✓ | ✓ | ✓ | ✗ | Good |
+| `#nameddest=X` | ✓ | ✓ | ✗ | ✓ | Good |
+
+**Named Destinations vs Page Numbers**:
+- **Page Numbers**: Simple, works with any PDF, but breaks if pagination changes
+- **Named Destinations**: Survive pagination changes, more semantic, but require PDF authoring
+- **Recommendation**: Use page numbers for simplicity; named destinations only for long-lived docs
+
+**PDF.js Integration**:
+- **Use PDF.js when**: Need custom UI, programmatic control, highlighting, annotations
+- **Don't use PDF.js when**: Just linking to pages (browser native support sufficient)
+- **Display Layer**: Sufficient for rendering and page navigation
+- **Lazy Loading**: Only load pages on-demand for performance with large PDFs
+
+**Citation Implementation Best Practices**:
+
+1. **Citation Format**:
+```typescript
+interface Citation {
+  documentId: string;
+  documentName: string;
+  pageNumber: number;
+  excerpt: string;
+  blobUrl: string;
+}
+
+// Generate URL
+const citationUrl = `${blobUrl}#page=${pageNumber}`;
+```
+
+2. **Validation Before Display**:
+```javascript
+// Validate page exists using PDF.js
+async function validatePageNumber(blobUrl, pageNum) {
+  const pdfDoc = await pdfjsLib.getDocument(blobUrl).promise;
+  return pageNum > 0 && pageNum <= pdfDoc.numPages;
+}
+```
+
+3. **Browser Detection for Safari**:
+```javascript
+const isSafari = /^((?!chrome|android).)*safari/i.test(navigator.userAgent);
+const citationLink = isSafari
+  ? blobUrl // No fragment for Safari
+  : `${blobUrl}#page=${pageNumber}`;
+```
+
+4. **Fallback Strategies**:
+- Primary: `#page=23` (works for most browsers)
+- Safari fallback: Open PDF without fragment
+- Invalid page: Open last page or display error message
+- Client-side validation before rendering citation links
+
+**Vercel Blob Integration**:
+- PDFs automatically display inline in browsers (content-disposition: inline)
+- Append `#page=N` fragment to blob URL
+- URLs are public but unique and hard to guess
+- No signed URL support yet (feature request pending)
+
+**Production RAG Citation Patterns**:
+
+**Pattern 1: Document + Page** (Most Common):
+```
+According to the User Guide (page 23), the system supports...
+[View citation: User Guide, page 23]
+```
+
+**Pattern 2: Chunk-Based** (LangChain):
+```json
+{
+  "answer": "The API rate limit is 1000 requests per minute.",
+  "citations": [{
+    "source_id": "api-docs-v2",
+    "page": 42,
+    "quote": "Rate limiting is implemented at..."
+  }]
+}
+```
+
+**Pattern 3: Advanced** (LARS System):
+- Document name, page number, text highlighting
+- Inline document reader for context
+- Image extraction from PDFs
+- Download highlighted PDF option
+
+**Edge Cases and Gotchas**:
+- **Page Indexing**: URL fragments use 1-based indexing, PDF.js API uses 0-based
+- **Logical vs Physical Pages**: Roman numerals (i, ii, iii) don't map to fragment identifiers
+- **Browser Plugins**: Adobe Reader plugin conflicts with fragment support
+- **Large PDFs**: Use lazy loading (getPage() on-demand) for 100+ page documents
+- **File Protocol**: `file://` URLs may not support fragments in some browsers
+
+**Integration Notes**:
+- Store citation metadata: `{ documentId, pageNumber, excerpt }`
+- Generate URLs on-demand: `${blobUrl}#page=${pageNumber}`
+- Validate page numbers before displaying citations (prevent broken links)
+- Implement Safari fallback (open without fragment)
+- Display excerpt/context on hover for better UX
+- Open in new tab with `target="_blank" rel="noopener noreferrer"`
+
+**Recommended Approach for Document RAG**:
+1. Use `#page=N` fragments for citation links (simple, widely supported)
+2. Store blob URL and page number in database
+3. Validate page numbers using PDF.js before rendering citations
+4. Detect Safari and provide fallback (open without fragment)
+5. Display citation excerpts for context
+6. Consider PDF.js custom viewer only if advanced features needed (highlighting, annotations)
+
+---
 
 </web-research-documents>
 
