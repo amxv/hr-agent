@@ -13,6 +13,7 @@ import {
   suggestion,
   type User,
   user,
+  vectorStoreConfig,
   vote,
 } from "./schema";
 
@@ -695,5 +696,55 @@ async function deleteAttachmentsFromMessages(messages: DBMessage[]) {
     console.error("Failed to delete attachments from Vercel Blob:", error);
     // Don't throw here - we still want to proceed with message deletion
     // even if blob cleanup fails
+  }
+}
+
+// ============================================================================
+// Vector Store Configuration Queries
+// ============================================================================
+
+/**
+ * Retrieves the shared vector store ID from the singleton configuration table.
+ * Returns null if no vector store has been created yet.
+ */
+export async function getVectorStoreId(): Promise<string | null> {
+  try {
+    const [config] = await db
+      .select()
+      .from(vectorStoreConfig)
+      .where(eq(vectorStoreConfig.id, "singleton"))
+      .limit(1);
+
+    return config?.vectorStoreId || null;
+  } catch (error) {
+    console.error("Failed to get vector store ID from database");
+    throw error;
+  }
+}
+
+/**
+ * Creates or updates the vector store ID in the singleton configuration table.
+ * This should be called once when the first vector store is created.
+ */
+export async function setVectorStoreId(vectorStoreId: string): Promise<void> {
+  try {
+    await db
+      .insert(vectorStoreConfig)
+      .values({
+        id: "singleton",
+        vectorStoreId,
+        createdAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .onConflictDoUpdate({
+        target: vectorStoreConfig.id,
+        set: {
+          vectorStoreId,
+          updatedAt: new Date(),
+        },
+      });
+  } catch (error) {
+    console.error("Failed to set vector store ID in database");
+    throw error;
   }
 }
