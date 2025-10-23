@@ -53,28 +53,29 @@ const _MODEL_ALIASES = {
   "chat-model-reasoning": getLanguageModel("openai/o3-mini"),
 };
 
+type GatewayProviderSlug =
+  | "anthropic"
+  | "openai"
+  | "deepinfra"
+  | "xai"
+  | "google";
+
+type GatewayProviderOptions = {
+  gateway: { only: GatewayProviderSlug[] };
+};
+
+type ProviderOptionsWithGateway<TOptions> = TOptions & GatewayProviderOptions;
+
+type ModelProviderOptions =
+  | ProviderOptionsWithGateway<{ openai: OpenAIResponsesProviderOptions }>
+  | ProviderOptionsWithGateway<{ anthropic: AnthropicProviderOptions }>
+  | ProviderOptionsWithGateway<{ xai: Record<string, never> }>
+  | ProviderOptionsWithGateway<{ google: GoogleGenerativeAIProviderOptions }>
+  | GatewayProviderOptions;
+
 export const getModelProviderOptions = (
   providerModelId: AppModelId
-):
-  | {
-      openai: OpenAIResponsesProviderOptions;
-      gateway: { only: ["deepinfra"] };
-    }
-  | {
-      anthropic: AnthropicProviderOptions;
-      gateway: { only: ["deepinfra"] };
-    }
-  | {
-      xai: Record<string, never>;
-      gateway: { only: ["deepinfra"] };
-    }
-  | {
-      google: GoogleGenerativeAIProviderOptions;
-      gateway: { only: ["deepinfra"] };
-    }
-  | {
-      gateway: { only: ["deepinfra"] };
-    } => {
+): ModelProviderOptions => {
   const model = getAppModelDefinition(providerModelId);
   if (model.owned_by === "openai") {
     if (model.reasoning) {
@@ -87,10 +88,10 @@ export const getModelProviderOptions = (
             ? { reasoningEffort: "low" }
             : {}),
         } satisfies OpenAIResponsesProviderOptions,
-        gateway: { only: ["deepinfra"] },
+        gateway: { only: ["openai"] },
       };
     }
-    return { openai: {}, gateway: { only: ["deepinfra"] } };
+    return { openai: {}, gateway: { only: ["openai"] } };
   }
   if (model.owned_by === "anthropic") {
     if (model.reasoning) {
@@ -101,10 +102,10 @@ export const getModelProviderOptions = (
             budgetTokens: 4096,
           },
         } satisfies AnthropicProviderOptions,
-        gateway: { only: ["deepinfra"] },
+        gateway: { only: ["anthropic"] },
       };
     }
-    return { anthropic: {}, gateway: { only: ["deepinfra"] } };
+    return { anthropic: {}, gateway: { only: ["anthropic"] } };
   }
   if (model.owned_by === "xai") {
     return {
