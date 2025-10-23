@@ -790,7 +790,7 @@ function PureChatInputBottomControls({
           selectedModelId={selectedModelId}
         />
         <PromptInputSubmit
-          className={"@[400px]:size-10 size-8 shrink-0 mr-1.5 mb-1.5"}
+          className={"mr-1.5 mb-1.5 @[400px]:size-10 size-8 shrink-0"}
           disabled={status === "ready" && !submission.enabled}
           onClick={(e) => {
             e.preventDefault();

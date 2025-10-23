@@ -72,7 +72,9 @@ export const adminRouter = createTRPCRouter({
         email: row.user.email,
         name: row.user.name,
         role: (row.user.role || "user") as "admin" | "user",
-        status: (row.user.banned ? "inactive" : "active") as "active" | "inactive",
+        status: (row.user.banned ? "inactive" : "active") as
+          | "active"
+          | "inactive",
         createdAt: row.user.createdAt,
         banned: row.user.banned || false,
         banReason: row.user.banReason,
