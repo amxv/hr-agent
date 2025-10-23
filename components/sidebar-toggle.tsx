@@ -19,7 +19,7 @@ export function SidebarToggle({
     <Tooltip>
       <TooltipTrigger asChild>
         <Button
-          className="md:h-fit md:px-2"
+          className="rounded-lg md:h-fit md:px-2"
           onClick={toggleSidebar}
           variant="outline"
         >
