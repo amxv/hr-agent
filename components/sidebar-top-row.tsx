@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { useTheme } from "next-themes";
 import { useSidebar } from "@/components/ui/sidebar";
-import { useChatId } from "@/providers/chat-id-provider";
 import { useMounted } from "@/hooks/use-mounted";
+import { useChatId } from "@/providers/chat-id-provider";
 
 export function SidebarTopRow() {
   const { setOpenMobile, open, openMobile } = useSidebar();

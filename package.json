@@ -133,7 +133,7 @@
     "lexical": "^0.32.1",
     "lodash": "^4.17.21",
     "lodash-es": "^4.17.21",
-    "lucide-react": "^0.542.0",
+    "lucide-react": "^0.546.0",
     "marked": "^15.0.12",
     "marked-react": "^3.0.2",
     "mermaid": "^11.12.0",

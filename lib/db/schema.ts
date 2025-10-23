@@ -20,7 +20,7 @@ export const userCredit = pgTable("UserCredit", {
     .primaryKey()
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  credits: integer("credits").notNull().default(10000),
+  credits: integer("credits").notNull().default(10_000),
   reservedCredits: integer("reservedCredits").notNull().default(0),
 });
 

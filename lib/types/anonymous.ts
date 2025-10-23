@@ -25,7 +25,7 @@ const AVAILABLE_MODELS: AppModelId[] = [
 ];
 
 export const ANONYMOUS_LIMITS = {
-  CREDITS: 10000,
+  CREDITS: 10_000,
   AVAILABLE_MODELS,
   AVAILABLE_TOOLS: ["createDocument", "updateDocument"] satisfies ToolName[],
   SESSION_DURATION: 2_147_483_647, // Max session time
