@@ -358,23 +358,69 @@ export const adminRouter = createTRPCRouter({
     }),
 
     refreshStatus: adminProcedure.mutation(async () => {
-      const { getVectorStoreId } = await import("@/lib/db/queries");
-      const { pollVectorStoreStatus } = await import(
+      const {
+        DOCUMENT_PROCESSING_TIMEOUT_MESSAGE,
+        getDocumentsRequiringStatusRefresh,
+        updateDocumentStatus,
+      } = await import("@/lib/db/queries");
+      const { getVectorStoreFileStatus } = await import(
         "@/lib/openai/vector-store"
       );
 
-      const vsId = await getVectorStoreId();
+      const processingDocs = await getDocumentsRequiringStatusRefresh();
 
-      if (!vsId) {
+      if (processingDocs.length === 0) {
         return {
-          inProgress: 0,
+          updated: 0,
           completed: 0,
           failed: 0,
         };
       }
 
-      const counts = await pollVectorStoreStatus(vsId);
-      return counts;
+      let completed = 0;
+      let failed = 0;
+
+      // Check each document's individual file status
+      for (const doc of processingDocs) {
+        try {
+          const fileStatus = await getVectorStoreFileStatus(
+            doc.vectorStoreId,
+            doc.openaiFileId
+          );
+
+          if (fileStatus.status === "completed") {
+            await updateDocumentStatus(doc.id, "ready");
+            completed++;
+          } else if (fileStatus.status === "failed") {
+            await updateDocumentStatus(
+              doc.id,
+              "failed",
+              fileStatus.lastError?.message || "Unknown error"
+            );
+            failed++;
+          }
+          if (fileStatus.status === "in_progress") {
+            if (doc.status !== "processing") {
+              await updateDocumentStatus(
+                doc.id,
+                "processing",
+                DOCUMENT_PROCESSING_TIMEOUT_MESSAGE
+              );
+            }
+          }
+        } catch (error) {
+          console.error(
+            `Failed to check status for document ${doc.id}:`,
+            error
+          );
+        }
+      }
+
+      return {
+        updated: completed + failed,
+        completed,
+        failed,
+      };
     }),
   },
 });
