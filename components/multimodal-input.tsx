@@ -1,5 +1,6 @@
 "use client";
 import type { UseChatHelpers } from "@ai-sdk/react";
+import type { LanguageModelUsage } from "ai";
 import { PlusIcon } from "lucide-react";
 import type React from "react";
 import {
@@ -8,11 +9,20 @@ import {
   memo,
   type SetStateAction,
   useCallback,
+  useMemo,
   useRef,
   useState,
 } from "react";
 import { useDropzone } from "react-dropzone";
 import { toast } from "sonner";
+import type { ModelId as TokenLensModelId } from "tokenlens";
+import { getContextWindow } from "tokenlens";
+import {
+  Context,
+  ContextContent,
+  ContextContentHeader,
+  ContextTrigger,
+} from "@/components/ai-elements/context";
 import {
   PromptInput,
   PromptInputButton,
@@ -36,6 +46,7 @@ import { processFilesForUpload } from "@/lib/files/upload-prep";
 import { useChatStoreApi } from "@/lib/stores/chat-store-context";
 import {
   useChatHelperStop,
+  useLastUsageUntilMessageId,
   useMessageIds,
   useSetMessages,
 } from "@/lib/stores/hooks";
@@ -604,6 +615,7 @@ function PureMultimodalInput({
             fileInputRef={fileInputRef}
             isEmpty={isEmpty}
             onModelChange={handleModelChange}
+            parentMessageId={parentMessageId}
             selectedModelId={selectedModelId}
             selectedTool={selectedTool}
             setSelectedTool={setSelectedTool}
@@ -675,6 +687,60 @@ function PureAttachmentsButton({
 
 const AttachmentsButton = memo(PureAttachmentsButton);
 
+function CompactContextUsage({
+  selectedModelId,
+  parentMessageId,
+}: {
+  selectedModelId: AppModelId;
+  parentMessageId: string | null;
+}) {
+  const usage = useLastUsageUntilMessageId(parentMessageId);
+  const modelDefinition = getAppModelDefinition(selectedModelId);
+  const apiModelId = modelDefinition.apiModelId;
+
+  const contextMax = useMemo(() => {
+    // First, try to get context window from our model data
+    if (modelDefinition?.context_window) {
+      return modelDefinition.context_window;
+    }
+
+    // Fall back to tokenlens for models not in our data
+    try {
+      const cw = getContextWindow(apiModelId as unknown as string);
+      return cw.combinedMax ?? cw.inputMax ?? 0;
+    } catch {
+      return 0;
+    }
+  }, [apiModelId, modelDefinition]);
+
+  const usedTokens = useMemo(() => {
+    if (!usage) {
+      return 0;
+    }
+    const input = (usage as any).inputTokens ?? 0;
+    const cached = (usage as any).cachedInputTokens ?? 0;
+    return input + cached;
+  }, [usage]);
+
+  if (!usage) {
+    return null;
+  }
+
+  return (
+    <Context
+      maxTokens={contextMax}
+      modelId={apiModelId.split("/").join(":") as TokenLensModelId}
+      usage={usage as LanguageModelUsage | undefined}
+      usedTokens={usedTokens}
+    >
+      <ContextTrigger />
+      <ContextContent align="end">
+        <ContextContentHeader />
+      </ContextContent>
+    </Context>
+  );
+}
+
 function PureChatInputBottomControls({
   selectedModelId,
   onModelChange,
@@ -686,6 +752,7 @@ function PureChatInputBottomControls({
   submitForm,
   uploadQueue: _uploadQueue,
   submission,
+  parentMessageId,
 }: {
   selectedModelId: AppModelId;
   onModelChange: (modelId: AppModelId) => void;
@@ -697,6 +764,7 @@ function PureChatInputBottomControls({
   submitForm: () => void;
   uploadQueue: string[];
   submission: { enabled: boolean; message?: string };
+  parentMessageId: string | null;
 }) {
   const stopHelper = useChatHelperStop();
   return (
@@ -716,25 +784,31 @@ function PureChatInputBottomControls({
           tools={selectedTool}
         />
       </PromptInputTools>
-      <PromptInputSubmit
-        className={"@[400px]:size-10 size-8 shrink-0"}
-        disabled={status === "ready" && !submission.enabled}
-        onClick={(e) => {
-          e.preventDefault();
-          if (status === "streaming" || status === "submitted") {
-            stopHelper?.();
-          } else if (status === "ready" || status === "error") {
-            if (!submission.enabled) {
-              if (submission.message) {
-                toast.error(submission.message);
+      <PromptInputTools className="flex min-w-0 items-center @[400px]:gap-2 gap-1">
+        <CompactContextUsage
+          parentMessageId={parentMessageId}
+          selectedModelId={selectedModelId}
+        />
+        <PromptInputSubmit
+          className={"@[400px]:size-10 size-8 shrink-0"}
+          disabled={status === "ready" && !submission.enabled}
+          onClick={(e) => {
+            e.preventDefault();
+            if (status === "streaming" || status === "submitted") {
+              stopHelper?.();
+            } else if (status === "ready" || status === "error") {
+              if (!submission.enabled) {
+                if (submission.message) {
+                  toast.error(submission.message);
+                }
+                return;
               }
-              return;
+              submitForm();
             }
-            submitForm();
-          }
-        }}
-        status={status}
-      />
+          }}
+          status={status}
+        />
+      </PromptInputTools>
     </PromptInputToolbar>
   );
 }
@@ -773,6 +847,9 @@ const ChatInputBottomControls = memo(
       return false;
     }
     if (prevProps.submission.message !== nextProps.submission.message) {
+      return false;
+    }
+    if (prevProps.parentMessageId !== nextProps.parentMessageId) {
       return false;
     }
     return true;
