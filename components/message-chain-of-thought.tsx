@@ -172,18 +172,23 @@ const SemanticSearchStep = memo(function SemanticSearchStep({
       >
         <ChainOfThoughtSearchResults className="flex-wrap gap-2 overflow-x-auto">
           {results.map((result, idx) => (
-            <ChainOfThoughtSearchResult
-              className="inline-flex h-8 max-w-[300px] items-center gap-1.5 whitespace-nowrap px-3 py-1 text-xs"
+            <a
+              className="no-underline"
+              href={result.blobUrl}
               key={idx}
+              rel="noopener noreferrer"
+              target="_blank"
             >
-              <FileTextIcon className="size-3.5 shrink-0" />
-              <span className="min-w-0 truncate">{result.documentName}</span>
-              {result.pageNumber && (
-                <span className="shrink-0 text-muted-foreground text-[10px]">
-                  (p.{result.pageNumber})
-                </span>
-              )}
-            </ChainOfThoughtSearchResult>
+              <ChainOfThoughtSearchResult className="inline-flex h-8 max-w-[300px] cursor-pointer items-center gap-1.5 whitespace-nowrap px-3 py-1 text-xs transition-colors hover:bg-secondary/80">
+                <FileTextIcon className="size-3.5 shrink-0" />
+                <span className="min-w-0 truncate">{result.documentName}</span>
+                {result.pageNumber && (
+                  <span className="shrink-0 text-muted-foreground text-[10px]">
+                    (p.{result.pageNumber})
+                  </span>
+                )}
+              </ChainOfThoughtSearchResult>
+            </a>
           ))}
         </ChainOfThoughtSearchResults>
       </ChainOfThoughtStep>
@@ -206,7 +211,7 @@ const ReasoningStepItem = memo(function ReasoningStepItem({
 
   return (
     <ChainOfThoughtStep icon={icon} label={label} status={status}>
-      <Response className="grid gap-2">{remainingContent}</Response>
+      <Response className="grid gap-1">{remainingContent}</Response>
     </ChainOfThoughtStep>
   );
 });
