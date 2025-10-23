@@ -75,12 +75,16 @@ export const fileRetrieve = ({ dataStream }: FileRetrieveProps) =>
           {
             documentId,
             openaiFileId: document.openaiFileId,
+            vectorStoreId: document.vectorStoreId,
           },
           "fileRetrieve: retrieving content from OpenAI"
         );
 
-        // Retrieve file content from OpenAI
-        const content = await retrieveFileContent(document.openaiFileId);
+        // Retrieve file content from OpenAI Vector Store
+        const content = await retrieveFileContent(
+          document.vectorStoreId,
+          document.openaiFileId
+        );
 
         // Extract page count (best effort - may not work for all formats)
         let pageCount: number | null = null;

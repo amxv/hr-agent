@@ -73,25 +73,61 @@ export async function uploadFileToOpenAI(
 }
 
 /**
- * Retrieves the full content of a file from OpenAI.
+ * Retrieves the full content of a file from OpenAI Vector Store.
+ *
+ * Note: Files uploaded with purpose "assistants" must be retrieved via the
+ * Vector Store API, not the standard Files API.
+ *
+ * The API returns parsed content in a structured format with text chunks.
  *
  * Warning: This may return very large content that could exceed context limits.
  * Use this carefully and consider the size of the file before retrieving.
  *
+ * @param vectorStoreId - Vector store ID where the file is stored
  * @param fileId - OpenAI file ID
- * @returns File content as string
+ * @returns File content as string (concatenated from all text chunks)
  */
-export async function retrieveFileContent(fileId: string): Promise<string> {
+export async function retrieveFileContent(
+  vectorStoreId: string,
+  fileId: string
+): Promise<string> {
   try {
-    const response = await withRetry(() => openaiClient.files.content(fileId));
+    // Use direct HTTP request since SDK doesn't have proper typing yet
+    const url = `https://api.openai.com/v1/vector_stores/${vectorStoreId}/files/${fileId}/content`;
 
-    // Read response as text
-    const content = await response.text();
+    const response = await withRetry(async () => {
+      const res = await fetch(url, {
+        headers: {
+          Authorization: `Bearer ${openaiClient.apiKey}`,
+        },
+      });
+
+      if (!res.ok) {
+        const error = await res.text();
+        throw new Error(`${res.status} ${error}`);
+      }
+
+      return res;
+    });
+
+    // Parse JSON response
+    const data = await response.json();
+
+    // Extract text content from all chunks
+    let content = "";
+    if (data.content && Array.isArray(data.content)) {
+      content = data.content
+        .filter((chunk: { type: string; text?: string }) => chunk.type === "text")
+        .map((chunk: { text: string }) => chunk.text)
+        .join("\n");
+    }
 
     log.info(
       {
+        vectorStoreId,
         fileId,
         contentLength: content.length,
+        chunkCount: data.content?.length || 0,
       },
       "retrieveFileContent: content retrieved"
     );
@@ -100,6 +136,7 @@ export async function retrieveFileContent(fileId: string): Promise<string> {
   } catch (error) {
     log.error(
       {
+        vectorStoreId,
         fileId,
         error: {
           name: (error as Error).name,
