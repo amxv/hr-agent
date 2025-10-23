@@ -8,19 +8,17 @@ import type { ModelId as TokenLensModelId } from "tokenlens";
 import { getContextWindow } from "tokenlens";
 import {
   Context,
-  ContextCacheUsage,
   ContextContent,
-  ContextContentBody,
-  ContextContentFooter,
   ContextContentHeader,
-  ContextInputUsage,
-  ContextOutputUsage,
-  ContextReasoningUsage,
   ContextTrigger,
 } from "@/components/ai-elements/context";
 import { PromptInputContextBar } from "@/components/ai-elements/prompt-input";
 import { AttachmentList } from "@/components/attachment-list";
-import { type AppModelId, getAppModelDefinition } from "@/lib/ai/app-models";
+import {
+  type AppModelDefinition,
+  type AppModelId,
+  getAppModelDefinition,
+} from "@/lib/ai/app-models";
 import type { Attachment } from "@/lib/ai/types";
 import { useLastUsageUntilMessageId } from "@/lib/stores/hooks";
 import { cn } from "@/lib/utils";
@@ -76,6 +74,7 @@ export function ContextBar({
         {usage && (
           <div className="ml-auto">
             <ContextUsage
+              modelDefinition={modelDefinition}
               selectedModelId={modelDefinition.apiModelId}
               usage={usage}
             />
@@ -89,18 +88,26 @@ export function ContextBar({
 function ContextUsage({
   usage,
   selectedModelId,
+  modelDefinition,
 }: {
   usage: LanguageModelUsage;
   selectedModelId: ModelId;
+  modelDefinition: AppModelDefinition;
 }) {
   const contextMax = useMemo(() => {
+    // First, try to get context window from our model data
+    if (modelDefinition?.context_window) {
+      return modelDefinition.context_window;
+    }
+
+    // Fall back to tokenlens for models not in our data
     try {
       const cw = getContextWindow(selectedModelId as unknown as string);
       return cw.combinedMax ?? cw.inputMax ?? 0;
     } catch {
       return 0;
     }
-  }, [selectedModelId]);
+  }, [selectedModelId, modelDefinition]);
 
   const usedTokens = useMemo(() => {
     if (!usage) {
@@ -121,13 +128,6 @@ function ContextUsage({
       <ContextTrigger />
       <ContextContent align="end">
         <ContextContentHeader />
-        <ContextContentBody className="space-y-2">
-          <ContextInputUsage />
-          <ContextOutputUsage />
-          <ContextReasoningUsage />
-          <ContextCacheUsage />
-        </ContextContentBody>
-        <ContextContentFooter />
       </ContextContent>
     </Context>
   );
