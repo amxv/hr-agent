@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/client";
-import { user } from "@/lib/db/schema";
+import { user, userCredit } from "@/lib/db/schema";
 import { generateSecurePassword } from "@/lib/utils/password";
 import { adminProcedure, createTRPCRouter } from "@/trpc/init";
 
@@ -46,10 +46,14 @@ export const adminRouter = createTRPCRouter({
         }
       }
 
-      // Query users with filters
+      // Query users with filters and credits
       const users = await db
-        .select()
+        .select({
+          user,
+          credits: userCredit.credits,
+        })
         .from(user)
+        .leftJoin(userCredit, eq(user.id, userCredit.userId))
         .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
         .limit(input.limit)
         .offset(input.offset);
@@ -62,16 +66,17 @@ export const adminRouter = createTRPCRouter({
           whereConditions.length > 0 ? and(...whereConditions) : undefined
         );
 
-      // Transform users to include status field
-      const transformedUsers = users.map((u) => ({
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        role: (u.role || "user") as "admin" | "user",
-        status: (u.banned ? "inactive" : "active") as "active" | "inactive",
-        createdAt: u.createdAt,
-        banned: u.banned || false,
-        banReason: u.banReason,
+      // Transform users to include status field and credits
+      const transformedUsers = users.map((row) => ({
+        id: row.user.id,
+        email: row.user.email,
+        name: row.user.name,
+        role: (row.user.role || "user") as "admin" | "user",
+        status: (row.user.banned ? "inactive" : "active") as "active" | "inactive",
+        createdAt: row.user.createdAt,
+        banned: row.user.banned || false,
+        banReason: row.user.banReason,
+        credits: row.credits ?? 0,
       }));
 
       return {
