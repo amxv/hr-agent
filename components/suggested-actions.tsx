@@ -57,7 +57,7 @@ function PureSuggestedActions({
           transition={{ delay: 0.05 * index }}
         >
           <Button
-            className="h-auto w-full flex-1 items-start justify-start gap-1 rounded-xl border px-4 py-3.5 text-left text-sm sm:flex-col"
+            className="h-auto w-full flex-1 items-start justify-start gap-1 rounded-3xl border px-4 py-3.5 text-left text-sm sm:flex-col"
             onClick={async () => {
               if (!sendMessage) {
                 return;

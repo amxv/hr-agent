@@ -1,7 +1,7 @@
 "use client";
 import type { UseChatHelpers } from "@ai-sdk/react";
 import type { LanguageModelUsage } from "ai";
-import { PlusIcon } from "lucide-react";
+import { PaperclipIcon } from "lucide-react";
 import type React from "react";
 import {
   type ChangeEvent,
@@ -669,7 +669,7 @@ function PureAttachmentsButton({
               onClick={handleClick}
               variant="ghost"
             >
-              <PlusIcon className="size-4" />
+              <PaperclipIcon className="size-4" />
             </PromptInputButton>
           </PopoverTrigger>
         </TooltipTrigger>
@@ -768,7 +768,7 @@ function PureChatInputBottomControls({
 }) {
   const stopHelper = useChatHelperStop();
   return (
-    <PromptInputToolbar className="flex w-full min-w-0 flex-row justify-between @[400px]:gap-2 gap-1 border-t">
+    <PromptInputToolbar className="flex w-full min-w-0 flex-row justify-between @[400px]:gap-2 gap-1">
       <PromptInputTools className="flex min-w-0 items-center @[400px]:gap-2 gap-1">
         <AttachmentsButton fileInputRef={fileInputRef} status={status} />
         {!env.NEXT_PUBLIC_DISABLE_MODEL_SELECTION && (
@@ -790,7 +790,7 @@ function PureChatInputBottomControls({
           selectedModelId={selectedModelId}
         />
         <PromptInputSubmit
-          className={"@[400px]:size-10 size-8 shrink-0"}
+          className={"@[400px]:size-10 size-8 shrink-0 mr-1.5 mb-1.5"}
           disabled={status === "ready" && !submission.enabled}
           onClick={(e) => {
             e.preventDefault();
