@@ -76,11 +76,11 @@ export function SemanticSearchResult({
         <div className="space-y-2">
           {results.map((result, index) => (
             <Card
-              className="p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-900"
+              className="overflow-hidden p-3 transition-colors hover:bg-gray-50 dark:hover:bg-gray-900"
               key={`${result.documentId}-${index}`}
             >
               <div className="flex items-start justify-between gap-2">
-                <div className="flex-1 space-y-1">
+                <div className="min-w-0 flex-1 space-y-1">
                   <div className="flex items-center gap-2">
                     <p className="font-medium text-gray-900 text-sm dark:text-gray-100">
                       {result.documentName}
@@ -93,7 +93,7 @@ export function SemanticSearchResult({
                   </div>
 
                   {result.chunkContent && (
-                    <p className="line-clamp-3 text-gray-600 text-xs dark:text-gray-400">
+                    <p className="break-words line-clamp-3 text-gray-600 text-xs dark:text-gray-400">
                       {result.chunkContent}
                     </p>
                   )}
