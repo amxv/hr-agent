@@ -93,7 +93,7 @@ export function SemanticSearchResult({
                   </div>
 
                   {result.chunkContent && (
-                    <p className="break-words line-clamp-3 text-gray-600 text-xs dark:text-gray-400">
+                    <p className="line-clamp-3 break-words text-gray-600 text-xs dark:text-gray-400">
                       {result.chunkContent}
                     </p>
                   )}
