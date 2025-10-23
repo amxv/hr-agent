@@ -76,6 +76,7 @@ export function UserListTable() {
                 <TableHead>Name</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Credits</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -91,6 +92,7 @@ export function UserListTable() {
                   createdAt: Date;
                   banned: boolean;
                   banReason: string | null;
+                  credits: number;
                 }) => (
                   <TableRow key={user.id}>
                     <TableCell>{user.email}</TableCell>
@@ -113,6 +115,7 @@ export function UserListTable() {
                         {user.status}
                       </Badge>
                     </TableCell>
+                    <TableCell>{user.credits.toLocaleString()}</TableCell>
                     <TableCell>
                       {new Date(user.createdAt).toLocaleDateString()}
                     </TableCell>

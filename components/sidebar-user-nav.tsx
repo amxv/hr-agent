@@ -1,5 +1,4 @@
 "use client";
-import { Coins } from "lucide-react";
 import Image from "next/image";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
@@ -10,7 +9,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetCredits } from "@/hooks/chat-sync-hooks";
 import type { Session } from "@/lib/auth";
 import authClient from "@/lib/auth-client";
 
@@ -20,7 +18,6 @@ export function HeaderUserNav({
   user: NonNullable<Session["user"]>;
 }) {
   const { setTheme, theme } = useTheme();
-  const { credits } = useGetCredits();
 
   return (
     <DropdownMenu>
@@ -43,13 +40,6 @@ export function HeaderUserNav({
       <DropdownMenuContent align="end" className="w-56" side="bottom">
         <DropdownMenuItem disabled>
           <span className="font-medium">{user.email}</span>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <div className="flex items-center text-muted-foreground">
-            <Coins className="mr-1 size-4" />
-            <span>Credits: {credits ?? "Loading..."}</span>
-          </div>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
         <DropdownMenuItem
