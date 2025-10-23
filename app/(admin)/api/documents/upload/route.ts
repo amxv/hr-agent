@@ -5,6 +5,7 @@ import { auth } from "@/lib/auth";
 import { uploadFile } from "@/lib/blob";
 import { saveUploadedDocument } from "@/lib/db/queries";
 import { uploadFileToOpenAI } from "@/lib/openai/files";
+import { pollDocumentStatus } from "@/lib/openai/status-polling";
 import {
   addFileToVectorStore,
   getOrCreateVectorStore,
@@ -111,6 +112,17 @@ export async function POST(request: Request) {
         uploadedBy: session.user.id,
         tags,
       });
+
+      // Start background status polling to auto-update when processing completes
+      // Don't await - let it run in background
+      pollDocumentStatus(document.id, vectorStoreId, openaiFileId).catch(
+        (error) => {
+          console.error(
+            `Background status polling failed for document ${document.id}:`,
+            error
+          );
+        }
+      );
 
       return NextResponse.json({
         success: true,

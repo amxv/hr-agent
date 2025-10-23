@@ -19,12 +19,14 @@ export async function uploadFileToOpenAI(
   fileBuffer: Buffer
 ): Promise<string> {
   try {
-    // Convert buffer to Blob for OpenAI API
-    const blob = new Blob([fileBuffer]);
+    // Convert buffer to File for OpenAI API (File object required, not just Blob)
+    const file = new File([fileBuffer], filename, {
+      type: "application/octet-stream",
+    });
 
-    const file = await withRetry(() =>
+    const uploadedFile = await withRetry(() =>
       openaiClient.files.create({
-        file: blob,
+        file,
         purpose: "assistants",
       })
     );
@@ -32,13 +34,13 @@ export async function uploadFileToOpenAI(
     log.info(
       {
         filename,
-        fileId: file.id,
-        bytes: file.bytes,
+        fileId: uploadedFile.id,
+        bytes: uploadedFile.bytes,
       },
       "uploadFileToOpenAI: file uploaded successfully"
     );
 
-    return file.id;
+    return uploadedFile.id;
   } catch (error) {
     const err = error as { status?: number; message?: string };
 

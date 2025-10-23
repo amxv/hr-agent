@@ -81,10 +81,14 @@ export function UploadDocumentDialog({
       }
 
       toast.success("Document uploaded successfully!");
-      onSuccess();
+
+      // Close dialog first for better UX, then invalidate queries
       setOpen(false);
       setFile(null);
       setTags([]);
+
+      // Trigger refetch of documents list
+      await onSuccess();
     } catch (error: unknown) {
       const err = error as { message?: string };
       toast.error(err.message || "Failed to upload document");

@@ -11,6 +11,7 @@ import {
   ilike,
   inArray,
   isNull,
+  or,
   sql,
 } from "drizzle-orm";
 import type { Attachment } from "@/lib/ai/types";
@@ -764,6 +765,9 @@ export async function setVectorStoreId(vectorStoreId: string): Promise<void> {
   }
 }
 
+export const DOCUMENT_PROCESSING_TIMEOUT_MESSAGE =
+  "Processing timeout - exceeded maximum polling attempts";
+
 // ============================================================================
 // Uploaded Document Queries
 // ============================================================================
@@ -830,6 +834,37 @@ export async function listDocuments(input: {
     };
   } catch (error) {
     console.error("Failed to list documents from database");
+    throw error;
+  }
+}
+
+export async function getDocumentsRequiringStatusRefresh(): Promise<
+  UploadedDocument[]
+> {
+  try {
+    return await db
+      .select()
+      .from(uploadedDocument)
+      .where(
+        and(
+          isNull(uploadedDocument.deletedAt),
+          or(
+            eq(uploadedDocument.status, "processing"),
+            and(
+              eq(uploadedDocument.status, "failed"),
+              eq(
+                uploadedDocument.errorMessage,
+                DOCUMENT_PROCESSING_TIMEOUT_MESSAGE
+              )
+            )
+          )
+        )
+      )
+      .orderBy(desc(uploadedDocument.uploadedAt));
+  } catch (error) {
+    console.error(
+      "Failed to get documents requiring status refresh from database"
+    );
     throw error;
   }
 }
@@ -958,6 +993,35 @@ export async function getAllTags(): Promise<string[]> {
     return uniqueTags.sort();
   } catch (error) {
     console.error("Failed to get all tags from database");
+    throw error;
+  }
+}
+
+/**
+ * Retrieves an uploaded document by OpenAI file ID.
+ * Used by semantic search tool to map file citations to documents.
+ *
+ * @param openaiFileId - The OpenAI file ID
+ * @returns The document or null if not found
+ */
+export async function getUploadedDocumentByOpenAIFileId(
+  openaiFileId: string
+): Promise<UploadedDocument | null> {
+  try {
+    const [document] = await db
+      .select()
+      .from(uploadedDocument)
+      .where(
+        and(
+          eq(uploadedDocument.openaiFileId, openaiFileId),
+          isNull(uploadedDocument.deletedAt)
+        )
+      )
+      .limit(1);
+
+    return document || null;
+  } catch (error) {
+    console.error("Failed to get uploaded document by OpenAI file ID");
     throw error;
   }
 }

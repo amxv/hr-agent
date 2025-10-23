@@ -42,13 +42,22 @@ export function DocumentListTable() {
     }),
   });
 
-  const invalidate = () => {
-    queryClient.invalidateQueries({
-      queryKey: trpc.admin.documents.list.queryOptions({
-        searchTerm: searchValue || undefined,
-        limit: 50,
-        offset: 0,
-      }).queryKey,
+  const invalidate = async () => {
+    // Invalidate all document queries (list and tags) to ensure UI updates
+    await queryClient.invalidateQueries({
+      predicate: (query) => {
+        const queryKey = query.queryKey as unknown[];
+        // tRPC query keys are arrays like: [["admin", "documents", "list"], {...}]
+        if (Array.isArray(queryKey) && queryKey.length > 0) {
+          const path = queryKey[0] as string[];
+          return (
+            Array.isArray(path) &&
+            path[0] === "admin" &&
+            path[1] === "documents"
+          );
+        }
+        return false;
+      },
     });
   };
 

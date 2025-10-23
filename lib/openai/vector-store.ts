@@ -192,3 +192,118 @@ export async function pollVectorStoreStatus(vectorStoreId: string): Promise<{
     throw error;
   }
 }
+
+/**
+ * Gets the current processing status of an individual file in a vector store.
+ *
+ * This is the CORRECT way to check if a specific file has finished processing.
+ * Do not rely on vector store aggregate counts - always check individual file status.
+ *
+ * @param vectorStoreId - The vector store ID
+ * @param fileId - The OpenAI file ID
+ * @returns Object with file status and optional error information
+ */
+export async function getVectorStoreFileStatus(
+  vectorStoreId: string,
+  fileId: string
+): Promise<{
+  status: "in_progress" | "completed" | "failed" | "cancelled";
+  lastError: { code: string; message: string } | null;
+}> {
+  try {
+    const file = await withRetry(() =>
+      openaiClient.vectorStores.files.retrieve(fileId, {
+        vector_store_id: vectorStoreId,
+      })
+    );
+
+    log.debug(
+      { vectorStoreId, fileId, status: file.status },
+      "getVectorStoreFileStatus: retrieved file status"
+    );
+
+    return {
+      status: file.status,
+      lastError: file.last_error
+        ? {
+            code: file.last_error.code,
+            message: file.last_error.message,
+          }
+        : null,
+    };
+  } catch (error) {
+    log.error(
+      {
+        vectorStoreId,
+        fileId,
+        error: {
+          name: (error as Error).name,
+          message: (error as Error).message,
+        },
+      },
+      "getVectorStoreFileStatus: failed"
+    );
+    throw error;
+  }
+}
+
+/**
+ * Performs semantic search across a vector store using natural language query.
+ * Returns ranked results with relevance scores.
+ *
+ * This uses the new Vector Store Search API which is much simpler and faster
+ * than the old Assistants API approach.
+ *
+ * @param vectorStoreId - The vector store ID
+ * @param query - Natural language search query
+ * @param maxNumResults - Maximum number of results to return (default: 10)
+ * @returns Search results with content, scores, and file references
+ */
+export async function searchVectorStore(
+  vectorStoreId: string,
+  query: string,
+  maxNumResults = 10
+): Promise<{
+  data: Array<{
+    file_id: string;
+    filename: string;
+    score: number;
+    content: Array<{
+      type: string;
+      text: string;
+    }>;
+  }>;
+}> {
+  try {
+    const results = await withRetry(() =>
+      openaiClient.vectorStores.search(vectorStoreId, {
+        query,
+        max_num_results: maxNumResults,
+      })
+    );
+
+    log.debug(
+      {
+        vectorStoreId,
+        query,
+        resultCount: results.data.length,
+      },
+      "searchVectorStore: search completed"
+    );
+
+    return results;
+  } catch (error) {
+    log.error(
+      {
+        vectorStoreId,
+        query,
+        error: {
+          name: (error as Error).name,
+          message: (error as Error).message,
+        },
+      },
+      "searchVectorStore: search failed"
+    );
+    throw error;
+  }
+}
