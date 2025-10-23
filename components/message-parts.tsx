@@ -15,6 +15,7 @@ import { DocumentPreview } from "./document-preview";
 import { FileRetrieveResult } from "./file-retrieve-result";
 import { GeneratedImage } from "./generated-image";
 import { ResearchUpdates } from "./message-annotations";
+import { MessageChainOfThought } from "./message-chain-of-thought";
 import { MessageReasoning } from "./message-reasoning";
 import { ReadDocument } from "./read-document";
 import { Retrieve } from "./retrieve";
@@ -600,25 +601,52 @@ export function PureMessageParts({
   >;
 
   const groups = useMemo(() => {
+    // Tools that should be integrated into Chain of Thought
+    const cotTools = new Set<ChatMessage["parts"][number]["type"]>([
+      "tool-semanticSearch",
+    ]);
+
     const result: Array<
-      | { kind: "reasoning"; startIndex: number; endIndex: number }
+      | { kind: "chain-of-thought"; startIndex: number; endIndex: number }
       | { kind: NonReasoningPartType; index: number }
     > = [];
 
+    // Find the first and last CoT-compatible parts
+    let cotStart = -1;
+    let cotEnd = -1;
+
     for (let i = 0; i < types.length; i++) {
-      const t = types[i];
-      if (t === "reasoning") {
-        const start = i;
-        while (i < types.length && types[i] === "reasoning") {
-          i++;
-        }
-        const end = i - 1;
-        result.push({ kind: "reasoning", startIndex: start, endIndex: end });
-        i = end;
-      } else {
-        result.push({ kind: t as NonReasoningPartType, index: i });
+      if (types[i] === "reasoning" || cotTools.has(types[i])) {
+        if (cotStart === -1) cotStart = i;
+        cotEnd = i;
       }
     }
+
+    // If we found any CoT parts, create one unified group for everything from first to last
+    if (cotStart !== -1) {
+      // Add any non-CoT parts before the CoT group
+      for (let i = 0; i < cotStart; i++) {
+        result.push({ kind: types[i] as NonReasoningPartType, index: i });
+      }
+
+      // Add the unified CoT group (includes everything from first to last CoT part)
+      result.push({
+        kind: "chain-of-thought",
+        startIndex: cotStart,
+        endIndex: cotEnd,
+      });
+
+      // Add any non-CoT parts after the CoT group
+      for (let i = cotEnd + 1; i < types.length; i++) {
+        result.push({ kind: types[i] as NonReasoningPartType, index: i });
+      }
+    } else {
+      // No CoT parts, add all parts as individual items
+      for (let i = 0; i < types.length; i++) {
+        result.push({ kind: types[i] as NonReasoningPartType, index: i });
+      }
+    }
+
     return result;
   }, [types]);
 
@@ -635,11 +663,11 @@ export function PureMessageParts({
   return (
     <>
       {groups.map((group, groupIdx) => {
-        if (group.kind === "reasoning") {
-          const key = `message-${messageId}-reasoning-${groupIdx}`;
+        if (group.kind === "chain-of-thought") {
+          const key = `message-${messageId}-cot-${groupIdx}`;
           const isLast = group.endIndex === types.length - 1;
           return (
-            <PureMessageReasoningParts
+            <MessageChainOfThought
               endIdx={group.endIndex}
               isLoading={isLoading && isLast}
               key={key}
