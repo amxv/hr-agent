@@ -1,9 +1,22 @@
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
+
 import { env } from "@/lib/env";
 
-// Optionally, if not using email/pass login, you can
-// use the Drizzle adapter for Auth.js / NextAuth
-// https://authjs.dev/reference/adapter/drizzle
-const client = postgres(env.POSTGRES_URL);
-export const db = drizzle(client);
+const globalForDb = globalThis as unknown as {
+  __postgresClient?: ReturnType<typeof postgres>;
+  __drizzleDb?: ReturnType<typeof drizzle>;
+};
+
+const isProd = process.env.NODE_ENV === "production";
+
+if (!globalForDb.__postgresClient) {
+  globalForDb.__postgresClient = postgres(env.POSTGRES_URL, {
+    // In dev we keep a small pool to avoid exhausting Postgres during HMR.
+    max: isProd ? undefined : 5,
+  });
+}
+
+export const client = globalForDb.__postgresClient;
+export const db =
+  globalForDb.__drizzleDb ?? (globalForDb.__drizzleDb = drizzle(client));
