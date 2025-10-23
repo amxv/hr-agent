@@ -58,17 +58,23 @@ export const getModelProviderOptions = (
 ):
   | {
       openai: OpenAIResponsesProviderOptions;
+      gateway: { only: ["deepinfra"] };
     }
   | {
       anthropic: AnthropicProviderOptions;
+      gateway: { only: ["deepinfra"] };
     }
   | {
       xai: Record<string, never>;
+      gateway: { only: ["deepinfra"] };
     }
   | {
       google: GoogleGenerativeAIProviderOptions;
+      gateway: { only: ["deepinfra"] };
     }
-  | Record<string, never> => {
+  | {
+      gateway: { only: ["deepinfra"] };
+    } => {
   const model = getAppModelDefinition(providerModelId);
   if (model.owned_by === "openai") {
     if (model.reasoning) {
@@ -81,9 +87,10 @@ export const getModelProviderOptions = (
             ? { reasoningEffort: "low" }
             : {}),
         } satisfies OpenAIResponsesProviderOptions,
+        gateway: { only: ["deepinfra"] },
       };
     }
-    return { openai: {} };
+    return { openai: {}, gateway: { only: ["deepinfra"] } };
   }
   if (model.owned_by === "anthropic") {
     if (model.reasoning) {
@@ -94,13 +101,15 @@ export const getModelProviderOptions = (
             budgetTokens: 4096,
           },
         } satisfies AnthropicProviderOptions,
+        gateway: { only: ["deepinfra"] },
       };
     }
-    return { anthropic: {} };
+    return { anthropic: {}, gateway: { only: ["deepinfra"] } };
   }
   if (model.owned_by === "xai") {
     return {
       xai: {},
+      gateway: { only: ["deepinfra"] },
     };
   }
   if (model.owned_by === "google") {
@@ -111,9 +120,10 @@ export const getModelProviderOptions = (
             thinkingBudget: 10_000,
           },
         },
+        gateway: { only: ["deepinfra"] },
       };
     }
-    return { google: {} };
+    return { google: {}, gateway: { only: ["deepinfra"] } };
   }
-  return {};
+  return { gateway: { only: ["deepinfra"] } };
 };

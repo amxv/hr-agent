@@ -117,7 +117,9 @@ export async function retrieveFileContent(
     let content = "";
     if (data.content && Array.isArray(data.content)) {
       content = data.content
-        .filter((chunk: { type: string; text?: string }) => chunk.type === "text")
+        .filter(
+          (chunk: { type: string; text?: string }) => chunk.type === "text"
+        )
         .map((chunk: { text: string }) => chunk.text)
         .join("\n");
     }
