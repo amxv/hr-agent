@@ -92,44 +92,38 @@ export async function retrieveFileContent(
   fileId: string
 ): Promise<string> {
   try {
-    // Use direct HTTP request since SDK doesn't have proper typing yet
-    const url = `https://api.openai.com/v1/vector_stores/${vectorStoreId}/files/${fileId}/content`;
+    const page = await withRetry(() =>
+      openaiClient.vectorStores.files.content(fileId, {
+        vector_store_id: vectorStoreId,
+      })
+    );
 
-    const response = await withRetry(async () => {
-      const res = await fetch(url, {
-        headers: {
-          Authorization: `Bearer ${openaiClient.apiKey}`,
-        },
-      });
+    const textChunks: string[] = [];
 
-      if (!res.ok) {
-        const error = await res.text();
-        throw new Error(`${res.status} ${error}`);
+    for await (const chunk of page) {
+      if (chunk?.type !== "text") {
+        continue;
       }
 
-      return res;
-    });
-
-    // Parse JSON response
-    const data = await response.json();
-
-    // Extract text content from all chunks
-    let content = "";
-    if (data.content && Array.isArray(data.content)) {
-      content = data.content
-        .filter(
-          (chunk: { type: string; text?: string }) => chunk.type === "text"
-        )
-        .map((chunk: { text: string }) => chunk.text)
-        .join("\n");
+      if (typeof chunk.text === "string") {
+        textChunks.push(chunk.text);
+      } else if (chunk.text && typeof chunk.text === "object") {
+        if (typeof (chunk.text as { value?: string }).value === "string") {
+          textChunks.push((chunk.text as { value: string }).value);
+        } else if (typeof (chunk.text as { text?: string }).text === "string") {
+          textChunks.push((chunk.text as { text: string }).text);
+        }
+      }
     }
+
+    const content = textChunks.join("\n");
 
     log.info(
       {
         vectorStoreId,
         fileId,
         contentLength: content.length,
-        chunkCount: data.content?.length || 0,
+        chunkCount: textChunks.length,
       },
       "retrieveFileContent: content retrieved"
     );
