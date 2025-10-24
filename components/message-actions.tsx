@@ -1,6 +1,6 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import equal from "fast-deep-equal";
-import { Pencil, PencilOff } from "lucide-react";
+import { Pencil, X } from "lucide-react";
 import { memo } from "react";
 import { toast } from "sonner";
 import { useCopyToClipboard } from "usehooks-ts";
@@ -78,7 +78,7 @@ export function PureMessageActions({
             onClick={() => onCancelEdit?.()}
             tooltip="Cancel edit"
           >
-            <PencilOff className="h-3.5 w-3.5" />
+            <X className="h-3.5 w-3.5" />
           </Action>
         ) : (
           <Action
