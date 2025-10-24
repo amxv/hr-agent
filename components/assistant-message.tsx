@@ -7,7 +7,6 @@ import {
 } from "./ai-elements/message";
 import { FollowUpSuggestionsParts } from "./followup-suggestions";
 import { MessageActions } from "./message-actions";
-import { SourcesAnnotations } from "./message-annotations";
 import { MessageParts } from "./message-parts";
 import { PartialMessageLoading } from "./partial-message-loading";
 import type { BaseMessageProps } from "./user-message";
@@ -31,11 +30,6 @@ const PureAssistantMessage = ({
         <MessageParts
           isLoading={isLoading}
           isReadonly={isReadonly}
-          messageId={messageId}
-        />
-
-        <SourcesAnnotations
-          key={`sources-annotations-${messageId}`}
           messageId={messageId}
         />
 

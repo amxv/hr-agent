@@ -8,7 +8,6 @@ import {
   useMessagePartsByPartRange,
   useMessagePartTypesById,
 } from "@/lib/stores/hooks";
-import { type Citation, Citations } from "./citations";
 import { CodeInterpreterMessage } from "./code-interpreter-message";
 import { DocumentToolCall, DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
@@ -29,33 +28,6 @@ type MessagePartsProps = {
   isLoading: boolean;
   isReadonly: boolean;
 };
-
-// Helper function to extract citations from message parts
-function extractCitationsFromParts(parts: ChatMessage["parts"]): Citation[] {
-  const citations: Citation[] = [];
-
-  for (const part of parts) {
-    if (
-      part.type === "tool-semanticSearch" &&
-      part.state === "output-available"
-    ) {
-      const { output } = part;
-      if (output && "results" in output && output.results) {
-        for (const result of output.results) {
-          citations.push({
-            documentId: result.documentId,
-            documentName: result.documentName,
-            pageNumber: result.pageNumber,
-            excerpt: result.chunkContent,
-            blobUrl: result.blobUrl,
-          });
-        }
-      }
-    }
-  }
-
-  return citations;
-}
 
 const isLastArtifact = (
   messages: ChatMessage[],
@@ -650,16 +622,6 @@ export function PureMessageParts({
     return result;
   }, [types]);
 
-  // Extract citations from all message parts
-  const citations = useMemo(() => {
-    const messages = chatStore.getState().messages;
-    const message = messages.find((m) => m.id === messageId);
-    if (!message) {
-      return [];
-    }
-    return extractCitationsFromParts(message.parts);
-  }, [chatStore, messageId, types]); // Include types in deps to re-extract when parts change
-
   return (
     <>
       {groups.map((group, groupIdx) => {
@@ -698,7 +660,6 @@ export function PureMessageParts({
           />
         );
       })}
-      {citations.length > 0 && <Citations citations={citations} />}
     </>
   );
 }
