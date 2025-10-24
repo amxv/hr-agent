@@ -7,7 +7,7 @@ import {
   type LucideIcon,
   SearchIcon,
 } from "lucide-react";
-import { memo, useMemo } from "react";
+import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
   ChainOfThought,
   ChainOfThoughtContent,
@@ -19,6 +19,7 @@ import {
 import { Response } from "@/components/ai-elements/response";
 import type { ChatMessage } from "@/lib/ai/types";
 import { useMessagePartsByPartRange } from "@/lib/stores/hooks-message-parts";
+import { formatDuration } from "@/lib/utils/format-duration";
 
 type MessageChainOfThoughtProps = {
   messageId: string;
@@ -229,6 +230,36 @@ function PureMessageChainOfThought({
 }: MessageChainOfThoughtProps) {
   const parts = useMessagePartsByPartRange(messageId, startIdx, endIdx);
 
+  // Track when thinking started
+  const thinkingStartTime = useRef<number | null>(null);
+  const [elapsedTime, setElapsedTime] = useState<number | null>(null);
+
+  // Initialize start time when component mounts or when loading begins
+  useEffect(() => {
+    if (isLoading && thinkingStartTime.current === null) {
+      thinkingStartTime.current = Date.now();
+    }
+  }, [isLoading]);
+
+  // Calculate elapsed time when thinking completes
+  useEffect(() => {
+    if (!isLoading && thinkingStartTime.current !== null) {
+      const elapsed = Date.now() - thinkingStartTime.current;
+      // Only update state if elapsed time actually changed
+      setElapsedTime((prev) => {
+        if (prev === elapsed) return prev;
+        return elapsed;
+      });
+    }
+  }, [isLoading]);
+
+  // Memoize header text to avoid recalculating on every render
+  const headerText = useMemo(() => {
+    if (isLoading) return "Thinking";
+    if (elapsedTime !== null) return `Thought for ${formatDuration(elapsedTime)}`;
+    return "Chain of Thought";
+  }, [isLoading, elapsedTime]);
+
   const steps = useMemo(() => {
     return parts.map((part, index) => {
       const isLastPart = index === parts.length - 1;
@@ -252,7 +283,7 @@ function PureMessageChainOfThought({
       data-testid="message-chain-of-thought"
       defaultOpen={isLoading}
     >
-      <ChainOfThoughtHeader />
+      <ChainOfThoughtHeader>{headerText}</ChainOfThoughtHeader>
       <ChainOfThoughtContent>
         {steps.map((step, index) => {
           const { part, status } = step;
