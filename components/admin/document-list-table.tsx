@@ -105,7 +105,9 @@ export function DocumentListTable() {
             Refresh Status
           </Button>
           <UploadDocumentDialog onSuccess={invalidate}>
-            <Button>Upload Document</Button>
+            <Button size="sm">
+              Upload Document
+            </Button>
           </UploadDocumentDialog>
         </div>
       </CardHeader>
