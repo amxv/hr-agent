@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatStatus } from "ai";
-import { SendIcon, SquareIcon, XIcon } from "lucide-react";
+import { ArrowUp, SquareIcon, XIcon } from "lucide-react";
 import type {
   ComponentProps,
   HTMLAttributes,
@@ -173,7 +173,7 @@ export const PromptInputSubmit = ({
     if (isStoppable) {
       return <SquareIcon className="size-4" />;
     }
-    return <SendIcon className="size-4" />;
+    return <ArrowUp className="size-4" strokeWidth={2.5} />;
   })();
 
   return (
