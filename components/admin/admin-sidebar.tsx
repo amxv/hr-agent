@@ -180,7 +180,7 @@ export const AdminSidebarLink = ({
     <Link
       href={link.href}
       className={cn(
-        "flex items-center justify-start gap-4 group/sidebar py-3 px-2.5 rounded-2xl transition-all duration-200 hover:bg-orange-50/50 hover:border hover:border-primary/60 dark:hover:bg-neutral-700 dark:hover:border-neutral-600 border border-transparent",
+        "flex items-center justify-start gap-4 group/sidebar py-3 px-2.5 rounded-2xl transition-all duration-200 hover:bg-orange-50/50 dark:hover:bg-neutral-700 border border-transparent",
         isActive &&
           "bg-white/50 border-primary/60 dark:bg-neutral-700 dark:border-neutral-600",
         className
