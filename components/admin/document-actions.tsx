@@ -16,6 +16,14 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
 import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
@@ -23,11 +31,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
 import type { UploadedDocument } from "@/lib/db/schema";
 import { useTRPC, useTRPCClient } from "@/trpc/react";
 import { DocumentTagsInput } from "./document-tags-input";
@@ -48,7 +51,7 @@ export function DocumentActions({
 }: DocumentActionsProps) {
   const [showDeleteDialog, setShowDeleteDialog] = useState(false);
   const [showUpdateDialog, setShowUpdateDialog] = useState(false);
-  const [showTagsPopover, setShowTagsPopover] = useState(false);
+  const [showTagsDialog, setShowTagsDialog] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const [tempTags, setTempTags] = useState(document.tags || []);
 
@@ -161,39 +164,39 @@ export function DocumentActions({
         open={showUpdateDialog}
       />
 
-      {/* Edit Tags Popover */}
-      <Popover onOpenChange={setShowTagsPopover} open={showTagsPopover}>
-        <PopoverTrigger asChild>
-          <div />
-        </PopoverTrigger>
-        <PopoverContent align="end" className="w-96">
-          <div className="space-y-4">
-            <div>
-              <h4 className="mb-2 font-medium text-sm">Edit Tags</h4>
-              <DocumentTagsInput
-                onChange={setTempTags}
-                suggestions={tagsData?.tags || []}
-                value={tempTags}
-              />
-            </div>
-            <div className="flex justify-end gap-2">
-              <Button
-                onClick={() => {
-                  setShowTagsPopover(false);
-                  setTempTags(document.tags || []);
-                }}
-                size="sm"
-                variant="outline"
-              >
-                Cancel
-              </Button>
-              <Button onClick={handleSaveTags} size="sm">
-                Save
-              </Button>
-            </div>
+      {/* Edit Tags Dialog */}
+      <Dialog onOpenChange={setShowTagsDialog} open={showTagsDialog}>
+        <DialogContent className="sm:max-w-[500px]">
+          <DialogHeader>
+            <DialogTitle>Edit Tags</DialogTitle>
+            <DialogDescription>
+              Add or remove tags for {document.filename}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="py-4">
+            <DocumentTagsInput
+              onChange={setTempTags}
+              suggestions={tagsData?.tags || []}
+              value={tempTags}
+            />
           </div>
-        </PopoverContent>
-      </Popover>
+          <DialogFooter>
+            <Button
+              onClick={() => {
+                setShowTagsDialog(false);
+                setTempTags(document.tags || []);
+              }}
+              type="button"
+              variant="outline"
+            >
+              Cancel
+            </Button>
+            <Button onClick={handleSaveTags} type="button">
+              Save
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </>
   );
 }

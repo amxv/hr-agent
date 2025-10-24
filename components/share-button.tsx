@@ -1,9 +1,8 @@
 "use client";
 
-import { Copy, GlobeIcon, Loader2, LockIcon, Share } from "lucide-react";
+import { Check, Copy, GlobeIcon, Loader2, LockIcon, Share } from "lucide-react";
 import type React from "react";
 import { useState } from "react";
-import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import {
   Dialog,
@@ -34,6 +33,7 @@ function ShareDialogContent({
   onClose: () => void;
 }) {
   const [step, setStep] = useState<ShareStep>("info");
+  const [copied, setCopied] = useState(false);
   const { data: chat } = useGetChatById(chatId);
   const setVisibilityMutation = useSetVisibility();
 
@@ -69,10 +69,15 @@ function ShareDialogContent({
     );
   };
 
-  const handleCopyLink = () => {
+  const handleCopyLink = async () => {
     const shareUrl = `${window.location.origin}/share/${chatId}`;
-    navigator.clipboard.writeText(shareUrl);
-    toast.success("Share link copied to clipboard");
+    try {
+      await navigator.clipboard.writeText(shareUrl);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy link: ", err);
+    }
   };
 
   return (
@@ -195,8 +200,8 @@ function ShareDialogContent({
               size="sm"
               type="submit"
             >
-              <Copy size={16} />
-              <span className="sr-only">Copy</span>
+              {copied ? <Check size={16} /> : <Copy size={16} />}
+              <span className="sr-only">{copied ? "Copied" : "Copy"}</span>
             </Button>
           </div>
           <div className="flex items-center justify-between pt-2">
