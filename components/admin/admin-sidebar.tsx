@@ -167,7 +167,7 @@ export const AdminSidebarLink = ({
 }: {
   link: Links;
   className?: string;
-  props?: LinkProps;
+  props?: LinkProps<string>;
 }) => {
   const { open, animate } = useAdminSidebar();
   const pathname = usePathname();
@@ -178,7 +178,7 @@ export const AdminSidebarLink = ({
 
   return (
     <Link
-      href={link.href}
+      href={link.href as string}
       className={cn(
         "flex items-center justify-start gap-4 group/sidebar py-3 px-2.5 rounded-2xl transition-all duration-200 hover:bg-orange-50/50 dark:hover:bg-neutral-700 border border-transparent",
         isActive &&
