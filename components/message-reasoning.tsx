@@ -59,6 +59,11 @@ function getIconForStep(content: string): LucideIcon {
   return BrainIcon;
 }
 
+// Helper to escape regex special characters
+function escapeRegExp(str: string): string {
+  return str.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+}
+
 // Helper function to extract a label from the first sentence or line
 function extractLabel(content: string): {
   label: string;
@@ -74,7 +79,7 @@ function extractLabel(content: string): {
     // Remove the label from content, including any markdown formatting
     let remainingContent = content
       .replace(/^\*\*[^*]+\*\*\s*/, "")
-      .replace(new RegExp(`^${label}[.!?]?\\s*`, "i"), "")
+      .replace(new RegExp(`^${escapeRegExp(label)}[.!?]?\\s*`, "i"), "")
       .trim();
 
     // If remaining content is empty or very short, just use the original content
