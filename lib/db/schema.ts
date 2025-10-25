@@ -1,7 +1,8 @@
-import type { InferSelectModel } from "drizzle-orm";
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
 import {
   boolean,
   foreignKey,
+  index,
   integer,
   json,
   pgTable,
@@ -19,11 +20,75 @@ export const userCredit = pgTable("UserCredit", {
     .primaryKey()
     .notNull()
     .references(() => user.id, { onDelete: "cascade" }),
-  credits: integer("credits").notNull().default(100),
+  credits: integer("credits").notNull().default(10_000),
   reservedCredits: integer("reservedCredits").notNull().default(0),
 });
 
 export type UserCredit = InferSelectModel<typeof userCredit>;
+
+export const uploadedDocument = pgTable(
+  "UploadedDocument",
+  {
+    // Identity
+    id: uuid("id").primaryKey().notNull().defaultRandom(),
+    filename: text("filename").notNull(),
+
+    // Ownership and timestamps
+    uploadedBy: text("uploaded_by")
+      .notNull()
+      .references(() => user.id, { onDelete: "cascade" }),
+    uploadedAt: timestamp("uploaded_at").notNull().defaultNow(),
+    updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at"),
+
+    // File metadata
+    fileSize: integer("file_size").notNull(),
+    contentType: text("content_type").notNull(),
+
+    // Storage references
+    blobUrl: text("blob_url").notNull(),
+    blobPathname: text("blob_pathname").notNull(),
+
+    // OpenAI references
+    openaiFileId: text("openai_file_id").notNull().unique(),
+    vectorStoreId: text("vector_store_id").notNull(),
+
+    // Processing status
+    status: varchar("status", {
+      enum: ["uploading", "processing", "ready", "failed"],
+    })
+      .notNull()
+      .default("uploading"),
+    errorMessage: text("error_message"),
+
+    // Organization
+    tags: json("tags").$type<string[]>().notNull().default([]),
+  },
+  (table) => ({
+    uploadedByIdx: index("uploaded_document_uploaded_by_idx").on(
+      table.uploadedBy
+    ),
+    statusIdx: index("uploaded_document_status_idx").on(table.status),
+    vectorStoreIdx: index("uploaded_document_vector_store_id_idx").on(
+      table.vectorStoreId
+    ),
+    deletedAtIdx: index("uploaded_document_deleted_at_idx").on(table.deletedAt),
+  })
+);
+
+export const vectorStoreConfig = pgTable("VectorStoreConfig", {
+  id: text("id").primaryKey().default("singleton"),
+  vectorStoreId: text("vector_store_id").notNull().unique(),
+  createdAt: timestamp("created_at").notNull().defaultNow(),
+  updatedAt: timestamp("updated_at").notNull().defaultNow(),
+});
+
+export type UploadedDocument = InferSelectModel<typeof uploadedDocument>;
+export type InsertUploadedDocument = InferInsertModel<typeof uploadedDocument>;
+export type VectorStoreConfig = InferSelectModel<typeof vectorStoreConfig>;
+export type InsertVectorStoreConfig = InferInsertModel<
+  typeof vectorStoreConfig
+>;
 
 export const chat = pgTable("Chat", {
   id: uuid("id").primaryKey().notNull().defaultRandom(),

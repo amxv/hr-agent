@@ -7,11 +7,13 @@ import type {
 import { z } from "zod";
 import type { codeInterpreter } from "@/lib/ai/tools/code-interpreter";
 import type { deepResearch } from "@/lib/ai/tools/deep-research/deep-research";
+import type { fileRetrieve } from "@/lib/ai/tools/file-retrieve";
 import type { generateImage } from "@/lib/ai/tools/generate-image";
 import type { getWeather } from "@/lib/ai/tools/get-weather";
 import type { readDocument } from "@/lib/ai/tools/read-document";
 import type { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
 import type { retrieve } from "@/lib/ai/tools/retrieve";
+import type { semanticSearch } from "@/lib/ai/tools/semantic-search";
 import type { stockChart } from "@/lib/ai/tools/stock-chart";
 import type { updateDocument } from "@/lib/ai/tools/update-document";
 import type { tavilyWebSearch } from "@/lib/ai/tools/web-search";
@@ -33,6 +35,8 @@ export const toolNameSchema = z.enum([
   "codeInterpreter",
   "generateImage",
   "deepResearch",
+  "semanticSearch",
+  "fileRetrieve",
 ]);
 
 const _ = toolNameSchema.options satisfies ToolName[];
@@ -73,6 +77,8 @@ type webSearchTool = InferUITool<ReturnType<typeof tavilyWebSearch>>;
 type stockChartTool = InferUITool<typeof stockChart>;
 type codeInterpreterTool = InferUITool<typeof codeInterpreter>;
 type retrieveTool = InferUITool<typeof retrieve>;
+type semanticSearchTool = InferUITool<ReturnType<typeof semanticSearch>>;
+type fileRetrieveTool = InferUITool<ReturnType<typeof fileRetrieve>>;
 
 export type ChatTools = {
   getWeather: weatherTool;
@@ -86,6 +92,8 @@ export type ChatTools = {
   stockChart: stockChartTool;
   codeInterpreter: codeInterpreterTool;
   retrieve: retrieveTool;
+  semanticSearch: semanticSearchTool;
+  fileRetrieve: fileRetrieveTool;
 };
 
 type FollowupSuggestions = {

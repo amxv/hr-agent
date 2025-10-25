@@ -53,22 +53,29 @@ const _MODEL_ALIASES = {
   "chat-model-reasoning": getLanguageModel("openai/o3-mini"),
 };
 
+type GatewayProviderSlug =
+  | "anthropic"
+  | "openai"
+  | "deepinfra"
+  | "xai"
+  | "google";
+
+type GatewayProviderOptions = {
+  gateway: { only: GatewayProviderSlug[] };
+};
+
+type ProviderOptionsWithGateway<TOptions> = TOptions & GatewayProviderOptions;
+
+type ModelProviderOptions =
+  | ProviderOptionsWithGateway<{ openai: OpenAIResponsesProviderOptions }>
+  | ProviderOptionsWithGateway<{ anthropic: AnthropicProviderOptions }>
+  | ProviderOptionsWithGateway<{ xai: Record<string, never> }>
+  | ProviderOptionsWithGateway<{ google: GoogleGenerativeAIProviderOptions }>
+  | GatewayProviderOptions;
+
 export const getModelProviderOptions = (
   providerModelId: AppModelId
-):
-  | {
-      openai: OpenAIResponsesProviderOptions;
-    }
-  | {
-      anthropic: AnthropicProviderOptions;
-    }
-  | {
-      xai: Record<string, never>;
-    }
-  | {
-      google: GoogleGenerativeAIProviderOptions;
-    }
-  | Record<string, never> => {
+): ModelProviderOptions => {
   const model = getAppModelDefinition(providerModelId);
   if (model.owned_by === "openai") {
     if (model.reasoning) {
@@ -81,9 +88,10 @@ export const getModelProviderOptions = (
             ? { reasoningEffort: "low" }
             : {}),
         } satisfies OpenAIResponsesProviderOptions,
+        gateway: { only: ["openai"] },
       };
     }
-    return { openai: {} };
+    return { openai: {}, gateway: { only: ["openai"] } };
   }
   if (model.owned_by === "anthropic") {
     if (model.reasoning) {
@@ -94,13 +102,15 @@ export const getModelProviderOptions = (
             budgetTokens: 4096,
           },
         } satisfies AnthropicProviderOptions,
+        gateway: { only: ["anthropic"] },
       };
     }
-    return { anthropic: {} };
+    return { anthropic: {}, gateway: { only: ["anthropic"] } };
   }
   if (model.owned_by === "xai") {
     return {
       xai: {},
+      gateway: { only: ["deepinfra"] },
     };
   }
   if (model.owned_by === "google") {
@@ -111,9 +121,10 @@ export const getModelProviderOptions = (
             thinkingBudget: 10_000,
           },
         },
+        gateway: { only: ["deepinfra"] },
       };
     }
-    return { google: {} };
+    return { google: {}, gateway: { only: ["deepinfra"] } };
   }
-  return {};
+  return { gateway: { only: ["deepinfra"] } };
 };

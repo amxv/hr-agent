@@ -4,7 +4,7 @@ import { headers } from "next/headers";
 import { z } from "zod";
 import { auth } from "@/lib/auth";
 import { db } from "@/lib/db/client";
-import { user } from "@/lib/db/schema";
+import { user, userCredit } from "@/lib/db/schema";
 import { generateSecurePassword } from "@/lib/utils/password";
 import { adminProcedure, createTRPCRouter } from "@/trpc/init";
 
@@ -46,10 +46,14 @@ export const adminRouter = createTRPCRouter({
         }
       }
 
-      // Query users with filters
+      // Query users with filters and credits
       const users = await db
-        .select()
+        .select({
+          user,
+          credits: userCredit.credits,
+        })
         .from(user)
+        .leftJoin(userCredit, eq(user.id, userCredit.userId))
         .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
         .limit(input.limit)
         .offset(input.offset);
@@ -62,16 +66,19 @@ export const adminRouter = createTRPCRouter({
           whereConditions.length > 0 ? and(...whereConditions) : undefined
         );
 
-      // Transform users to include status field
-      const transformedUsers = users.map((u) => ({
-        id: u.id,
-        email: u.email,
-        name: u.name,
-        role: (u.role || "user") as "admin" | "user",
-        status: (u.banned ? "inactive" : "active") as "active" | "inactive",
-        createdAt: u.createdAt,
-        banned: u.banned || false,
-        banReason: u.banReason,
+      // Transform users to include status field and credits
+      const transformedUsers = users.map((row) => ({
+        id: row.user.id,
+        email: row.user.email,
+        name: row.user.name,
+        role: (row.user.role || "user") as "admin" | "user",
+        status: (row.user.banned ? "inactive" : "active") as
+          | "active"
+          | "inactive",
+        createdAt: row.user.createdAt,
+        banned: row.user.banned || false,
+        banReason: row.user.banReason,
+        credits: row.credits ?? 0,
       }));
 
       return {
@@ -255,4 +262,172 @@ export const adminRouter = createTRPCRouter({
 
       return { success: true };
     }),
+
+  // ============================================================================
+  // Document Management Procedures
+  // ============================================================================
+
+  documents: {
+    list: adminProcedure
+      .input(
+        z.object({
+          searchTerm: z.string().optional(),
+          tags: z.array(z.string()).optional(),
+          status: z
+            .enum(["uploading", "processing", "ready", "failed"])
+            .optional(),
+          limit: z.number().min(1).max(100).default(50),
+          offset: z.number().min(0).default(0),
+        })
+      )
+      .query(async ({ input }) => {
+        const { listDocuments } = await import("@/lib/db/queries");
+        return await listDocuments(input);
+      }),
+
+    getById: adminProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ input }) => {
+        const { getUploadedDocumentById } = await import("@/lib/db/queries");
+        const document = await getUploadedDocumentById(input.id);
+
+        if (!document) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Document not found",
+          });
+        }
+
+        return document;
+      }),
+
+    delete: adminProcedure
+      .input(z.object({ id: z.string() }))
+      .mutation(async ({ input }) => {
+        const { getUploadedDocumentById, softDeleteDocument } = await import(
+          "@/lib/db/queries"
+        );
+        const { removeFileFromVectorStore } = await import(
+          "@/lib/openai/vector-store"
+        );
+        const { deleteFileFromOpenAI } = await import("@/lib/openai/files");
+
+        // Get document by ID
+        const document = await getUploadedDocumentById(input.id);
+
+        if (!document) {
+          throw new TRPCError({
+            code: "NOT_FOUND",
+            message: "Document not found",
+          });
+        }
+
+        try {
+          // Remove from vector store
+          await removeFileFromVectorStore(
+            document.vectorStoreId,
+            document.openaiFileId
+          );
+
+          // Delete from OpenAI Files
+          await deleteFileFromOpenAI(document.openaiFileId);
+
+          // Soft delete in database
+          await softDeleteDocument(input.id);
+
+          return { success: true };
+        } catch (error) {
+          console.error("Failed to delete document:", error);
+          throw new TRPCError({
+            code: "INTERNAL_SERVER_ERROR",
+            message: "Failed to delete document",
+          });
+        }
+      }),
+
+    updateTags: adminProcedure
+      .input(
+        z.object({
+          id: z.string(),
+          tags: z.array(z.string()),
+        })
+      )
+      .mutation(async ({ input }) => {
+        const { updateDocumentTags } = await import("@/lib/db/queries");
+        await updateDocumentTags(input.id, input.tags);
+        return { success: true };
+      }),
+
+    getAllTags: adminProcedure.query(async () => {
+      const { getAllTags } = await import("@/lib/db/queries");
+      const tags = await getAllTags();
+      return { tags };
+    }),
+
+    refreshStatus: adminProcedure.mutation(async () => {
+      const {
+        DOCUMENT_PROCESSING_TIMEOUT_MESSAGE,
+        getDocumentsRequiringStatusRefresh,
+        updateDocumentStatus,
+      } = await import("@/lib/db/queries");
+      const { getVectorStoreFileStatus } = await import(
+        "@/lib/openai/vector-store"
+      );
+
+      const processingDocs = await getDocumentsRequiringStatusRefresh();
+
+      if (processingDocs.length === 0) {
+        return {
+          updated: 0,
+          completed: 0,
+          failed: 0,
+        };
+      }
+
+      let completed = 0;
+      let failed = 0;
+
+      // Check each document's individual file status
+      for (const doc of processingDocs) {
+        try {
+          const fileStatus = await getVectorStoreFileStatus(
+            doc.vectorStoreId,
+            doc.openaiFileId
+          );
+
+          if (fileStatus.status === "completed") {
+            await updateDocumentStatus(doc.id, "ready");
+            completed++;
+          } else if (fileStatus.status === "failed") {
+            await updateDocumentStatus(
+              doc.id,
+              "failed",
+              fileStatus.lastError?.message || "Unknown error"
+            );
+            failed++;
+          }
+          if (fileStatus.status === "in_progress") {
+            if (doc.status !== "processing") {
+              await updateDocumentStatus(
+                doc.id,
+                "processing",
+                DOCUMENT_PROCESSING_TIMEOUT_MESSAGE
+              );
+            }
+          }
+        } catch (error) {
+          console.error(
+            `Failed to check status for document ${doc.id}:`,
+            error
+          );
+        }
+      }
+
+      return {
+        updated: completed + failed,
+        completed,
+        failed,
+      };
+    }),
+  },
 });

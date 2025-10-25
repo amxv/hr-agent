@@ -1,7 +1,7 @@
 "use client";
 
 import type { ChatStatus } from "ai";
-import { SendIcon, SquareIcon, XIcon } from "lucide-react";
+import { ArrowUp, SquareIcon, XIcon } from "lucide-react";
 import type {
   ComponentProps,
   HTMLAttributes,
@@ -24,7 +24,7 @@ export type PromptInputProps = HTMLAttributes<HTMLFormElement>;
 export const PromptInput = ({ className, ...props }: PromptInputProps) => (
   <form
     className={cn(
-      "w-full overflow-hidden rounded-xl border bg-muted shadow-xs",
+      "w-full overflow-hidden rounded-3xl border bg-muted shadow-xs",
       className
     )}
     {...props}
@@ -173,12 +173,12 @@ export const PromptInputSubmit = ({
     if (isStoppable) {
       return <SquareIcon className="size-4" />;
     }
-    return <SendIcon className="size-4" />;
+    return <ArrowUp className="size-4" strokeWidth={2.5} />;
   })();
 
   return (
     <Button
-      className={cn("gap-1.5 rounded-2xl", className)}
+      className={cn("gap-1.5 rounded-full", className)}
       data-testid={isStoppable ? "stop-button" : undefined}
       size={size}
       type="button"

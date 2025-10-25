@@ -12,6 +12,7 @@ import {
   CardTitle,
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Skeleton } from "@/components/ui/skeleton";
 import {
   Table,
   TableBody,
@@ -64,7 +65,48 @@ export function UserListTable() {
           />
         </div>
 
-        {isLoading && <div>Loading users...</div>}
+        {isLoading && (
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>Email</TableHead>
+                <TableHead>Name</TableHead>
+                <TableHead>Role</TableHead>
+                <TableHead>Status</TableHead>
+                <TableHead>Credits</TableHead>
+                <TableHead>Created</TableHead>
+                <TableHead>Actions</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {Array.from({ length: 5 }).map((_, index) => (
+                <TableRow key={index}>
+                  <TableCell>
+                    <Skeleton className="h-4 w-48" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-32" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-5 w-20" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-16" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-4 w-24" />
+                  </TableCell>
+                  <TableCell>
+                    <Skeleton className="h-8 w-8" />
+                  </TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        )}
 
         {error && <div>Error loading users: {error.message}</div>}
 
@@ -76,6 +118,7 @@ export function UserListTable() {
                 <TableHead>Name</TableHead>
                 <TableHead>Role</TableHead>
                 <TableHead>Status</TableHead>
+                <TableHead>Credits</TableHead>
                 <TableHead>Created</TableHead>
                 <TableHead>Actions</TableHead>
               </TableRow>
@@ -91,6 +134,7 @@ export function UserListTable() {
                   createdAt: Date;
                   banned: boolean;
                   banReason: string | null;
+                  credits: number;
                 }) => (
                   <TableRow key={user.id}>
                     <TableCell>{user.email}</TableCell>
@@ -113,6 +157,7 @@ export function UserListTable() {
                         {user.status}
                       </Badge>
                     </TableCell>
+                    <TableCell>{user.credits.toLocaleString()}</TableCell>
                     <TableCell>
                       {new Date(user.createdAt).toLocaleDateString()}
                     </TableCell>
