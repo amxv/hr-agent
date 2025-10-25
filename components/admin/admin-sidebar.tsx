@@ -1,15 +1,16 @@
 "use client";
 
-import { cn } from "@/lib/utils";
-import { AnimatePresence, motion } from "motion/react";
 import { Menu, X } from "lucide-react";
+import { AnimatePresence, motion } from "motion/react";
+import type { Route } from "next";
 import Link, { type LinkProps } from "next/link";
 import { usePathname } from "next/navigation";
-import { type ReactNode, createContext, useContext, useState } from "react";
+import { createContext, type ReactNode, useContext, useState } from "react";
+import { cn } from "@/lib/utils";
 
 interface Links {
   label: string;
-  href: string;
+  href: Route;
   icon: ReactNode;
 }
 
@@ -19,9 +20,9 @@ interface AdminSidebarContextProps {
   animate: boolean;
 }
 
-const AdminSidebarContext = createContext<
-  AdminSidebarContextProps | undefined
->(undefined);
+const AdminSidebarContext = createContext<AdminSidebarContextProps | undefined>(
+  undefined
+);
 
 export const useAdminSidebar = () => {
   const context = useContext(AdminSidebarContext);
@@ -66,24 +67,20 @@ export const AdminSidebar = ({
   open?: boolean;
   setOpen?: React.Dispatch<React.SetStateAction<boolean>>;
   animate?: boolean;
-}) => {
-  return (
-    <AdminSidebarProvider open={open} setOpen={setOpen} animate={animate}>
-      {children}
-    </AdminSidebarProvider>
-  );
-};
+}) => (
+  <AdminSidebarProvider animate={animate} open={open} setOpen={setOpen}>
+    {children}
+  </AdminSidebarProvider>
+);
 
 export const AdminSidebarBody = (
   props: React.ComponentProps<typeof motion.div>
-) => {
-  return (
-    <>
-      <AdminDesktopSidebar {...props} />
-      <AdminMobileSidebar {...(props as React.ComponentProps<"div">)} />
-    </>
-  );
-};
+) => (
+  <>
+    <AdminDesktopSidebar {...props} />
+    <AdminMobileSidebar {...(props as React.ComponentProps<"div">)} />
+  </>
+);
 
 export const AdminDesktopSidebar = ({
   className,
@@ -93,13 +90,13 @@ export const AdminDesktopSidebar = ({
   const { open, setOpen, animate } = useAdminSidebar();
   return (
     <motion.div
-      className={cn(
-        "h-full px-4 py-4 hidden md:flex md:flex-col bg-background dark:bg-neutral-800 w-[220px] flex-shrink-0",
-        className
-      )}
       animate={{
         width: animate ? (open ? "220px" : "75px") : "220px",
       }}
+      className={cn(
+        "hidden h-full w-[220px] flex-shrink-0 bg-background px-4 py-4 md:flex md:flex-col dark:bg-neutral-800",
+        className
+      )}
       onMouseEnter={() => setOpen(true)}
       onMouseLeave={() => setOpen(false)}
       {...props}
@@ -119,35 +116,35 @@ export const AdminMobileSidebar = ({
     <>
       <div
         className={cn(
-          "h-10 px-4 py-4 flex flex-row md:hidden items-center bg-white dark:bg-neutral-800 w-full"
+          "flex h-10 w-full flex-row items-center bg-white px-4 py-4 md:hidden dark:bg-neutral-800"
         )}
         {...props}
       >
-        <div className="flex justify-start z-20 w-full">
+        <div className="z-20 flex w-full justify-start">
           <Menu
-            className="text-black dark:text-white cursor-pointer"
+            className="cursor-pointer text-black dark:text-white"
             onClick={() => setOpen(!open)}
           />
         </div>
         <AnimatePresence>
           {open && (
             <motion.div
-              initial={{ x: "-100%", opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
+              className={cn(
+                "fixed inset-0 z-[100] flex h-full w-full flex-col justify-between bg-white p-10 dark:bg-neutral-900",
+                className
+              )}
               exit={{ x: "-100%", opacity: 0 }}
+              initial={{ x: "-100%", opacity: 0 }}
               transition={{
                 duration: 0.3,
                 ease: "easeInOut",
               }}
-              className={cn(
-                "fixed h-full w-full inset-0 bg-white dark:bg-neutral-900 p-10 z-[100] flex flex-col justify-between",
-                className
-              )}
             >
               <button
-                type="button"
-                className="absolute right-10 top-10 z-50 text-black dark:text-white cursor-pointer bg-transparent border-none p-0 m-0"
+                className="absolute top-10 right-10 z-50 m-0 cursor-pointer border-none bg-transparent p-0 text-black dark:text-white"
                 onClick={() => setOpen(!open)}
+                type="button"
               >
                 <X />
               </button>
@@ -178,13 +175,13 @@ export const AdminSidebarLink = ({
 
   return (
     <Link
-      href={link.href as string}
       className={cn(
-        "flex items-center justify-start gap-4 group/sidebar py-3 px-2.5 rounded-2xl transition-all duration-200 hover:bg-orange-50/50 dark:hover:bg-neutral-700 border border-transparent",
+        "group/sidebar flex items-center justify-start gap-4 rounded-2xl border border-transparent px-2.5 py-3 transition-all duration-200 hover:bg-orange-50/50 dark:hover:bg-neutral-700",
         isActive &&
-          "bg-white/50 border-primary/60 dark:bg-neutral-700 dark:border-neutral-600",
+          "border-primary/60 bg-white/50 dark:border-neutral-600 dark:bg-neutral-700",
         className
       )}
+      href={link.href}
       {...props}
     >
       <div className={cn(isActive ? "text-primary dark:text-primary" : "")}>
@@ -196,9 +193,9 @@ export const AdminSidebarLink = ({
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
         className={cn(
-          "text-sm whitespace-pre inline-block !p-0 !m-0",
+          "!p-0 !m-0 inline-block whitespace-pre text-sm",
           isActive
-            ? "text-black dark:text-primary font-medium"
+            ? "font-medium text-black dark:text-primary"
             : "text-black dark:text-white"
         )}
       >

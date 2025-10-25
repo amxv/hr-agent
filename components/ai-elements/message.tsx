@@ -31,7 +31,7 @@ export const MessageContent = ({
     className={cn(
       "flex flex-col gap-2 rounded-2xl px-4 py-3 text-foreground",
       "group-[.is-user]:bg-gray-100 group-[.is-user]:text-foreground dark:group-[.is-user]:bg-card",
-      "group-[.is-assistant]:bg-background group-[.is-assistant]:text-foreground group-[.is-assistant]:text-base",
+      "group-[.is-assistant]:bg-background group-[.is-assistant]:text-base group-[.is-assistant]:text-foreground",
       className
     )}
     {...props}

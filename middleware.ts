@@ -13,7 +13,10 @@ export default async function middleware(req: NextRequest) {
   const isSignupEndpoint = url.pathname.startsWith("/api/auth/sign-up");
   if (isSignupEndpoint) {
     return NextResponse.json(
-      { error: "Self-service registration is disabled. Please contact an administrator." },
+      {
+        error:
+          "Self-service registration is disabled. Please contact an administrator.",
+      },
       { status: 403 }
     );
   }

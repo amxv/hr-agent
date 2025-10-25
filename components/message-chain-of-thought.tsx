@@ -120,10 +120,7 @@ const SemanticSearchStep = memo(function SemanticSearchStep({
   part,
   isActive,
 }: {
-  part: Extract<
-    ChatMessage["parts"][number],
-    { type: "tool-semanticSearch" }
-  >;
+  part: Extract<ChatMessage["parts"][number], { type: "tool-semanticSearch" }>;
   isActive: boolean;
 }) {
   const { state, input } = part;
@@ -148,7 +145,7 @@ const SemanticSearchStep = memo(function SemanticSearchStep({
       return (
         <ChainOfThoughtStep
           icon={SearchIcon}
-          label={`Search failed`}
+          label={"Search failed"}
           status="complete"
         >
           <div className="text-red-500 text-sm">{output.error}</div>
@@ -189,7 +186,7 @@ const SemanticSearchStep = memo(function SemanticSearchStep({
                 <FileTextIcon className="size-3.5 shrink-0" />
                 <span className="min-w-0 truncate">{result.documentName}</span>
                 {result.pageNumber && (
-                  <span className="shrink-0 text-muted-foreground text-[10px]">
+                  <span className="shrink-0 text-[10px] text-muted-foreground">
                     (p.{result.pageNumber})
                   </span>
                 )}
@@ -256,22 +253,25 @@ function PureMessageChainOfThought({
   // Memoize header text to avoid recalculating on every render
   const headerText = useMemo(() => {
     if (isLoading) return "Thinking";
-    if (elapsedTime !== null) return `Thought for ${formatDuration(elapsedTime)}`;
+    if (elapsedTime !== null)
+      return `Thought for ${formatDuration(elapsedTime)}`;
     return "Chain of Thought";
   }, [isLoading, elapsedTime]);
 
-  const steps = useMemo(() => {
-    return parts.map((part, index) => {
-      const isLastPart = index === parts.length - 1;
-      const isActive = isLoading && isLastPart;
+  const steps = useMemo(
+    () =>
+      parts.map((part, index) => {
+        const isLastPart = index === parts.length - 1;
+        const isActive = isLoading && isLastPart;
 
-      return {
-        part,
-        isActive,
-        status: isActive ? ("active" as const) : ("complete" as const),
-      };
-    });
-  }, [parts, isLoading]);
+        return {
+          part,
+          isActive,
+          status: isActive ? ("active" as const) : ("complete" as const),
+        };
+      }),
+    [parts, isLoading]
+  );
 
   if (steps.length === 0) {
     return null;

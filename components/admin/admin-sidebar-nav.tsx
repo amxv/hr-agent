@@ -1,5 +1,10 @@
 "use client";
 
+import { FileText, Home, Users } from "lucide-react";
+import { motion } from "motion/react";
+import Image from "next/image";
+import type { Route } from "next";
+import { useState } from "react";
 import {
   AdminSidebar,
   AdminSidebarBody,
@@ -8,10 +13,6 @@ import {
 } from "@/components/admin/admin-sidebar";
 import { HeaderUserNav } from "@/components/sidebar-user-nav";
 import { useSession } from "@/providers/session-provider";
-import { FileText, Home, Users } from "lucide-react";
-import { motion } from "motion/react";
-import Image from "next/image";
-import { useState } from "react";
 
 function AdminUserButton() {
   const { open, animate } = useAdminSidebar();
@@ -22,14 +23,14 @@ function AdminUserButton() {
   }
 
   return (
-    <div className="flex items-center justify-start gap-3 py-3 pl-1 pr-2.5">
+    <div className="flex items-center justify-start gap-3 py-3 pr-2.5 pl-1">
       <HeaderUserNav user={session.user} />
       <motion.span
         animate={{
           display: animate ? (open ? "inline-block" : "none") : "inline-block",
           opacity: animate ? (open ? 1 : 0) : 1,
         }}
-        className="text-sm whitespace-pre inline-block !p-0 !m-0 text-black dark:text-white truncate"
+        className="!p-0 !m-0 inline-block truncate whitespace-pre text-black text-sm dark:text-white"
       >
         {session.user.email}
       </motion.span>
@@ -43,16 +44,16 @@ export function AdminSidebarNav() {
   const links = [
     {
       label: "Users",
-      href: "/admin/users",
+      href: "/admin/users" as Route,
       icon: (
-        <Users className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <Users className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
     {
       label: "Documents",
-      href: "/admin/documents",
+      href: "/admin/documents" as Route,
       icon: (
-        <FileText className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <FileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
   ];
@@ -60,9 +61,9 @@ export function AdminSidebarNav() {
   const bottomLinks = [
     {
       label: "Home",
-      href: "/",
+      href: "/" as Route,
       icon: (
-        <Home className="text-neutral-700 dark:text-neutral-200 h-5 w-5 flex-shrink-0" />
+        <Home className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
   ];
@@ -70,7 +71,7 @@ export function AdminSidebarNav() {
   return (
     <AdminSidebar open={open} setOpen={setOpen}>
       <AdminSidebarBody className="justify-between gap-10">
-        <div className="flex flex-col flex-1 overflow-y-auto overflow-x-hidden scrollbar-hide">
+        <div className="scrollbar-hide flex flex-1 flex-col overflow-y-auto overflow-x-hidden">
           <div className="mt-6 flex flex-col gap-2">
             {links.map((link, idx) => (
               <AdminSidebarLink key={`${link.label}-${idx}`} link={link} />

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import type { Route } from "next";
 import { cn } from "@/lib/utils";
 
 type LinkMarkdownProps = {
@@ -32,8 +33,7 @@ export function LinkMarkdown({
   return (
     <Link
       className={cn("text-blue-500 hover:underline", className)}
-      // @ts-expect-error - href is a valid URL
-      href={href}
+      href={href as Route}
       {...props}
     >
       {children}

@@ -88,7 +88,7 @@ export function DocumentActions({
       });
       toast.success("Tags updated successfully");
       onTagsUpdate();
-      setShowTagsPopover(false);
+      setShowTagsDialog(false);
     } catch (error: unknown) {
       const err = error as { message?: string };
       toast.error(err.message || "Failed to update tags");
@@ -114,7 +114,7 @@ export function DocumentActions({
             <Pencil className="mr-2 size-4" />
             Update
           </DropdownMenuItem>
-          <DropdownMenuItem onClick={() => setShowTagsPopover(true)}>
+          <DropdownMenuItem onClick={() => setShowTagsDialog(true)}>
             <Tags className="mr-2 size-4" />
             Edit Tags
           </DropdownMenuItem>
