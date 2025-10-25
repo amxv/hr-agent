@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { MoreHorizontal, Pencil, Tags, Trash2 } from "lucide-react";
+import { ExternalLink, MoreHorizontal, Pencil, Tags, Trash2 } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
 import {
@@ -110,6 +110,16 @@ export function DocumentActions({
         <DropdownMenuContent align="end">
           <DropdownMenuLabel>Actions</DropdownMenuLabel>
           <DropdownMenuSeparator />
+          <DropdownMenuItem asChild>
+            <a
+              href={document.blobUrl}
+              rel="noopener noreferrer"
+              target="_blank"
+            >
+              <ExternalLink className="mr-2 size-4" />
+              View Document
+            </a>
+          </DropdownMenuItem>
           <DropdownMenuItem onClick={() => setShowUpdateDialog(true)}>
             <Pencil className="mr-2 size-4" />
             Update
