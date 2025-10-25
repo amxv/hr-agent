@@ -1,6 +1,6 @@
 "use client";
-import { Coins } from "lucide-react";
 import Image from "next/image";
+import Link from "next/link";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -10,7 +10,6 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import { useGetCredits } from "@/hooks/chat-sync-hooks";
 import type { Session } from "@/lib/auth";
 import authClient from "@/lib/auth-client";
 
@@ -20,7 +19,6 @@ export function HeaderUserNav({
   user: NonNullable<Session["user"]>;
 }) {
   const { setTheme, theme } = useTheme();
-  const { credits } = useGetCredits();
 
   return (
     <DropdownMenu>
@@ -45,19 +43,22 @@ export function HeaderUserNav({
           <span className="font-medium">{user.email}</span>
         </DropdownMenuItem>
         <DropdownMenuSeparator />
-        <DropdownMenuItem disabled>
-          <div className="flex items-center text-muted-foreground">
-            <Coins className="mr-1 size-4" />
-            <span>Credits: {credits ?? "Loading..."}</span>
-          </div>
-        </DropdownMenuItem>
-        <DropdownMenuSeparator />
         <DropdownMenuItem
           className="cursor-pointer"
           onSelect={() => setTheme(theme === "dark" ? "light" : "dark")}
         >
           {`Toggle ${theme === "light" ? "dark" : "light"} mode`}
         </DropdownMenuItem>
+        {user.role === "admin" && (
+          <>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <Link className="cursor-pointer" href={"/admin" as string}>
+                Admin Panel
+              </Link>
+            </DropdownMenuItem>
+          </>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem asChild>
           <button

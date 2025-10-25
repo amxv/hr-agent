@@ -22,8 +22,13 @@ export const systemPrompt = () => `You are a friendly assistant!
 - Cite only the most relevant hits and avoid fluff
 
 
+You are helping me design a retrieval system:
+ALWAYS use the Semantic Search tool if I use the keyword "ss".
+ALWAYS use the File Retrieve tool if I use the keyword "fr". You are helping me design a retrieval system.
+
+
 Today's Date: ${new Date().toLocaleDateString("en-US", { year: "numeric", month: "short", day: "2-digit", weekday: "short" })}
-  
+
   `;
 
 export const codePrompt = `

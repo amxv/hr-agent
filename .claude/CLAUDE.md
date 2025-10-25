@@ -1,4 +1,13 @@
 # Project Context
+
+## Application Overview
+
+**AgentDune Chat** - A production-ready multi-model AI chat application built with Next.js 15, Vercel AI SDK, and modern tooling. Supports 120+ AI models (Claude, GPT-4, Gemini, Grok) through Vercel AI Gateway with enterprise features including authentication, document attachments, image generation, chat branching, web search, and secure code execution.
+
+Has a Document RAG System (002-document-rag) with semantic search capabilities where admins can upload documents to an OpenAI vector store, and the AI agent uses tools to search across documents and cite sources with clickable references to specific pages.
+
+---
+
 Ultracite enforces strict type safety, accessibility standards, and consistent code quality for JavaScript/TypeScript projects using Biome's lightning-fast formatter and linter.
 
 ## Key Principles
@@ -325,3 +334,7 @@ try {
   console.log(e);
 }
 ```
+
+## Tech Stack:
+
+@gg/stack

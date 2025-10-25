@@ -35,5 +35,5 @@ export function getNewChatShortcutText() {
   }
 
   const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-  return isMac ? "Cmd+Shift+O" : "Ctrl+Shift+O";
+  return isMac ? "⌘⇧O" : "Ctrl+Shift+O";
 }

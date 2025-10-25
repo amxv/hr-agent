@@ -13,7 +13,7 @@ function getSearchShortcutText() {
   }
 
   const isMac = navigator.platform.toUpperCase().indexOf("MAC") >= 0;
-  return isMac ? "Cmd+K" : "Ctrl+K";
+  return isMac ? "⌘K" : "Ctrl+K";
 }
 
 export function SearchChatsButton() {
@@ -42,14 +42,14 @@ export function SearchChatsButton() {
   return (
     <>
       <SidebarMenuButton
-        className="w-full justify-start"
+        className="w-full cursor-pointer justify-start"
         onClick={() => setOpen(true)}
       >
         <SearchIcon className="h-4 w-4" />
         <span className="transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
           Search chats
         </span>
-        <span className="ml-auto text-muted-foreground text-xs transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
+        <span className="ml-auto text-muted-foreground text-xs transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:pointer-events-none group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
           {shortcutText}
         </span>
       </SidebarMenuButton>

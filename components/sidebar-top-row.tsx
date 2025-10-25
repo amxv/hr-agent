@@ -2,12 +2,16 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { useTheme } from "next-themes";
 import { useSidebar } from "@/components/ui/sidebar";
+import { useMounted } from "@/hooks/use-mounted";
 import { useChatId } from "@/providers/chat-id-provider";
 
 export function SidebarTopRow() {
   const { setOpenMobile, open, openMobile } = useSidebar();
   const { refreshChatID } = useChatId();
+  const { theme } = useTheme();
+  const mounted = useMounted();
 
   return (
     <Link
@@ -23,7 +27,7 @@ export function SidebarTopRow() {
           alt="AgentDune Chat"
           className="h-6 w-6 shrink-0"
           height={24}
-          src="/icon.svg"
+          src={mounted && theme === "dark" ? "/icon-dark.svg" : "/icon.svg"}
           width={24}
         />
         <span className="overflow-hidden whitespace-nowrap transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">

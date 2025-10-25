@@ -27,6 +27,8 @@ export default async function ChatLayout({
               name: raw.user.name ?? null,
               email: raw.user.email ?? null,
               image: raw.user.image ?? null,
+              role: raw.user.role ?? null,
+              banned: raw.user.banned ?? null,
             }
           : undefined,
         expires: raw.session?.expiresAt

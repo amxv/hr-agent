@@ -25,13 +25,13 @@ const AVAILABLE_MODELS: AppModelId[] = [
 ];
 
 export const ANONYMOUS_LIMITS = {
-  CREDITS: env.NEXT_PUBLIC_NODE_ENV === "production" ? 100 : 1000,
+  CREDITS: 10_000,
   AVAILABLE_MODELS,
   AVAILABLE_TOOLS: ["createDocument", "updateDocument"] satisfies ToolName[],
   SESSION_DURATION: 2_147_483_647, // Max session time
   // Rate limiting for anonymous users based on IP
   RATE_LIMIT: {
     REQUESTS_PER_MINUTE: env.NEXT_PUBLIC_NODE_ENV === "production" ? 5 : 60,
-    REQUESTS_PER_MONTH: env.NEXT_PUBLIC_NODE_ENV === "production" ? 100 : 1000, // Same as CREDITS
+    REQUESTS_PER_MONTH: env.NEXT_PUBLIC_NODE_ENV === "production" ? 100 : 1000,
   },
 } as const;
