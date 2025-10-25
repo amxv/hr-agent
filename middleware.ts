@@ -8,6 +8,16 @@ export const runtime = "nodejs";
 export default async function middleware(req: NextRequest) {
   // Mirror previous authorized() logic using Better Auth session
   const url = req.nextUrl;
+
+  // Block signup API endpoint - only admins can create users
+  const isSignupEndpoint = url.pathname.startsWith("/api/auth/sign-up");
+  if (isSignupEndpoint) {
+    return NextResponse.json(
+      { error: "Self-service registration is disabled. Please contact an administrator." },
+      { status: 403 }
+    );
+  }
+
   const isApiAuthRoute = url.pathname.startsWith("/api/auth");
   if (isApiAuthRoute) {
     return;
@@ -71,25 +81,29 @@ export default async function middleware(req: NextRequest) {
   if (isOnSharePage) {
     return;
   }
+  if (isOnPrivacyPage || isOnTermsPage) {
+    return;
+  }
+
+  // Require authentication for models and compare pages
   if (isOnModels || isOnCompare) {
     // Redirect to home if model selection is disabled
     if (env.DISABLE_MODEL_SELECTION) {
       return NextResponse.redirect(new URL("/", url));
     }
-    return;
-  }
-  if (isOnPrivacyPage || isOnTermsPage) {
+    // Require authentication
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", url));
+    }
     return;
   }
 
+  // Require authentication for all chat routes including home page
   if (isOnChat) {
-    if (url.pathname === "/") {
-      return;
+    if (!isLoggedIn) {
+      return NextResponse.redirect(new URL("/login", url));
     }
-    if (isLoggedIn) {
-      return;
-    }
-    return NextResponse.redirect(new URL("/login", url));
+    return;
   }
 
   if (isLoggedIn) {
