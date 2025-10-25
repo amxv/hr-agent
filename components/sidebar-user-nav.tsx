@@ -1,6 +1,7 @@
 "use client";
 import Image from "next/image";
 import Link from "next/link";
+import type { Route } from "next";
 import { useTheme } from "next-themes";
 import { Button } from "@/components/ui/button";
 import {
@@ -53,7 +54,7 @@ export function HeaderUserNav({
           <>
             <DropdownMenuSeparator />
             <DropdownMenuItem asChild>
-              <Link className="cursor-pointer" href={"/admin" as string}>
+              <Link className="cursor-pointer" href={"/admin" as Route}>
                 Admin Panel
               </Link>
             </DropdownMenuItem>

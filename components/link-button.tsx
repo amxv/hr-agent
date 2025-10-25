@@ -1,5 +1,6 @@
 import type { VariantProps } from "class-variance-authority";
 import Link from "next/link";
+import type { Route } from "next";
 import type * as React from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -16,7 +17,7 @@ function LinkButton({
   className?: string;
   variant?: VariantProps<typeof buttonVariants>["variant"];
   size?: VariantProps<typeof buttonVariants>["size"];
-  href: string;
+  href: Route | string;
   disabled?: boolean;
   children?: React.ReactNode;
   props?: React.AnchorHTMLAttributes<HTMLAnchorElement>;
@@ -28,8 +29,7 @@ function LinkButton({
         buttonVariants({ variant, size, className }),
         disabled && "pointer-events-none opacity-50"
       )}
-      // @ts-expect-error - href is a valid URL
-      href={href}
+      href={href as Route}
       tabIndex={disabled ? -1 : undefined}
       {...props}
     >

@@ -16,13 +16,20 @@ const _telemetryConfig = {
   },
 };
 
-const gatewayProvider = createGateway({
-  apiKey: env.AI_GATEWAY_API_KEY,
-});
+let gatewayProvider: ReturnType<typeof createGateway> | null = null;
+
+function getGatewayProvider() {
+  if (!gatewayProvider) {
+    gatewayProvider = createGateway({
+      apiKey: env.AI_GATEWAY_API_KEY,
+    });
+  }
+  return gatewayProvider;
+}
 
 export const getLanguageModel = (modelId: ModelId) => {
   const model = getAppModelDefinition(modelId);
-  const languageProvider = gatewayProvider(model.id);
+  const languageProvider = getGatewayProvider()(model.id);
 
   // Wrap with reasoning middleware if the model supports reasoning
   if (model.reasoning && model.owned_by === "xai") {
@@ -44,13 +51,6 @@ export const getImageModel = (modelId: ImageModelId) => {
     return openai.image(modelIdShort);
   }
   throw new Error(`Provider ${model.owned_by} not supported`);
-};
-
-const _MODEL_ALIASES = {
-  "chat-model": getLanguageModel("openai/gpt-4o-mini"),
-  "title-model": getLanguageModel("openai/gpt-4o-mini"),
-  "artifact-model": getLanguageModel("openai/gpt-4o-mini"),
-  "chat-model-reasoning": getLanguageModel("openai/o3-mini"),
 };
 
 type GatewayProviderSlug =
