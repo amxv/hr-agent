@@ -8,17 +8,17 @@ import { usePathname } from "next/navigation";
 import { createContext, type ReactNode, useContext, useState } from "react";
 import { cn } from "@/lib/utils";
 
-interface Links {
+type Links = {
   label: string;
   href: Route;
   icon: ReactNode;
-}
+};
 
-interface AdminSidebarContextProps {
+type AdminSidebarContextProps = {
   open: boolean;
   setOpen: React.Dispatch<React.SetStateAction<boolean>>;
   animate: boolean;
-}
+};
 
 const AdminSidebarContext = createContext<AdminSidebarContextProps | undefined>(
   undefined
@@ -113,47 +113,45 @@ export const AdminMobileSidebar = ({
 }: React.ComponentProps<"div">) => {
   const { open, setOpen } = useAdminSidebar();
   return (
-    <>
-      <div
-        className={cn(
-          "flex h-10 w-full flex-row items-center bg-white px-4 py-4 md:hidden dark:bg-neutral-800"
-        )}
-        {...props}
-      >
-        <div className="z-20 flex w-full justify-start">
-          <Menu
-            className="cursor-pointer text-black dark:text-white"
-            onClick={() => setOpen(!open)}
-          />
-        </div>
-        <AnimatePresence>
-          {open && (
-            <motion.div
-              animate={{ x: 0, opacity: 1 }}
-              className={cn(
-                "fixed inset-0 z-[100] flex h-full w-full flex-col justify-between bg-white p-10 dark:bg-neutral-900",
-                className
-              )}
-              exit={{ x: "-100%", opacity: 0 }}
-              initial={{ x: "-100%", opacity: 0 }}
-              transition={{
-                duration: 0.3,
-                ease: "easeInOut",
-              }}
-            >
-              <button
-                className="absolute top-10 right-10 z-50 m-0 cursor-pointer border-none bg-transparent p-0 text-black dark:text-white"
-                onClick={() => setOpen(!open)}
-                type="button"
-              >
-                <X />
-              </button>
-              {children}
-            </motion.div>
-          )}
-        </AnimatePresence>
+    <div
+      className={cn(
+        "flex h-10 w-full flex-row items-center bg-white px-4 py-4 md:hidden dark:bg-neutral-800"
+      )}
+      {...props}
+    >
+      <div className="z-20 flex w-full justify-start">
+        <Menu
+          className="cursor-pointer text-black dark:text-white"
+          onClick={() => setOpen(!open)}
+        />
       </div>
-    </>
+      <AnimatePresence>
+        {open && (
+          <motion.div
+            animate={{ x: 0, opacity: 1 }}
+            className={cn(
+              "fixed inset-0 z-[100] flex h-full w-full flex-col justify-between bg-white p-10 dark:bg-neutral-900",
+              className
+            )}
+            exit={{ x: "-100%", opacity: 0 }}
+            initial={{ x: "-100%", opacity: 0 }}
+            transition={{
+              duration: 0.3,
+              ease: "easeInOut",
+            }}
+          >
+            <button
+              className="absolute top-10 right-10 z-50 m-0 cursor-pointer border-none bg-transparent p-0 text-black dark:text-white"
+              onClick={() => setOpen(!open)}
+              type="button"
+            >
+              <X />
+            </button>
+            {children}
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </div>
   );
 };
 

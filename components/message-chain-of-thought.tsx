@@ -244,7 +244,9 @@ function PureMessageChainOfThought({
       const elapsed = Date.now() - thinkingStartTime.current;
       // Only update state if elapsed time actually changed
       setElapsedTime((prev) => {
-        if (prev === elapsed) return prev;
+        if (prev === elapsed) {
+          return prev;
+        }
         return elapsed;
       });
     }
@@ -252,9 +254,12 @@ function PureMessageChainOfThought({
 
   // Memoize header text to avoid recalculating on every render
   const headerText = useMemo(() => {
-    if (isLoading) return "Thinking";
-    if (elapsedTime !== null)
+    if (isLoading) {
+      return "Thinking";
+    }
+    if (elapsedTime !== null) {
       return `Thought for ${formatDuration(elapsedTime)}`;
+    }
     return "Chain of Thought";
   }, [isLoading, elapsedTime]);
 
@@ -291,7 +296,9 @@ function PureMessageChainOfThought({
           // Reasoning parts
           if (part.type === "reasoning") {
             const text = part.text;
-            if (!text) return null;
+            if (!text) {
+              return null;
+            }
 
             return (
               <ReasoningStepItem

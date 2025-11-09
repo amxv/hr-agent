@@ -589,7 +589,9 @@ export function PureMessageParts({
 
     for (let i = 0; i < types.length; i++) {
       if (types[i] === "reasoning" || cotTools.has(types[i])) {
-        if (cotStart === -1) cotStart = i;
+        if (cotStart === -1) {
+          cotStart = i;
+        }
         cotEnd = i;
       }
     }
