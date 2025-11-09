@@ -14,7 +14,7 @@ import {
 import { formatNumberCompact } from "@/lib/utils/format-number-compact";
 import { getProviderIconUrl } from "../get-provider-icon-url";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const contentType = "image/png";
 export const size = OG_SIZE;
 
