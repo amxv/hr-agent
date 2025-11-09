@@ -338,3 +338,4 @@ try {
 ## Tech Stack:
 
 @gg/stack
+## If bun is not installed, run `npm install -g bun`. Don't use the curl command because it won't work.

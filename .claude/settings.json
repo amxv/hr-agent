@@ -1,0 +1,15 @@
+{
+  "hooks": {
+    "SessionStart": [
+      {
+        "matcher": "startup",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "if [ \"$CLAUDE_CODE_REMOTE\" != \"true\" ]; then exit 0; fi; if [ -f \"bun.lockb\" ] || [ -f \"bun.lock\" ]; then npm install -g bun && bun install; elif [ -f \"pnpm-lock.yaml\" ]; then pnpm install; elif [ -f \"yarn.lock\" ]; then yarn install; elif [ -f \"package-lock.json\" ]; then npm install; fi"
+          }
+        ]
+      }
+    ]
+  }
+}
