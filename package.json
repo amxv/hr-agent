@@ -29,6 +29,7 @@
   "dependencies": {
     "@ai-models/vercel-gateway": "workspace:*",
     "@ai-sdk-tools/devtools": "^0.8.4",
+    "@ai-sdk-tools/store": "^1.0.8",
     "@ai-sdk/anthropic": "^2.0.37",
     "@ai-sdk/gateway": "1.0.23",
     "@ai-sdk/google": "^2.0.23",
