@@ -338,3 +338,9 @@ try {
 ## Tech Stack:
 
 @gg/stack
+
+## If bun is not installed in your environment, install it using the following command:
+
+```bash
+curl -fsSL https://bun.com/install | bash
+```
