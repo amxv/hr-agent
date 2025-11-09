@@ -339,8 +339,4 @@ try {
 
 @gg/stack
 
-## If bun is not installed in your environment, install it using the following command:
-
-```bash
-curl -fsSL https://bun.com/install | bash
-```
+## If bun is not installed, run `npm install -g bun`. Don't use the curl command because it won't work.
