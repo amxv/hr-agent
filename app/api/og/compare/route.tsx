@@ -24,7 +24,7 @@ import {
 } from "@/lib/og/shared";
 import { getProviderIconUrl } from "../../../(models)/get-provider-icon-url";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const size = OG_SIZE;
 

@@ -7,7 +7,7 @@ import {
   OG_SIZE,
 } from "@/lib/og/shared";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 
 const size = OG_SIZE;
 

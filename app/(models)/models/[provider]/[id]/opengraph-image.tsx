@@ -23,7 +23,7 @@ import {
 } from "@/lib/og/shared";
 import { getProviderIconUrl } from "../../../get-provider-icon-url";
 
-export const runtime = "edge";
+export const runtime = "nodejs";
 export const contentType = "image/png";
 export const size = OG_SIZE;
 const TITLE_MAX_LENGTH = 30;
