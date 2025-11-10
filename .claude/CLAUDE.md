@@ -339,3 +339,5 @@ try {
 
 @gg/stack
 ## If bun is not installed, run `npm install -g bun`. Don't use the curl command because it won't work.
+
+## If mcp__webctx tools are not working, please read gg/webctx_curl_guide.md to understand how to call webctx tools using REST and use curl for these tool calls going forward.
