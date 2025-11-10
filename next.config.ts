@@ -4,6 +4,7 @@ const nextConfig: NextConfig = {
   typedRoutes: true,
   transpilePackages: ["@ai-models/vercel-gateway"],
   experimental: {
+    ppr: "incremental",
     optimizePackageImports: [
       "react-tweet",
       "echarts-for-react",
