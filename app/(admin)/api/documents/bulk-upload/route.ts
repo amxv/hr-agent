@@ -145,9 +145,6 @@ export async function POST(request: Request) {
     });
   } catch (error) {
     console.error("Bulk upload failed:", error);
-    return NextResponse.json(
-      { error: "Bulk upload failed" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Bulk upload failed" }, { status: 500 });
   }
 }

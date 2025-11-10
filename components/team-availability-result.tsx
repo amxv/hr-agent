@@ -1,17 +1,17 @@
 "use client";
 
 import {
+  AlertTriangle,
+  Calendar,
+  CheckCircle,
+  Clock,
   Loader2,
   Users,
-  Calendar,
-  AlertTriangle,
-  CheckCircle,
   XCircle,
-  Clock,
 } from "lucide-react";
-import { Card } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
+import { Badge } from "@/components/ui/badge";
+import { Card } from "@/components/ui/card";
 import { Progress } from "@/components/ui/progress";
 import type {
   TeamAvailabilityInput,
@@ -75,29 +75,33 @@ export function TeamAvailabilityResult({
                 <br />
                 {criticalDates.length} date(s) have less than 70% team coverage:
                 <br />
-                {criticalDates.map((d) => new Date(d).toLocaleDateString()).join(", ")}
+                {criticalDates
+                  .map((d) => new Date(d).toLocaleDateString())
+                  .join(", ")}
               </AlertDescription>
             </Alert>
           )}
 
           {/* Team Absences */}
           <div className="space-y-2">
-            <h3 className="font-medium text-sm flex items-center gap-2">
+            <h3 className="flex items-center gap-2 font-medium text-sm">
               <Users className="h-4 w-4" />
               Team Absences ({absences.length})
             </h3>
             {absences.length === 0 ? (
-              <Card className="p-3 text-center text-sm text-muted-foreground">
+              <Card className="p-3 text-center text-muted-foreground text-sm">
                 No absences scheduled for this period
               </Card>
             ) : (
               <div className="grid gap-2">
                 {absences.map((absence, idx) => (
-                  <Card key={idx} className="p-3">
+                  <Card className="p-3" key={idx}>
                     <div className="flex items-start justify-between">
                       <div className="space-y-1">
-                        <p className="font-medium text-sm">{absence.employeeName}</p>
-                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                        <p className="font-medium text-sm">
+                          {absence.employeeName}
+                        </p>
+                        <div className="flex items-center gap-2 text-muted-foreground text-xs">
                           <Calendar className="h-3 w-3" />
                           <span>
                             {new Date(absence.startDate).toLocaleDateString()} -{" "}
@@ -107,7 +111,7 @@ export function TeamAvailabilityResult({
                         </div>
                       </div>
                       <div className="flex gap-2">
-                        <Badge variant="outline" className="capitalize">
+                        <Badge className="capitalize" variant="outline">
                           {absence.leaveType}
                         </Badge>
                         <Badge
@@ -130,18 +134,18 @@ export function TeamAvailabilityResult({
           {/* Coverage Summary with Progress Bars */}
           <div className="space-y-2">
             <h3 className="font-medium text-sm">Team Coverage</h3>
-            <div className="space-y-2 max-h-48 overflow-y-auto">
+            <div className="max-h-48 space-y-2 overflow-y-auto">
               {coverageSummary.map((coverage) => (
                 <Card
-                  key={coverage.date}
                   className={`p-2 ${
                     coverage.coveragePercentage < 70
                       ? "border-red-300 bg-red-50 dark:border-red-800 dark:bg-red-950"
                       : ""
                   }`}
+                  key={coverage.date}
                 >
-                  <div className="flex items-center justify-between mb-1">
-                    <span className="text-xs font-medium">
+                  <div className="mb-1 flex items-center justify-between">
+                    <span className="font-medium text-xs">
                       {new Date(coverage.date).toLocaleDateString("en-US", {
                         weekday: "short",
                         month: "short",
@@ -152,8 +156,11 @@ export function TeamAvailabilityResult({
                       {coverage.available}/{coverage.totalTeamSize} available
                     </span>
                   </div>
-                  <Progress value={coverage.coveragePercentage} className="h-2" />
-                  <p className="text-xs text-muted-foreground mt-1">
+                  <Progress
+                    className="h-2"
+                    value={coverage.coveragePercentage}
+                  />
+                  <p className="mt-1 text-muted-foreground text-xs">
                     {coverage.coveragePercentage}% coverage
                   </p>
                 </Card>
@@ -171,7 +178,7 @@ export function TeamAvailabilityResult({
       return (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <h3 className="font-medium text-sm flex items-center gap-2">
+            <h3 className="flex items-center gap-2 font-medium text-sm">
               <Clock className="h-4 w-4" />
               Pending Approvals
             </h3>
@@ -179,31 +186,33 @@ export function TeamAvailabilityResult({
           </div>
 
           {pendingRequests.length === 0 ? (
-            <Card className="p-4 text-center text-sm text-muted-foreground">
-              <CheckCircle className="h-8 w-8 mx-auto mb-2 text-green-500" />
+            <Card className="p-4 text-center text-muted-foreground text-sm">
+              <CheckCircle className="mx-auto mb-2 h-8 w-8 text-green-500" />
               No pending approval requests
             </Card>
           ) : (
             <div className="space-y-3">
               {pendingRequests.map((request) => (
                 <Card
-                  key={request.requestId}
                   className={`p-3 ${
                     request.conflicts.hasConflict
-                      ? "border-l-4 border-amber-400"
-                      : "border-l-4 border-green-400"
+                      ? "border-amber-400 border-l-4"
+                      : "border-green-400 border-l-4"
                   }`}
+                  key={request.requestId}
                 >
                   <div className="space-y-2">
                     {/* Header */}
                     <div className="flex items-start justify-between">
                       <div>
-                        <p className="font-medium text-sm">{request.employeeName}</p>
-                        <p className="text-xs text-muted-foreground">
+                        <p className="font-medium text-sm">
+                          {request.employeeName}
+                        </p>
+                        <p className="text-muted-foreground text-xs">
                           Request ID: {request.requestId}
                         </p>
                       </div>
-                      <Badge variant="outline" className="capitalize">
+                      <Badge className="capitalize" variant="outline">
                         {request.leaveType}
                       </Badge>
                     </div>
@@ -222,36 +231,40 @@ export function TeamAvailabilityResult({
 
                     {/* Reason */}
                     {request.reason && (
-                      <p className="text-xs italic text-muted-foreground">
+                      <p className="text-muted-foreground text-xs italic">
                         "{request.reason}"
                       </p>
                     )}
 
                     {/* Conflicts */}
                     {request.conflicts.hasConflict ? (
-                      <Alert variant="destructive" className="py-2">
+                      <Alert className="py-2" variant="destructive">
                         <AlertTriangle className="h-3 w-3" />
                         <AlertDescription className="text-xs">
                           <strong>Scheduling Conflict</strong>
                           <br />
-                          Overlaps with: {request.conflicts.conflictingEmployees.join(", ")}
+                          Overlaps with:{" "}
+                          {request.conflicts.conflictingEmployees.join(", ")}
                           <br />
-                          Team coverage: {request.conflicts.teamCoveragePercentage}%
+                          Team coverage:{" "}
+                          {request.conflicts.teamCoveragePercentage}%
                         </AlertDescription>
                       </Alert>
                     ) : (
-                      <div className="flex items-center gap-1 text-xs text-green-700 dark:text-green-400">
+                      <div className="flex items-center gap-1 text-green-700 text-xs dark:text-green-400">
                         <CheckCircle className="h-3 w-3" />
                         <span>
-                          No conflicts • {request.conflicts.teamCoveragePercentage}% team
+                          No conflicts •{" "}
+                          {request.conflicts.teamCoveragePercentage}% team
                           coverage
                         </span>
                       </div>
                     )}
 
                     {/* Request Date */}
-                    <p className="text-xs text-muted-foreground">
-                      Requested: {new Date(request.requestDate).toLocaleDateString()}
+                    <p className="text-muted-foreground text-xs">
+                      Requested:{" "}
+                      {new Date(request.requestDate).toLocaleDateString()}
                     </p>
                   </div>
                 </Card>
@@ -263,13 +276,18 @@ export function TeamAvailabilityResult({
     }
 
     // APPROVE/DENY ACTION
-    if (output.action === "approve_request" || output.action === "deny_request") {
+    if (
+      output.action === "approve_request" ||
+      output.action === "deny_request"
+    ) {
       const { request, message } = output;
       const isApproved = output.action === "approve_request";
 
       return (
-        <Card className={`border-l-4 ${isApproved ? "border-green-400" : "border-red-400"}`}>
-          <div className="p-4 space-y-3">
+        <Card
+          className={`border-l-4 ${isApproved ? "border-green-400" : "border-red-400"}`}
+        >
+          <div className="space-y-3 p-4">
             {/* Success Message */}
             <div
               className={`flex items-start gap-2 ${
@@ -279,15 +297,15 @@ export function TeamAvailabilityResult({
               }`}
             >
               {isApproved ? (
-                <CheckCircle className="h-5 w-5 mt-0.5" />
+                <CheckCircle className="mt-0.5 h-5 w-5" />
               ) : (
-                <XCircle className="h-5 w-5 mt-0.5" />
+                <XCircle className="mt-0.5 h-5 w-5" />
               )}
               <div>
                 <p className="font-medium">
                   {isApproved ? "Request Approved" : "Request Denied"}
                 </p>
-                <p className="text-sm mt-0.5">{message}</p>
+                <p className="mt-0.5 text-sm">{message}</p>
               </div>
             </div>
 
@@ -310,9 +328,11 @@ export function TeamAvailabilityResult({
                   <span>{request.totalDays} days</span>
                 </div>
                 {request.managerNotes && (
-                  <div className="pt-2 border-t">
-                    <span className="text-muted-foreground text-xs">Manager Notes:</span>
-                    <p className="text-xs mt-1">{request.managerNotes}</p>
+                  <div className="border-t pt-2">
+                    <span className="text-muted-foreground text-xs">
+                      Manager Notes:
+                    </span>
+                    <p className="mt-1 text-xs">{request.managerNotes}</p>
                   </div>
                 )}
               </div>
