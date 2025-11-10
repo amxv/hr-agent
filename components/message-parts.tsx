@@ -10,10 +10,15 @@ import {
 } from "@/lib/stores/hooks";
 import { CodeInterpreterMessage } from "./code-interpreter-message";
 import { DocumentToolCall, DocumentToolResult } from "./document";
+import { BenefitsInfoResult } from "./benefits-info-result";
 import { DocumentPreview } from "./document-preview";
 import { FileRetrieveResult } from "./file-retrieve-result";
 import { GeneratedImage } from "./generated-image";
+import { HRCaseResult } from "./hr-case-result";
+import { LeaveBalanceResult } from "./leave-balance-result";
+import { PeopleSearchResult } from "./people-search-result";
 import { ResearchUpdates } from "./message-annotations";
+import { TeamAvailabilityResult } from "./team-availability-result";
 import { MessageChainOfThought } from "./message-chain-of-thought";
 import { MessageReasoning } from "./message-reasoning";
 import { ReadDocument } from "./read-document";
@@ -505,6 +510,106 @@ function PureMessagePart({
       return (
         <div key={toolCallId}>
           <FileRetrieveResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-leaveBalance") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <LeaveBalanceResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <LeaveBalanceResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-benefitsInfo") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <BenefitsInfoResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <BenefitsInfoResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-hrCase") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <HRCaseResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <HRCaseResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-teamAvailability") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <TeamAvailabilityResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <TeamAvailabilityResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-peopleSearch") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <PeopleSearchResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <PeopleSearchResult input={input} output={output} state={state} />
         </div>
       );
     }
