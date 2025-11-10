@@ -71,6 +71,31 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
     description: "File Retrieve",
     cost: 1,
   },
+  leaveBalance: {
+    name: "leaveBalance",
+    description: "Check leave balances and projections",
+    cost: 2,
+  },
+  benefitsInfo: {
+    name: "benefitsInfo",
+    description: "Query benefits and plan information",
+    cost: 2,
+  },
+  hrCase: {
+    name: "hrCase",
+    description: "Create and manage HR support tickets",
+    cost: 3,
+  },
+  teamAvailability: {
+    name: "teamAvailability",
+    description: "Team Availability & Approvals",
+    cost: 3,
+  },
+  peopleSearch: {
+    name: "peopleSearch",
+    description: "People Search & Org Context",
+    cost: 2,
+  },
 };
 
 export const allTools = toolNameSchema.options;

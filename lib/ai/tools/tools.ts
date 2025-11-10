@@ -1,11 +1,16 @@
 import type { ModelId } from "@ai-models/vercel-gateway";
 import type { FileUIPart, ModelMessage } from "ai";
+import { benefitsInfo } from "@/lib/ai/tools/benefits-info";
 import { codeInterpreter } from "@/lib/ai/tools/code-interpreter";
 import { createDocumentTool } from "@/lib/ai/tools/create-document";
 import { fileRetrieve } from "@/lib/ai/tools/file-retrieve";
 import { generateImage } from "@/lib/ai/tools/generate-image";
 import { getWeather } from "@/lib/ai/tools/get-weather";
+import { hrCase } from "@/lib/ai/tools/hr-case";
+import { leaveBalance } from "@/lib/ai/tools/leave-balance";
+import { peopleSearch } from "@/lib/ai/tools/people-search";
 import { readDocument } from "@/lib/ai/tools/read-document";
+import { teamAvailability } from "@/lib/ai/tools/team-availability";
 import { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
 import { retrieve } from "@/lib/ai/tools/retrieve";
 import { semanticSearch } from "@/lib/ai/tools/semantic-search";
@@ -92,5 +97,12 @@ export function getTools({
           fileRetrieve: fileRetrieve({ dataStream }),
         }
       : {}),
+    leaveBalance: leaveBalance({ dataStream }),
+    benefitsInfo: benefitsInfo({ dataStream }),
+    hrCase: hrCase({ dataStream }),
+    // Manager-only tool - RBAC check enforced in execute function
+    teamAvailability: teamAvailability({ dataStream }),
+    // HR-only tool - RBAC check enforced in execute function
+    peopleSearch: peopleSearch({ dataStream }),
   };
 }
