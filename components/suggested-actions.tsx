@@ -21,24 +21,24 @@ function PureSuggestedActions({
   const sendMessage = useSendMessage();
   const suggestedActions = [
     {
-      title: "What are the advantages",
-      label: "of using Next.js?",
-      action: "What are the advantages of using Next.js?",
+      title: "What is our company's",
+      label: "vacation policy?",
+      action: "What is our company's vacation policy?",
     },
     {
-      title: "Write code to",
-      label: `demonstrate djikstra's algorithm`,
-      action: `Write code to demonstrate djikstra's algorithm`,
+      title: "How do I submit",
+      label: "a reimbursement request?",
+      action: "How do I submit a reimbursement request?",
     },
     {
-      title: "Help me write an essay",
-      label: "about silicon valley",
-      action: "Help me write an essay about silicon valley",
+      title: "What benefits are",
+      label: "available to employees?",
+      action: "What benefits are available to employees?",
     },
     {
-      title: "What is the weather",
-      label: "in San Francisco?",
-      action: "What is the weather in San Francisco?",
+      title: "How do I request",
+      label: "time off?",
+      action: "How do I request time off?",
     },
   ];
 
