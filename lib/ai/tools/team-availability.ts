@@ -8,7 +8,11 @@ const log = createModuleLogger("ai.tools.team-availability");
 // ===== TYPES =====
 
 export type TeamAvailabilityInput = {
-  action: "view_schedule" | "view_approvals" | "approve_request" | "deny_request";
+  action:
+    | "view_schedule"
+    | "view_approvals"
+    | "approve_request"
+    | "deny_request";
   startDate?: string; // ISO date for schedule view
   endDate?: string; // ISO date for schedule view
   employeeId?: string; // for approval actions
@@ -238,12 +242,29 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
     `,
     inputSchema: z.object({
       action: z
-        .enum(["view_schedule", "view_approvals", "approve_request", "deny_request"])
+        .enum([
+          "view_schedule",
+          "view_approvals",
+          "approve_request",
+          "deny_request",
+        ])
         .describe("Action to perform"),
-      startDate: z.string().optional().describe("Start date for schedule (ISO format)"),
-      endDate: z.string().optional().describe("End date for schedule (ISO format)"),
-      employeeId: z.string().optional().describe("Employee ID for approval actions"),
-      requestId: z.string().optional().describe("Request ID for approval actions"),
+      startDate: z
+        .string()
+        .optional()
+        .describe("Start date for schedule (ISO format)"),
+      endDate: z
+        .string()
+        .optional()
+        .describe("End date for schedule (ISO format)"),
+      employeeId: z
+        .string()
+        .optional()
+        .describe("Employee ID for approval actions"),
+      requestId: z
+        .string()
+        .optional()
+        .describe("Request ID for approval actions"),
       reason: z.string().optional().describe("Reason for denial"),
     }),
     execute: async ({
@@ -255,7 +276,10 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
       reason,
     }: TeamAvailabilityInput): Promise<TeamAvailabilityOutput> => {
       const startMs = Date.now();
-      log.info({ action, startDate, endDate, employeeId, requestId }, "teamAvailability: start");
+      log.info(
+        { action, startDate, endDate, employeeId, requestId },
+        "teamAvailability: start"
+      );
 
       // ⚠️ CRITICAL: Check manager permissions
       // In production: const user = await getUser(session);
@@ -265,7 +289,8 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
       if (!manager.isManager) {
         log.warn({ action }, "teamAvailability: permission denied");
         return {
-          error: "This tool is only available to managers. Please contact your HR administrator if you believe you should have access.",
+          error:
+            "This tool is only available to managers. Please contact your HR administrator if you believe you should have access.",
           permissionDenied: true,
         };
       }
@@ -289,11 +314,13 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
           const start = startDate || new Date().toISOString().split("T")[0];
           const end =
             endDate ||
-            new Date(Date.now() + 14 * 24 * 60 * 60 * 1000).toISOString().split("T")[0];
+            new Date(Date.now() + 14 * 24 * 60 * 60 * 1000)
+              .toISOString()
+              .split("T")[0];
 
-          const absences = APPROVED_ABSENCES.filter((absence) => {
-            return absence.endDate >= start && absence.startDate <= end;
-          });
+          const absences = APPROVED_ABSENCES.filter(
+            (absence) => absence.endDate >= start && absence.startDate <= end
+          );
 
           const coverageSummary = calculateCoverage(start, end, absences);
 
@@ -352,7 +379,9 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             return { error: "Request ID is required to approve" };
           }
 
-          const request = PENDING_REQUESTS.find((r) => r.requestId === requestId);
+          const request = PENDING_REQUESTS.find(
+            (r) => r.requestId === requestId
+          );
           if (!request) {
             return { error: `Request ${requestId} not found` };
           }
@@ -370,7 +399,10 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             },
           });
 
-          log.info({ ms: Date.now() - startMs, requestId }, "teamAvailability: approve success");
+          log.info(
+            { ms: Date.now() - startMs, requestId },
+            "teamAvailability: approve success"
+          );
 
           return {
             action: "approve_request",
@@ -388,7 +420,9 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             return { error: "Reason is required to deny a request" };
           }
 
-          const request = PENDING_REQUESTS.find((r) => r.requestId === requestId);
+          const request = PENDING_REQUESTS.find(
+            (r) => r.requestId === requestId
+          );
           if (!request) {
             return { error: `Request ${requestId} not found` };
           }
@@ -406,7 +440,10 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             },
           });
 
-          log.info({ ms: Date.now() - startMs, requestId }, "teamAvailability: deny success");
+          log.info(
+            { ms: Date.now() - startMs, requestId },
+            "teamAvailability: deny success"
+          );
 
           return {
             action: "deny_request",

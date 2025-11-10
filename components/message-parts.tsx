@@ -8,23 +8,23 @@ import {
   useMessagePartsByPartRange,
   useMessagePartTypesById,
 } from "@/lib/stores/hooks";
+import { BenefitsInfoResult } from "./benefits-info-result";
 import { CodeInterpreterMessage } from "./code-interpreter-message";
 import { DocumentToolCall, DocumentToolResult } from "./document";
-import { BenefitsInfoResult } from "./benefits-info-result";
 import { DocumentPreview } from "./document-preview";
 import { FileRetrieveResult } from "./file-retrieve-result";
 import { GeneratedImage } from "./generated-image";
 import { HRCaseResult } from "./hr-case-result";
 import { LeaveBalanceResult } from "./leave-balance-result";
-import { PeopleSearchResult } from "./people-search-result";
 import { ResearchUpdates } from "./message-annotations";
-import { TeamAvailabilityResult } from "./team-availability-result";
 import { MessageChainOfThought } from "./message-chain-of-thought";
 import { MessageReasoning } from "./message-reasoning";
+import { PeopleSearchResult } from "./people-search-result";
 import { ReadDocument } from "./read-document";
 import { Retrieve } from "./retrieve";
 import { SemanticSearchResult } from "./semantic-search-result";
 import { StockChartMessage } from "./stock-chart-message";
+import { TeamAvailabilityResult } from "./team-availability-result";
 import { TextMessagePart } from "./text-message-part";
 import { Weather } from "./weather";
 
@@ -694,7 +694,9 @@ export function PureMessageParts({
 
     for (let i = 0; i < types.length; i++) {
       if (types[i] === "reasoning" || cotTools.has(types[i])) {
-        if (cotStart === -1) cotStart = i;
+        if (cotStart === -1) {
+          cotStart = i;
+        }
         cotEnd = i;
       }
     }

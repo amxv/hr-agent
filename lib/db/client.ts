@@ -18,5 +18,9 @@ if (!globalForDb.__postgresClient) {
 }
 
 export const client = globalForDb.__postgresClient;
-export const db =
-  globalForDb.__drizzleDb ?? (globalForDb.__drizzleDb = drizzle(client));
+
+if (!globalForDb.__drizzleDb) {
+  globalForDb.__drizzleDb = drizzle(client);
+}
+
+export const db = globalForDb.__drizzleDb;
