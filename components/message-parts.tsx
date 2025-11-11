@@ -688,10 +688,22 @@ export function PureMessageParts({
       "tool-peopleSearch",
     ]);
 
+    // HR tools that should also render as full UI cards after the response
+    const hrToolsForFullDisplay = new Set<ChatMessage["parts"][number]["type"]>([
+      "tool-leaveBalance",
+      "tool-benefitsInfo",
+      "tool-hrCase",
+      "tool-teamAvailability",
+      "tool-peopleSearch",
+    ]);
+
     const result: Array<
       | { kind: "chain-of-thought"; startIndex: number; endIndex: number }
       | { kind: NonReasoningPartType; index: number }
     > = [];
+
+    // Track HR tool indices for later rendering
+    const hrToolIndices: number[] = [];
 
     // Find the first and last CoT-compatible parts
     let cotStart = -1;
@@ -703,6 +715,11 @@ export function PureMessageParts({
           cotStart = i;
         }
         cotEnd = i;
+
+        // Track HR tools for full display later
+        if (hrToolsForFullDisplay.has(types[i])) {
+          hrToolIndices.push(i);
+        }
       }
     }
 
@@ -720,7 +737,12 @@ export function PureMessageParts({
         endIndex: cotEnd,
       });
 
-      // Add any non-CoT parts after the CoT group
+      // Add HR tools again as individual parts for full UI display (BEFORE text responses)
+      for (const idx of hrToolIndices) {
+        result.push({ kind: types[idx] as NonReasoningPartType, index: idx });
+      }
+
+      // Add any non-CoT parts after the CoT group (text responses come after HR cards)
       for (let i = cotEnd + 1; i < types.length; i++) {
         result.push({ kind: types[i] as NonReasoningPartType, index: i });
       }
@@ -763,6 +785,28 @@ export function PureMessageParts({
         }
 
         const key = `message-${messageId}-part-${group.index}-${group.kind}`;
+
+        // Add spacing for HR tool result cards
+        const isHRTool = [
+          "tool-leaveBalance",
+          "tool-benefitsInfo",
+          "tool-hrCase",
+          "tool-teamAvailability",
+          "tool-peopleSearch",
+        ].includes(group.kind);
+
+        if (isHRTool) {
+          return (
+            <div className="my-4" key={key}>
+              <MessagePart
+                isReadonly={isReadonly}
+                messageId={messageId}
+                partIdx={group.index}
+              />
+            </div>
+          );
+        }
+
         return (
           <MessagePart
             isReadonly={isReadonly}
