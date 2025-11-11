@@ -47,16 +47,16 @@ Finally, Jessica shows the benefits administration section where she can modify 
 
 ### Edge Cases
 
-- What happens when an admin tries to delete an employee who has associated data (leave balances, benefits enrollments, HR cases)? [NEEDS CLARIFICATION: Should deletion be prevented with a warning, or should it cascade delete related records, or should it mark the employee as "inactive" instead?]
-- How should the system handle invalid data entries (e.g., negative leave balances, future start dates, missing required fields)? [NEEDS CLARIFICATION: What validation rules should be enforced for each data type?]
-- What happens when multiple admins edit the same employee record simultaneously? [NEEDS CLARIFICATION: Should there be optimistic locking, last-write-wins, or conflict detection?]
+- What happens when an admin tries to delete an employee who has associated data (leave balances, benefits enrollments, HR cases)? System uses soft deletion—employee is marked as inactive (employment status set to "terminated") rather than permanently deleted. Associated data (leave balances, enrollments) is preserved for historical records.
+- How should the system handle invalid data entries (e.g., negative leave balances, future start dates, missing required fields)? System enforces simple, sensible validation appropriate for demo purposes: required fields must be populated, email format validation, leave balances cannot be negative, dates must be valid. Validation messages are clear and user-friendly.
+- What happens when multiple admins edit the same employee record simultaneously? System uses last-write-wins approach without optimistic locking or conflict detection. The most recent save overwrites previous changes.
 - How does the agent behave when HR data tables are completely empty (no employees, no cases, no benefits)? Agent should gracefully report that no data is available.
-- What happens when an admin creates duplicate employee records with the same email or employee ID? [NEEDS CLARIFICATION: Should uniqueness be enforced on certain fields?]
-- How should the system handle data import if admins want to bulk-load employee data? [NEEDS CLARIFICATION: Is bulk import/export needed, or is manual entry sufficient?]
-- What happens to historical HR cases when the assigned team member is deleted from the directory? [NEEDS CLARIFICATION: Should cases retain historical data even if the employee is deleted?]
-- How should leave accrual rates and schedules be configured per employee? [NEEDS CLARIFICATION: Should accrual be automatic/calculated, or purely manual entries by admins?]
-- What happens when an admin modifies a benefits plan that employees are currently enrolled in? [NEEDS CLARIFICATION: Should changes apply immediately to enrollments, or require re-enrollment?]
-- How should pending leave requests be approved/denied—only through chat agent or also through admin panel? [NEEDS CLARIFICATION: Should admin panel have approval workflow UI, or rely solely on agent interaction?]
+- What happens when an admin creates duplicate employee records with the same email or employee ID? System enforces uniqueness on email field—duplicate emails are rejected with a validation error message.
+- How should the system handle data import if admins want to bulk-load employee data? Manual entry only—no bulk import/export functionality is needed for demo purposes.
+- What happens to historical HR cases when the assigned team member is deleted from the directory? Historical data is retained—cases preserve the employee information as it was at the time, even if the employee is marked inactive or deleted.
+- How should leave accrual rates and schedules be configured per employee? Accrual is managed purely through manual entries by admins—no automatic calculation or scheduling logic is needed.
+- What happens when an admin modifies a benefits plan that employees are currently enrolled in? Changes apply immediately to all enrollments referencing that plan—no re-enrollment process is required.
+- How should pending leave requests be approved/denied—only through chat agent or also through admin panel? Admin panel includes approval workflow UI where admins can approve or deny pending leave requests directly, in addition to agent-based approvals via the Team Availability tool.
 
 ## 2. Requirements
 
@@ -85,8 +85,8 @@ Finally, Jessica shows the benefits administration section where she can modify 
   - Start date
   - Years of service
 - **FR-007**: System MUST allow admins to edit existing employee records
-- **FR-008**: System MUST allow admins to delete employee records [NEEDS CLARIFICATION: Should deletion be soft or hard? Should it cascade to related data?]
-- **FR-009**: System MUST enforce data validation rules [NEEDS CLARIFICATION: What specific validation rules are required for employee data?]
+- **FR-008**: System MUST implement soft deletion for employee records by marking employment status as "terminated" rather than permanently removing data, preserving associated leave balances, benefits enrollments, and HR case history
+- **FR-009**: System MUST enforce simple validation rules appropriate for demo purposes: required fields (name, email, employee ID), email format validation, email uniqueness, non-negative leave balances, valid date formats, and clear user-friendly error messages
 - **FR-010**: System MUST support manager-employee hierarchical relationships where employees can be designated as managers with direct reports
 - **FR-011**: Employee search tool MUST retrieve employee data from the admin-managed directory in real-time
 
@@ -114,7 +114,7 @@ Finally, Jessica shows the benefits administration section where she can modify 
   - HSA/FSA options (contribution limits, employer contributions)
 - **FR-019**: System MUST allow admins to create new plan options for each benefits category
 - **FR-020**: System MUST allow admins to edit existing plan details (premiums, coverage levels, deductibles)
-- **FR-021**: System MUST allow admins to remove outdated or unavailable plans [NEEDS CLARIFICATION: Should removal be prevented if employees are enrolled?]
+- **FR-021**: System MUST allow admins to remove benefits plans even if employees are currently enrolled, with a confirmation dialog warning about active enrollments
 - **FR-022**: System MUST allow admins to view and manage employee benefit enrollments including:
   - Current medical plan selection
   - Current dental plan selection
@@ -165,7 +165,7 @@ Finally, Jessica shows the benefits administration section where she can modify 
   - Submission date
   - Status (pending, approved, denied)
   - Conflict flags (overlaps with other absences)
-- **FR-039**: System MUST allow admins to approve or deny pending leave requests
+- **FR-039**: System MUST provide approval workflow UI in the admin panel allowing admins to approve or deny pending leave requests directly (in addition to agent-based approvals via Team Availability tool)
 - **FR-040**: System MUST calculate team coverage percentage based on approved absences
 - **FR-041**: System MUST flag critical coverage dates (when coverage falls below configurable threshold, e.g., 70%)
 - **FR-042**: System MUST detect conflicts when multiple team members request overlapping absences
@@ -177,19 +177,19 @@ Finally, Jessica shows the benefits administration section where she can modify 
 - **FR-046**: System MUST ensure agent tool calls always retrieve the latest data from the database (no caching of HR data)
 - **FR-047**: System MUST replace the hardcoded mock data in tool files with database queries
 - **FR-048**: System MUST maintain referential integrity between related entities (e.g., employees and their leave balances)
-- **FR-049**: System MUST use database transactions for operations that modify multiple related records [NEEDS CLARIFICATION: Are there complex multi-record operations that require transactions?]
+- **FR-049**: System MUST use standard CRUD operations without complex transaction requirements, as demo purposes do not require multi-record transaction handling
 
 #### Access Control
 - **FR-050**: System MUST enforce role-based access control for the HR data admin interface
 - **FR-051**: System MUST restrict /admin/hr-data routes to authenticated admin users
 - **FR-052**: Non-admin users MUST NOT be able to access or modify HR data through the admin panel
 - **FR-053**: Agent tools MUST respect existing RBAC restrictions (Team Availability for managers only, People Search for HR only)
-- **FR-054**: System MUST validate user permissions before allowing any data modification [NEEDS CLARIFICATION: Should there be a separate "HR Admin" role distinct from general "Admin"?]
+- **FR-054**: System MUST validate that users have admin role before allowing any HR data modification, using the existing admin role without requiring a separate "HR Admin" role
 
 #### Data Initialization and Seeding
-- **FR-055**: System MUST provide initial seed data that matches the current mock data structure when the feature is first deployed [NEEDS CLARIFICATION: Should seed data be automatically loaded on first run, or require manual admin action?]
+- **FR-055**: System MUST automatically load initial seed data matching the current mock data structure on first deployment when HR data tables are empty
 - **FR-056**: System MUST prevent duplicate seeding if data already exists in the database
-- **FR-057**: System MUST allow admins to reset HR data to default seed values [NEEDS CLARIFICATION: Should there be a "reset to defaults" feature?]
+- **FR-057**: System MUST provide a "Reset to Defaults" feature in the admin panel that clears all HR data and reloads the original seed data for demo reset purposes
 
 #### User Experience
 - **FR-058**: Admin interface MUST provide immediate feedback when data is saved successfully
@@ -199,8 +199,8 @@ Finally, Jessica shows the benefits administration section where she can modify 
 - **FR-062**: System MUST provide confirmation dialogs before destructive actions (delete employee, delete case)
 
 #### Audit and Logging
-- **FR-063**: System MUST log all HR data modifications (create, update, delete) with timestamp and admin user ID [NEEDS CLARIFICATION: Should there be a visible audit log in the admin UI?]
-- **FR-064**: System MUST track who created and last modified each HR data record [NEEDS CLARIFICATION: Should audit history be visible to admins?]
+- **FR-063**: System MUST log all HR data modifications (create, update, delete) with timestamp and admin user ID, with a visible audit log UI in the admin panel showing recent changes
+- **FR-064**: System MUST track and display who created and when each HR data record was created, plus who last modified and when it was last modified, visible to admins in record details
 
 #### Performance
 - **FR-065**: Admin interface MUST load employee directory page with up to 100 employees in under 2 seconds
