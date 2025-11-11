@@ -15,12 +15,12 @@ The application has a fully functional admin panel located at the `/admin` route
 ## 1. Admin Routes & Structure
 
 ### Route Organization
-- **Admin Layout**: `/Users/ashray/code/amxv/rag/app/admin/layout.tsx` (lines 1-35)
+- **Admin Layout**: `/Users/ashray/code/amxv/agentdune-chat/app/admin/layout.tsx` (lines 1-35)
   - Serves as the root layout for all admin pages
   - Wraps children with `TRPCReactProvider` and `SessionProvider`
   - Fetches session server-side using `auth.api.getSession()` for initial hydration
 
-- **User Management Page**: `/Users/ashray/code/amxv/rag/app/admin/users/page.tsx` (lines 1-15)
+- **User Management Page**: `/Users/ashray/code/amxv/agentdune-chat/app/admin/users/page.tsx` (lines 1-15)
   - Simple page component that renders `UserListTable` component
   - Displays heading "User Management" with description
   - No explicit protection at the page level (relies on middleware and layout)
@@ -34,7 +34,7 @@ The application has a fully functional admin panel located at the `/admin` route
 ## 2. Admin Route Protection
 
 ### Middleware-Level Protection
-**File**: `/Users/ashray/code/amxv/rag/middleware.ts` (lines 37-54)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` (lines 37-54)
 
 The middleware enforces two-level authentication for `/admin` routes:
 
@@ -66,7 +66,7 @@ if (isOnAdminRoute) {
 3. Allow access if both conditions pass (line 53)
 
 ### tRPC Procedure-Level Protection
-**File**: `/Users/ashray/code/amxv/rag/trpc/init.ts` (lines 143-170)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` (lines 143-170)
 
 The `adminProcedure` middleware ensures only authenticated admin users can call admin APIs:
 
@@ -109,7 +109,7 @@ export const adminProcedure = t.procedure.use(({ ctx, next }) => {
 
 ## 3. Admin Router & API Endpoints
 
-**File**: `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts` (lines 1-259)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts` (lines 1-259)
 
 All procedures use `adminProcedure` for protection. The admin router provides 5 main operations:
 
@@ -249,7 +249,7 @@ All components use **shadcn/ui** with Tailwind CSS styling:
 - Form validation via React Hook Form + Zod
 
 ### 4.1 User List Table
-**File**: `/Users/ashray/code/amxv/rag/components/admin/user-list-table.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/admin/user-list-table.tsx`
 
 **Purpose**: Main display component for users with search and actions
 
@@ -275,7 +275,7 @@ UserListTable renders
 - Status: "active" = default variant, "inactive" = destructive variant
 
 ### 4.2 User Actions
-**File**: `/Users/ashray/code/amxv/rag/components/admin/user-actions.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/admin/user-actions.tsx`
 
 **Purpose**: Action buttons for each user (Edit, Reset Password, Deactivate/Reactivate)
 
@@ -297,7 +297,7 @@ UserListTable renders
 - Type-safe error handling (line 51, 65)
 
 ### 4.3 Create User Dialog
-**File**: `/Users/ashray/code/amxv/rag/components/admin/create-user-dialog.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/admin/create-user-dialog.tsx`
 
 **Purpose**: Form dialog to add new users
 
@@ -328,7 +328,7 @@ UserListTable renders
 - Generic toast error fallback (line 99)
 
 ### 4.4 Edit User Dialog
-**File**: `/Users/ashray/code/amxv/rag/components/admin/edit-user-dialog.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/admin/edit-user-dialog.tsx`
 
 **Purpose**: Update user email
 
@@ -343,7 +343,7 @@ UserListTable renders
 - Closes dialog (line 78)
 
 ### 4.5 Reset Password Dialog
-**File**: `/Users/ashray/code/amxv/rag/components/admin/reset-password-dialog.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/admin/reset-password-dialog.tsx`
 
 **Purpose**: Set new password for user
 
@@ -364,7 +364,7 @@ UserListTable renders
 ## 5. Authentication & Role Management
 
 ### Better Auth Configuration
-**File**: `/Users/ashray/code/amxv/rag/lib/auth.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts`
 
 **Admin Plugin Setup** (lines 38-42):
 ```typescript
@@ -394,7 +394,7 @@ export type Session = {
 ```
 
 ### Database Schema
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` (lines 138-153)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` (lines 138-153)
 
 **User Table Columns**:
 ```typescript
@@ -419,7 +419,7 @@ export const user = pgTable("user", {
 - Better Auth handles setting role via admin API
 
 ### Context Creation
-**File**: `/Users/ashray/code/amxv/rag/trpc/init.ts` (lines 29-34)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` (lines 29-34)
 
 ```typescript
 export const createTRPCContext = cache(async () => {

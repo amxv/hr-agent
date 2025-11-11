@@ -9,17 +9,17 @@ This codebase uses `better-auth@1.3.27` for authentication, configured with OAut
 
 ## Entry Points
 
-- **Backend Auth Server**: `/Users/ashray/code/amxv/rag/lib/auth.ts` - Core auth configuration
-- **Backend API Route Handler**: `/Users/ashray/code/amxv/rag/app/(auth)/api/auth/[...all]/route.ts` - Catch-all route for auth endpoints
-- **Frontend Auth Client**: `/Users/ashray/code/amxv/rag/lib/auth-client.ts` - React client for auth operations
-- **Middleware**: `/Users/ashray/code/amxv/rag/middleware.ts` - Session-based route protection
+- **Backend Auth Server**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Core auth configuration
+- **Backend API Route Handler**: `/Users/ashray/code/amxv/agentdune-chat/app/(auth)/api/auth/[...all]/route.ts` - Catch-all route for auth endpoints
+- **Frontend Auth Client**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth-client.ts` - React client for auth operations
+- **Middleware**: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` - Session-based route protection
 
 ---
 
 ## 1. Backend Auth Configuration
 
 ### Location
-**File**: `/Users/ashray/code/amxv/rag/lib/auth.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts`
 
 ### Configuration Details
 
@@ -43,7 +43,7 @@ export const auth = betterAuth({
 
 **Key Points:**
 - **Database Adapter** (Line 19-22): Uses Drizzle ORM adapter with PostgreSQL provider
-- **Database Schema** (Line 21): References schema from `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
+- **Database Schema** (Line 21): References schema from `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
 - **Trusted Origins** (Line 23): Configured from `env.VERCEL_URL` for production deployments
 - **Auth Secret** (Line 24): Required `AUTH_SECRET` from environment for cryptographic operations
 - **Cookie Plugin** (Line 50): `nextCookies()` plugin handles cookie-based sessions for Next.js
@@ -94,8 +94,8 @@ export type Session = {
 ## 2. Environment Variables
 
 ### Location
-**Primary**: `/Users/ashray/code/amxv/rag/lib/env.ts`
-**Example**: `/Users/ashray/code/amxv/rag/.env.example`
+**Primary**: `/Users/ashray/code/amxv/agentdune-chat/lib/env.ts`
+**Example**: `/Users/ashray/code/amxv/agentdune-chat/.env.example`
 
 ### Required Environment Variables for Auth
 
@@ -121,7 +121,7 @@ AUTH_GOOGLE_SECRET: z.string().optional(),
 **Details:**
 - **Type**: Optional strings
 - **Setup**: Create OAuth app at Google Cloud Console
-- **Configuration Location**: `/Users/ashray/code/amxv/rag/.env.example` lines 42-44
+- **Configuration Location**: `/Users/ashray/code/amxv/agentdune-chat/.env.example` lines 42-44
   ```
   # Google auth
   AUTH_GOOGLE_ID=****
@@ -143,7 +143,7 @@ AUTH_GITHUB_SECRET: z.string().optional(),
 **Details:**
 - **Type**: Optional strings
 - **Setup**: Create OAuth app at GitHub Developer Settings
-- **Configuration Location**: `/Users/ashray/code/amxv/rag/.env.example` lines 46-47
+- **Configuration Location**: `/Users/ashray/code/amxv/agentdune-chat/.env.example` lines 46-47
   ```
   AUTH_GITHUB_ID=your_github_client_id
   AUTH_GITHUB_SECRET=your_github_client_secret
@@ -163,7 +163,7 @@ POSTGRES_URL: z.string().min(1),
 **Details:**
 - **Purpose**: PostgreSQL connection string for auth data storage
 - **Required**: Yes (auth tables need database)
-- **Documentation**: `/Users/ashray/code/amxv/rag/.env.example` line 11
+- **Documentation**: `/Users/ashray/code/amxv/agentdune-chat/.env.example` line 11
   ```
   POSTGRES_URL=****
   ```
@@ -184,7 +184,7 @@ VERCEL_PROJECT_PRODUCTION_URL: z.string().optional(),
 ## 3. Auth API Routes & Endpoints
 
 ### Location
-**File**: `/Users/ashray/code/amxv/rag/app/(auth)/api/auth/[...all]/route.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(auth)/api/auth/[...all]/route.ts`
 
 ### Route Handler Implementation (Lines 1-4)
 
@@ -215,7 +215,7 @@ Better-auth with Next.js integration automatically creates these endpoints (stan
 ## 4. Frontend Auth Client
 
 ### Location
-**File**: `/Users/ashray/code/amxv/rag/lib/auth-client.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth-client.ts`
 
 ### Client Initialization (Lines 1-9)
 
@@ -239,9 +239,9 @@ export default authClient;
 
 ### Client Usage Examples
 
-#### 4.1 Social Sign-In (Component: `/Users/ashray/code/amxv/rag/components/social-auth-providers.tsx`)
+#### 4.1 Social Sign-In (Component: `/Users/ashray/code/amxv/agentdune-chat/components/social-auth-providers.tsx`)
 
-**File**: `/Users/ashray/code/amxv/rag/components/social-auth-providers.tsx` (Lines 12 & 21)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/social-auth-providers.tsx` (Lines 12 & 21)
 
 ```typescript
 <Button
@@ -268,7 +268,7 @@ export default authClient;
 4. OAuth provider redirects back to callback URL
 5. Session cookie is set upon successful authentication
 
-#### 4.2 Session Access in Middleware (File: `/Users/ashray/code/amxv/rag/middleware.ts`)
+#### 4.2 Session Access in Middleware (File: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts`)
 
 **Lines 33-34**:
 
@@ -316,7 +316,7 @@ Better-auth automatically constructs callback URLs based on:
 ## 6. Database Schema for Auth
 
 ### Location
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
 
 ### Auth-Related Tables
 
@@ -445,7 +445,7 @@ export const schema = { user, session, account, verification };
 ## 7. Login & Registration Pages
 
 ### Login Page
-**File**: `/Users/ashray/code/amxv/rag/app/(auth)/login/page.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(auth)/login/page.tsx`
 
 **Implementation** (Lines 13-31):
 - Routes: `/login`
@@ -453,7 +453,7 @@ export const schema = { user, session, account, verification };
 - Features: OAuth buttons for Google and GitHub, link to sign up
 
 ### Registration Page
-**File**: `/Users/ashray/code/amxv/rag/app/(auth)/register/page.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(auth)/register/page.tsx`
 
 **Implementation** (Lines 12-29):
 - Routes: `/register`
@@ -461,7 +461,7 @@ export const schema = { user, session, account, verification };
 - Features: OAuth buttons, link to login
 
 ### Login Form Component
-**File**: `/Users/ashray/code/amxv/rag/components/login-form.tsx` (Lines 1-44)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/login-form.tsx` (Lines 1-44)
 
 **Details:**
 - Imports: `SocialAuthProviders` component
@@ -470,7 +470,7 @@ export const schema = { user, session, account, verification };
 - Redirect link to registration page
 
 ### Sign-Up Form Component
-**File**: `/Users/ashray/code/amxv/rag/components/signup-form.tsx` (Lines 1-43)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/signup-form.tsx` (Lines 1-43)
 
 **Details:**
 - Imports: `SocialAuthProviders` component
@@ -479,7 +479,7 @@ export const schema = { user, session, account, verification };
 - Redirect link to login page
 
 ### Social Auth Providers Component
-**File**: `/Users/ashray/code/amxv/rag/components/social-auth-providers.tsx` (Lines 1-30)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/social-auth-providers.tsx` (Lines 1-30)
 
 **Details** (Lines 7-29):
 - Uses `authClient` from `/lib/auth-client.ts`
@@ -492,7 +492,7 @@ export const schema = { user, session, account, verification };
 ## 8. Protected Routes & Middleware
 
 ### Middleware Implementation
-**File**: `/Users/ashray/code/amxv/rag/middleware.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts`
 
 #### 8.1 Session Checking (Lines 33-34)
 
@@ -608,22 +608,22 @@ VERCEL_URL=https://your-domain.vercel.app
 ## 11. Key Architectural Patterns
 
 ### Pattern 1: Conditional Provider Setup
-**Location**: `/Users/ashray/code/amxv/rag/lib/auth.ts` (Lines 26-49)
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` (Lines 26-49)
 
 Providers are conditionally enabled based on environment variables rather than failing at startup. This allows the app to run without OAuth configured.
 
 ### Pattern 2: Middleware-Based Session Validation
-**Location**: `/Users/ashray/code/amxv/rag/middleware.ts` (Line 33)
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` (Line 33)
 
 Session is validated at the middleware level for all requests, enabling centralized route protection.
 
 ### Pattern 3: Catch-All Route Handler
-**Location**: `/Users/ashray/code/amxv/rag/app/(auth)/api/auth/[...all]/route.ts`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(auth)/api/auth/[...all]/route.ts`
 
 Uses Next.js catch-all segments to handle all better-auth endpoints with a single handler.
 
 ### Pattern 4: Typed Session Type
-**Location**: `/Users/ashray/code/amxv/rag/lib/auth.ts` (Lines 8-16)
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` (Lines 8-16)
 
 Exports a `Session` type for type-safe session usage throughout the application.
 

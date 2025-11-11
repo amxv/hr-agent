@@ -18,11 +18,11 @@ The codebase uses a modern, type-safe form architecture combining **react-hook-f
 The application uses **shadcn/ui** form components built on top of react-hook-form primitives.
 
 **Key Files**:
-- `/Users/ashray/code/amxv/rag/components/ui/form.tsx` - Form component wrapper
-- `/Users/ashray/code/amxv/rag/components/ui/input.tsx` - Input component
-- `/Users/ashray/code/amxv/rag/components/ui/label.tsx` - Label component
-- `/Users/ashray/code/amxv/rag/components/ui/textarea.tsx` - Textarea component
-- `/Users/ashray/code/amxv/rag/components/ui/button.tsx` - Button component
+- `/Users/ashray/code/amxv/agentdune-chat/components/ui/form.tsx` - Form component wrapper
+- `/Users/ashray/code/amxv/agentdune-chat/components/ui/input.tsx` - Input component
+- `/Users/ashray/code/amxv/agentdune-chat/components/ui/label.tsx` - Label component
+- `/Users/ashray/code/amxv/agentdune-chat/components/ui/textarea.tsx` - Textarea component
+- `/Users/ashray/code/amxv/agentdune-chat/components/ui/button.tsx` - Button component
 
 ### 1.2 Form Component Structure (form.tsx:1-165)
 
@@ -106,7 +106,7 @@ Zod is used throughout the codebase for declarative schema validation.
 
 ### 2.2 Validation Pattern in tRPC Routers
 
-**File**: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts`
 
 Example from chat.router.ts (lines 58-61):
 ```typescript
@@ -378,7 +378,7 @@ renameChat: protectedProcedure
 
 ### 5.2 Protected Procedures and Authorization
 
-**File**: `/Users/ashray/code/amxv/rag/trpc/init.ts` lines 120-135
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` lines 120-135
 
 ```typescript
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
@@ -406,7 +406,7 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 
 ### 5.3 Context Access in Procedures
 
-**File**: `/Users/ashray/code/amxv/rag/trpc/init.ts` lines 29-34
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` lines 29-34
 
 ```typescript
 export const createTRPCContext = cache(async () => {
@@ -468,7 +468,7 @@ export function ChatRenameForm() {
 
 ### 5.5 Server Actions Pattern
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/actions.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/actions.ts`
 
 Alternative to tRPC for server operations:
 
@@ -504,7 +504,7 @@ export async function generateTitleFromUserMessage({
 
 **Library**: `better-auth@^1.3.27`
 
-**File**: `/Users/ashray/code/amxv/rag/lib/auth.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts`
 
 ```typescript
 export const auth = betterAuth({
@@ -525,7 +525,7 @@ export const auth = betterAuth({
 
 ### 6.2 Session Access in tRPC
 
-**File**: `/Users/ashray/code/amxv/rag/trpc/init.ts` lines 29-34
+**File**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` lines 29-34
 
 ```typescript
 export const createTRPCContext = cache(async () => {
@@ -548,7 +548,7 @@ export const createTRPCContext = cache(async () => {
 
 ### 7.1 User Table
 
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` lines 138-149
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` lines 138-149
 
 ```typescript
 export const user = pgTable("user", {
@@ -575,7 +575,7 @@ export const user = pgTable("user", {
 
 ### 7.2 Account Table (for OAuth)
 
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` lines 166-184
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` lines 166-184
 
 ```typescript
 export const account = pgTable("account", {
@@ -599,7 +599,7 @@ export const account = pgTable("account", {
 
 ### 7.3 Session Table
 
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` lines 151-164
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` lines 151-164
 
 ```typescript
 export const session = pgTable("session", {
@@ -624,7 +624,7 @@ export const session = pgTable("session", {
 
 ### 8.1 Submit Button with Loading State
 
-**File**: `/Users/ashray/code/amxv/rag/components/submit-button.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/submit-button.tsx`
 
 ```typescript
 'use client';
@@ -702,7 +702,7 @@ Available components for building admin dashboards:
 
 ### 9.2 Authentication Flow in Middleware
 
-**File**: `/Users/ashray/code/amxv/rag/middleware.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts`
 
 Middleware is used for protecting routes and redirecting based on auth status.
 
@@ -829,12 +829,12 @@ admin.getUsers()
 ## References
 
 ### Key Files
-- Form components: `/Users/ashray/code/amxv/rag/components/ui/form.tsx`
-- Auth setup: `/Users/ashray/code/amxv/rag/lib/auth.ts`
-- tRPC init: `/Users/ashray/code/amxv/rag/trpc/init.ts`
-- Chat router example: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts`
-- Database schema: `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
-- Admin spec: `/Users/ashray/code/amxv/rag/gg/features/001-admin-user-management/001-SPEC.md`
+- Form components: `/Users/ashray/code/amxv/agentdune-chat/components/ui/form.tsx`
+- Auth setup: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts`
+- tRPC init: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts`
+- Chat router example: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts`
+- Database schema: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
+- Admin spec: `/Users/ashray/code/amxv/agentdune-chat/gg/features/001-admin-user-management/001-SPEC.md`
 
 ### Package Versions
 - react-hook-form@7.62.0

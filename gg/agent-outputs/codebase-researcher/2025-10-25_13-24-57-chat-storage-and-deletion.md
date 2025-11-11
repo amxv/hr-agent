@@ -13,11 +13,11 @@ This document details the chat storage system, data models, and deletion mechani
 ### Details:
 - **ORM Framework:** Drizzle ORM (lightweight, type-safe)
 - **Database:** PostgreSQL
-- **Connection Setup:** `/Users/ashray/code/amxv/rag/lib/db/client.ts`
+- **Connection Setup:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/client.ts`
 
 ### Connection Code:
 ```typescript
-// File: /Users/ashray/code/amxv/rag/lib/db/client.ts (lines 1-23)
+// File: /Users/ashray/code/amxv/agentdune-chat/lib/db/client.ts (lines 1-23)
 import { drizzle } from "drizzle-orm/postgres-js";
 import postgres from "postgres";
 
@@ -47,7 +47,7 @@ export const db =
 **Answer:** Chats are associated with users via the `userId` field (foreign key).
 
 ### Chat Table Definition:
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` (lines 93-105)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` (lines 93-105)
 
 ```typescript
 export const chat = pgTable("Chat", {
@@ -74,7 +74,7 @@ export type Chat = InferSelectModel<typeof chat>;
 - **Message Relationship:** One-to-Many (one chat has many messages)
 
 ### Message Table Definition:
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` (lines 109-126)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` (lines 109-126)
 
 ```typescript
 export const message = pgTable("Message", {
@@ -101,7 +101,7 @@ export const message = pgTable("Message", {
 
 ## 3. Chat Data Model Definition Location
 
-**Answer:** `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
+**Answer:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
 
 All database schema definitions are centralized in this file:
 - **Chat table:** Lines 93-105
@@ -118,7 +118,7 @@ This is a Drizzle ORM schema file using PostgreSQL core functions.
 **Answer:** Multiple functions and API routes exist for deleting chats.
 
 ### Primary Deletion Function:
-File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 68-86)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (lines 68-86)
 
 ```typescript
 export async function deleteChatById({ id }: { id: string }) {
@@ -145,12 +145,12 @@ export async function deleteChatById({ id }: { id: string }) {
 ### Key Points:
 1. **Attachment Cleanup:** Removes files from Vercel Blob storage before deleting messages
 2. **Cascade Delete:** Messages are automatically deleted via foreign key cascade
-3. **Location:** `/Users/ashray/code/amxv/rag/lib/db/queries.ts`
+3. **Location:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts`
 
 ### Related Deletion Functions:
 
 #### Get All Chats for a User:
-File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 88-99)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (lines 88-99)
 
 ```typescript
 export async function getChatsByUserId({ id }: { id: string }) {
@@ -168,7 +168,7 @@ export async function getChatsByUserId({ id }: { id: string }) {
 ```
 
 ### TRPC Router Deletion Endpoint:
-File: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` (lines 201-218)
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` (lines 201-218)
 
 ```typescript
 deleteChat: protectedProcedure
@@ -194,10 +194,10 @@ deleteChat: protectedProcedure
 ### Related Message Deletion Functions:
 
 **Delete Messages After Timestamp:**
-File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 476-515)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (lines 476-515)
 
 **Delete Messages After Message ID (branch deletion):**
-File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 517-573)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (lines 517-573)
 
 ---
 
@@ -206,7 +206,7 @@ File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 517-573)
 **Answer:** The application uses `better-auth` for authentication with admin plugin support.
 
 ### Authentication Setup:
-File: `/Users/ashray/code/amxv/rag/lib/auth.ts` (lines 1-44)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` (lines 1-44)
 
 ```typescript
 import { betterAuth } from "better-auth";
@@ -256,7 +256,7 @@ export const auth = betterAuth({
 ```
 
 ### User Table Structure:
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` (lines 203-218)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` (lines 203-218)
 
 ```typescript
 export const user = pgTable("user", {
@@ -280,7 +280,7 @@ export const user = pgTable("user", {
 ### Finding User by Email:
 
 **Function to Get User by Email:**
-File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 36-43)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (lines 36-43)
 
 ```typescript
 export async function getUserByEmail(email: string): Promise<User[]> {
@@ -460,7 +460,7 @@ When `deleteChatById()` is called for each chat:
 
 When deleting chats and messages, attachments are cleaned up from Vercel Blob storage before database deletion.
 
-File: `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (lines 693-716)
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (lines 693-716)
 
 ```typescript
 async function deleteAttachmentsFromMessages(messages: DBMessage[]) {
@@ -495,7 +495,7 @@ async function deleteAttachmentsFromMessages(messages: DBMessage[]) {
 
 For accessing and managing users as an admin, use the admin router:
 
-File: `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts` (lines 11-88)
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts` (lines 11-88)
 
 ### List Users with Filters:
 ```typescript
@@ -516,12 +516,12 @@ This will return user details including:
 
 | File | Purpose | Lines |
 |------|---------|-------|
-| `/Users/ashray/code/amxv/rag/lib/db/schema.ts` | Database schema definitions | 93-218 |
-| `/Users/ashray/code/amxv/rag/lib/db/client.ts` | Database client initialization | 1-23 |
-| `/Users/ashray/code/amxv/rag/lib/db/queries.ts` | Query functions including deletion | 36-99, 68-86 |
-| `/Users/ashray/code/amxv/rag/lib/auth.ts` | Authentication setup | 1-44 |
-| `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` | Chat TRPC endpoints | 201-218 |
-| `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts` | Admin TRPC endpoints | 11-88 |
+| `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` | Database schema definitions | 93-218 |
+| `/Users/ashray/code/amxv/agentdune-chat/lib/db/client.ts` | Database client initialization | 1-23 |
+| `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` | Query functions including deletion | 36-99, 68-86 |
+| `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` | Authentication setup | 1-44 |
+| `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` | Chat TRPC endpoints | 201-218 |
+| `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts` | Admin TRPC endpoints | 11-88 |
 
 ---
 
@@ -531,8 +531,8 @@ This will return user details including:
 |----------|--------|
 | **1. Database System** | PostgreSQL with Drizzle ORM |
 | **2. Chat-User Association** | `Chat.userId` references `User.id` (foreign key) |
-| **3. Data Model Location** | `/Users/ashray/code/amxv/rag/lib/db/schema.ts` |
-| **4. Delete Functions** | `deleteChatById()` in `/Users/ashray/code/amxv/rag/lib/db/queries.ts:68-86` |
+| **3. Data Model Location** | `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` |
+| **4. Delete Functions** | `deleteChatById()` in `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts:68-86` |
 | **5. Auth System** | `better-auth` with admin plugin; user lookup via `getUserByEmail()` |
 | **6. Chat Tables** | Chat, Message, Vote, Document, Suggestion, User, Session, Account, etc. |
 | **7. Find User** | `await getUserByEmail("admin@agentdune.com")` returns User[] |

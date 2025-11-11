@@ -344,8 +344,8 @@ curl -X POST http://localhost:3000/api/documents/upload \
 - AI SDK v5 Tools: https://sdk.vercel.ai/docs/ai-sdk-core/tools
 
 ### Spec Files
-- Feature Spec: `/Users/ashray/code/amxv/rag/gg/features/002-document-rag/002-SPEC.md`
-- Implementation Plan: `/Users/ashray/code/amxv/rag/gg/features/002-document-rag/002-PLAN.md`
+- Feature Spec: `/Users/ashray/code/amxv/agentdune-chat/gg/features/002-document-rag/002-SPEC.md`
+- Implementation Plan: `/Users/ashray/code/amxv/agentdune-chat/gg/features/002-document-rag/002-PLAN.md`
 
 ### Related Code
 - Upload endpoint: `app/(admin)/api/documents/upload/route.ts`

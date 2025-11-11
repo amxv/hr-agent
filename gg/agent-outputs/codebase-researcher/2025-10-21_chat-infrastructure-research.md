@@ -12,7 +12,7 @@ The chat infrastructure in this codebase uses the **Vercel AI SDK** for streamin
 
 The application uses the Vercel AI SDK v5 with the following key imports:
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:1-12`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:1-12`
 
 ```typescript
 import {
@@ -35,7 +35,7 @@ The application leverages these specific AI SDK utilities:
 
 ### 1.2 Streaming Implementation Architecture
 
-**Entry Point**: `POST /api/chat` → `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:161`
+**Entry Point**: `POST /api/chat` → `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:161`
 
 The chat API endpoint handles streaming responses through a multi-stage pipeline:
 
@@ -99,7 +99,7 @@ The chat API endpoint handles streaming responses through a multi-stage pipeline
 
 ### 2.1 Provider Integration via Vercel Gateway
 
-**Core File**: `/Users/ashray/code/amxv/rag/lib/ai/providers.ts`
+**Core File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/providers.ts`
 
 The system uses **Vercel Gateway** as a unified API layer:
 
@@ -124,7 +124,7 @@ export const getLanguageModel = (modelId: ModelId) => {
 
 ### 2.2 Supported Providers & Models
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts:1-64`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts:1-64`
 
 **Model Data Source**: `@ai-models/vercel-gateway` package
 
@@ -146,7 +146,7 @@ export const chatModels = allAppModels
 
 ### 2.3 Provider-Specific Options
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/providers.ts:54-117`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/providers.ts:54-117`
 
 Different providers support different features via `getModelProviderOptions()`:
 
@@ -208,7 +208,7 @@ providerOptions: getModelProviderOptions(selectedModelId),
 ### 3.1 User Model Selection Flow
 
 #### Step 1: UI Component Initialization
-**File**: `/Users/ashray/code/amxv/rag/components/model-selector.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/model-selector.tsx`
 
 The model selector reads from the `DefaultModelProvider` context (line 28):
 ```typescript
@@ -240,7 +240,7 @@ export function PureModelSelector({
 ```
 
 #### Step 2: Model Change Handler
-**File**: `/Users/ashray/code/amxv/rag/providers/default-model-provider.tsx:34-56`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/providers/default-model-provider.tsx:34-56`
 
 When user selects a model, `changeModel` is called:
 
@@ -269,7 +269,7 @@ const changeModel = useCallback(
 ```
 
 #### Step 3: Cookie Persistence
-**File**: `/Users/ashray/code/amxv/rag/app/api/chat-model/route.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/api/chat-model/route.ts`
 
 The cookie API endpoint persists model selection:
 
@@ -304,7 +304,7 @@ export async function POST(request: NextRequest) {
 ```
 
 #### Step 4: Chat Input Provider Updates Selection
-**File**: `/Users/ashray/code/amxv/rag/providers/chat-input-provider.tsx:112-134`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/providers/chat-input-provider.tsx:112-134`
 
 ```typescript
 const handleModelChange = useCallback(
@@ -333,7 +333,7 @@ const handleModelChange = useCallback(
 ### 3.2 Message Submission Flow
 
 #### Step 1: Build ChatMessage with Model Metadata
-**File**: `/Users/ashray/code/amxv/rag/components/multimodal-input.tsx:248-269`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/multimodal-input.tsx:248-269`
 
 When user sends a message, `coreSubmitLogic` creates the ChatMessage:
 
@@ -390,7 +390,7 @@ The message flows through the chat store to `/api/chat` endpoint.
 ```
 
 #### Step 3: Backend Processes Model Selection
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:179-283`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:179-283`
 
 ```typescript
 export async function POST(request: NextRequest) {
@@ -428,7 +428,7 @@ export async function POST(request: NextRequest) {
 ```
 
 #### Step 4: Stream Response with Selected Model
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:514-567`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:514-567`
 
 ```typescript
 const result = streamText({
@@ -469,7 +469,7 @@ ChatInputProvider
 └── Auto-disables incompatible tools based on model capabilities
 ```
 
-**File**: `/Users/ashray/code/amxv/rag/providers/default-model-provider.tsx:28-91`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/providers/default-model-provider.tsx:28-91`
 
 ```typescript
 export function DefaultModelProvider({
@@ -512,7 +512,7 @@ export function useModelChange() {
 
 ### 4.2 Chat Store Architecture
 
-**File**: `/Users/ashray/code/amxv/rag/lib/stores/chat-store-context.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/stores/chat-store-context.tsx`
 
 ```typescript
 export function ChatStoreProvider({
@@ -551,7 +551,7 @@ The store manages:
 
 ### 5.1 Environment Configuration
 
-**File**: `/Users/ashray/code/amxv/rag/lib/env.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/env.ts`
 
 **Required Variables**:
 ```typescript
@@ -579,7 +579,7 @@ export const env = createEnv({
 
 ### 5.2 Default Models Configuration
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts:132-150`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts:132-150`
 
 ```typescript
 export const DEFAULT_CHAT_MODEL: ModelId = "openai/gpt-5-nano";
@@ -601,7 +601,7 @@ Each operation has a dedicated default model optimized for that task.
 
 ### 6.1 Model Features
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts:12-20`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts:12-20`
 
 ```typescript
 export type AppModelDefinition = Omit<ModelDefinition, "id"> & {
@@ -623,7 +623,7 @@ export type AppModelDefinition = Omit<ModelDefinition, "id"> & {
 
 ### 6.2 Tool Availability Logic
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:372-420`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:372-420`
 
 ```typescript
 // Determine which tools are available based on model capabilities
@@ -660,7 +660,7 @@ if (explicitlyRequestedTools && explicitlyRequestedTools.length > 0) {
 
 ### 6.3 Auto-Model Switching in UI
 
-**File**: `/Users/ashray/code/amxv/rag/components/multimodal-input.tsx:104-120`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/multimodal-input.tsx:104-120`
 
 When user attaches files, model automatically switches to compatible one:
 
@@ -688,7 +688,7 @@ if (processedImages.length > 0 && !currentModelDef.input?.image) {
 
 ### 7.1 Credit Reservation
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:349-370`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:349-370`
 
 ```typescript
 const baseModelCost = getBaseModelCostByModelId(selectedModelId);
@@ -713,7 +713,7 @@ if (!isAnonymous) {
 
 ### 7.2 Anonymous User Restrictions
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:255-272`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:255-272`
 
 ```typescript
 // Validate model for anonymous users
@@ -745,7 +745,7 @@ if (anonymousSession.remainingCredits <= 0) {
 
 ### 8.1 Reasoning Model Variants
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts:31-63`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts:31-63`
 
 For models supporting reasoning, two variants are created:
 
@@ -778,7 +778,7 @@ export const allAppModels = allModelsData
 
 ### 8.2 Reasoning Middleware
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/providers.ts:19-35`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/providers.ts:19-35`
 
 ```typescript
 export const getLanguageModel = (modelId: ModelId) => {
@@ -802,7 +802,7 @@ export const getLanguageModel = (modelId: ModelId) => {
 
 ### 8.3 Provider-Specific Reasoning Configuration
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/providers.ts:54-117`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/providers.ts:54-117`
 
 ```typescript
 if (model.owned_by === "openai") {
@@ -843,7 +843,7 @@ if (model.owned_by === "google") {
 
 ### 9.1 Resumable Streams (Redis-Backed)
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:66-114`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:66-114`
 
 ```typescript
 let redisPublisher: any = null;
@@ -887,7 +887,7 @@ export function getStreamContext() {
 
 ### 9.2 Stream Recovery Endpoint
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/[id]/stream/route.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/[id]/stream/route.ts`
 
 ```typescript
 export async function GET(
@@ -924,7 +924,7 @@ export async function GET(
 
 ### 9.3 Credit Cleanup on Error
 
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:683-696`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:683-696`
 
 ```typescript
 onError: (error) => {
@@ -952,7 +952,7 @@ onError: (error) => {
 
 ### 10.1 ChatMessage Structure
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts:52-127`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts:52-127`
 
 ```typescript
 export type MessageMetadata = {
@@ -996,7 +996,7 @@ export type ChatTools = {
 
 ### 10.2 Available Tools
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts:24-36`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts:24-36`
 
 ```typescript
 export const toolNameSchema = z.enum([
@@ -1028,7 +1028,7 @@ export const frontendToolsSchema = z.enum([
 
 ### 11.1 Chat System Provider Hierarchy
 
-**File**: `/Users/ashray/code/amxv/rag/components/chat-system.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/chat-system.tsx`
 
 ```typescript
 export const ChatSystem = memo(function ChatSystem({
@@ -1083,7 +1083,7 @@ export const ChatSystem = memo(function ChatSystem({
 
 ### 11.2 Model Selector Component
 
-**File**: `/Users/ashray/code/amxv/rag/components/model-selector-base.tsx:361-536`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/model-selector-base.tsx:361-536`
 
 Key features:
 - Search/filter by model name, provider, capabilities

@@ -32,7 +32,7 @@ Authentication Flow:
 ## 1. User Authentication Configuration
 
 ### Library: Better Auth
-- **Location**: `/Users/ashray/code/amxv/rag/lib/auth.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts`
 - **Type**: Server-side authentication library with database adapter
 
 ### Core Setup (`lib/auth.ts:21-44`)
@@ -99,7 +99,7 @@ The session includes:
 ## 2. User Roles Definition and Storage
 
 ### Database Schema
-- **Location**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
 
 ### User Table Definition (`lib/db/schema.ts:138-153`)
 
@@ -173,7 +173,7 @@ Only users with role = "admin" are considered administrators.
 5. Cannot access `/admin` routes or admin procedures
 
 ### Admin-Only Procedures
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts`
 
 All procedures are protected by `adminProcedure` middleware (line 9):
 ```typescript
@@ -192,7 +192,7 @@ export const adminRouter = createTRPCRouter({
 ## 4. Route Protection Based on User Roles
 
 ### Middleware-Level Protection
-- **Location**: `/Users/ashray/code/amxv/rag/middleware.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts`
 - **Type**: Next.js middleware executed on all requests
 
 ### Admin Route Protection (`middleware.ts:37-54`)
@@ -252,7 +252,7 @@ Routes that bypass middleware checks:
 ## 5. Middleware and RBAC Patterns
 
 ### tRPC Procedure-Level Access Control
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/init.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts`
 
 #### Three Levels of Procedures
 
@@ -329,7 +329,7 @@ export const adminProcedure = t.procedure.use(({ ctx, next }) => {
 6. If admin → Pass through with type-guaranteed admin role (lines 165-169)
 
 ### Context with User Data
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/init.ts:29-34`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:29-34`
 
 ```typescript
 export const createTRPCContext = cache(async () => {
@@ -347,7 +347,7 @@ Context is created on every request:
 - User includes role information via session
 
 ### tRPC Router Setup
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/routers/_app.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts`
 
 ```typescript
 export const appRouter = createTRPCRouter({
@@ -366,7 +366,7 @@ Admin router is mounted as a sub-router, with all its procedures requiring admin
 ## 6. Client-Side Authentication Management
 
 ### Auth Client Setup
-- **Location**: `/Users/ashray/code/amxv/rag/lib/auth-client.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/auth-client.ts`
 
 ```typescript
 import { adminClient } from "better-auth/client/plugins";
@@ -385,7 +385,7 @@ export default authClient;
 - **adminClient()**: Provides admin-specific client methods
 
 ### Session Provider
-- **Location**: `/Users/ashray/code/amxv/rag/providers/session-provider.tsx`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/providers/session-provider.tsx`
 
 ```typescript
 export function useSession(): SessionContextValue {
@@ -402,7 +402,7 @@ Provides React context-based access to session:
 - `isPending`: Whether session is being loaded
 
 ### Admin Layout Integration
-- **Location**: `/Users/ashray/code/amxv/rag/app/admin/layout.tsx`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/app/admin/layout.tsx`
 
 ```typescript
 export default async function AdminLayout({
@@ -448,7 +448,7 @@ export default async function AdminLayout({
 ## 7. Admin User Management Features
 
 ### Create User with Role
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts:83-133`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts:83-133`
 
 ```typescript
 createUser: adminProcedure
@@ -512,7 +512,7 @@ createUser: adminProcedure
 - Prevents duplicate emails
 
 ### List Users with Filtering
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts:12-81`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts:12-81`
 
 ```typescript
 listUsers: adminProcedure
@@ -589,7 +589,7 @@ listUsers: adminProcedure
 - Pagination with limit and offset
 
 ### Deactivate User (Ban)
-- **Location**: `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts:188-241`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts:188-241`
 
 ```typescript
 deactivateUser: adminProcedure
@@ -863,12 +863,12 @@ The `as const` ensures TypeScript knows the role is specifically "admin", not ju
 
 ## Files Referenced
 
-- `/Users/ashray/code/amxv/rag/lib/auth.ts` - Authentication configuration
-- `/Users/ashray/code/amxv/rag/lib/auth-client.ts` - Client-side auth setup
-- `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Database schema including user table
-- `/Users/ashray/code/amxv/rag/middleware.ts` - Route protection middleware
-- `/Users/ashray/code/amxv/rag/trpc/init.ts` - tRPC procedures and middleware
-- `/Users/ashray/code/amxv/rag/trpc/routers/admin.router.ts` - Admin-only procedures
-- `/Users/ashray/code/amxv/rag/trpc/routers/_app.ts` - Router setup
-- `/Users/ashray/code/amxv/rag/providers/session-provider.tsx` - Session context provider
-- `/Users/ashray/code/amxv/rag/app/admin/layout.tsx` - Admin page layout
+- `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Authentication configuration
+- `/Users/ashray/code/amxv/agentdune-chat/lib/auth-client.ts` - Client-side auth setup
+- `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Database schema including user table
+- `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` - Route protection middleware
+- `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` - tRPC procedures and middleware
+- `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/admin.router.ts` - Admin-only procedures
+- `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts` - Router setup
+- `/Users/ashray/code/amxv/agentdune-chat/providers/session-provider.tsx` - Session context provider
+- `/Users/ashray/code/amxv/agentdune-chat/app/admin/layout.tsx` - Admin page layout

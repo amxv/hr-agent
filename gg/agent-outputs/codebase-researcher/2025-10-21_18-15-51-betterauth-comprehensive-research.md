@@ -10,7 +10,7 @@ This document provides a detailed analysis of the BetterAuth authentication syst
 
 ### Location and Initialization
 
-**Primary Configuration File:** `/Users/ashray/code/amxv/rag/lib/auth.ts`
+**Primary Configuration File:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts`
 
 BetterAuth is initialized with comprehensive configuration:
 
@@ -51,35 +51,35 @@ export const auth = betterAuth({
 });
 ```
 
-**File:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Lines 18-51
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Lines 18-51
 
 ### Core Configuration Options
 
 #### 1. Database Adapter
 - **Type:** Drizzle ORM Adapter for PostgreSQL
 - **Provider:** `pg` (PostgreSQL)
-- **Schema Location:** `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
+- **Schema Location:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
 - **Configuration:** Uses Drizzle adapter to connect to PostgreSQL database with BetterAuth-compatible schema
 
 #### 2. Trust Configuration
 - **Trusted Origins:** Configured from `env.VERCEL_URL` if available
 - **Purpose:** Prevents CSRF attacks by restricting auth requests to known domains
-- **File:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Line 23
+- **File:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Line 23
 
 #### 3. Secret Configuration
 - **Secret Source:** `env.AUTH_SECRET`
 - **Purpose:** Used for signing and encrypting sensitive data (tokens, sessions)
 - **Type:** Cryptographic secret generated via `https://generate-secret.vercel.app/32` or `openssl rand -base64 32`
-- **File:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Line 24
+- **File:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Line 24
 
 #### 4. Plugins
 - **Used:** `nextCookies()` plugin from BetterAuth
 - **Purpose:** Enables cookie-based session management for Next.js applications
-- **File:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Line 50
+- **File:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Line 50
 
 ### Environment Variables Required
 
-**File:** `/Users/ashray/code/amxv/rag/.env.example`
+**File:** `/Users/ashray/code/amxv/agentdune-chat/.env.example`
 
 ```env
 # Authentication Secret
@@ -101,7 +101,7 @@ VERCEL_URL=<optional>
 ```
 
 **Type Safety:** Validated via T3 Env
-**File:** `/Users/ashray/code/amxv/rag/lib/env.ts` - Lines 6-87
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/env.ts` - Lines 6-87
 
 Environment variable validation:
 
@@ -130,7 +130,7 @@ export const env = createEnv({
 
 **Status:** Active/Primary authentication provider
 
-**Configuration Location:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Lines 40-46
+**Configuration Location:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Lines 40-46
 
 ```typescript
 const github =
@@ -147,7 +147,7 @@ const github =
 - `AUTH_GITHUB_SECRET` - GitHub OAuth App Client Secret
 
 **Callback Flow:**
-1. User clicks "Continue with GitHub" button (line 21 in `/Users/ashray/code/amxv/rag/components/social-auth-providers.tsx`)
+1. User clicks "Continue with GitHub" button (line 21 in `/Users/ashray/code/amxv/agentdune-chat/components/social-auth-providers.tsx`)
 2. Client calls `authClient.signIn.social({ provider: "github" })`
 3. Redirects to GitHub authorization endpoint with app credentials
 4. GitHub redirects back to callback URL at `/api/auth/[...all]/` (BetterAuth handles this)
@@ -163,7 +163,7 @@ const github =
 
 **Status:** Conditionally enabled (not currently active in environment)
 
-**Configuration Location:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Lines 32-38
+**Configuration Location:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Lines 32-38
 
 ```typescript
 const google =
@@ -182,7 +182,7 @@ const google =
 **Callback Flow:** Same as GitHub - handled transparently by BetterAuth
 
 **UI Implementation:**
-- Button in `/Users/ashray/code/amxv/rag/components/social-auth-providers.tsx` - Line 12
+- Button in `/Users/ashray/code/amxv/agentdune-chat/components/social-auth-providers.tsx` - Line 12
 - Call: `authClient.signIn.social({ provider: "google" })`
 
 **Conditional Enabling Logic:**
@@ -197,7 +197,7 @@ const google =
 
 ### Primary Auth Route Handler
 
-**Location:** `/Users/ashray/code/amxv/rag/app/(auth)/api/auth/[...all]/route.ts`
+**Location:** `/Users/ashray/code/amxv/agentdune-chat/app/(auth)/api/auth/[...all]/route.ts`
 
 ```typescript
 import { toNextJsHandler } from "better-auth/next-js";
@@ -247,7 +247,7 @@ When user is redirected back from GitHub/Google, BetterAuth:
 **Step 2: User Database Entry**
 - User is created or updated in `user` table
 - User data stored: `id`, `name`, `email`, `emailVerified`, `image`, `createdAt`, `updatedAt`
-- File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 138-149
+- File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 138-149
 
 ```typescript
 export const user = pgTable("user", {
@@ -266,7 +266,7 @@ export const user = pgTable("user", {
 
 **Step 3: OAuth Account Record**
 - OAuth credentials stored in `account` table
-- File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 166-184
+- File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 166-184
 
 ```typescript
 export const account = pgTable("account", {
@@ -292,7 +292,7 @@ export const account = pgTable("account", {
 
 **Step 4: Session Creation**
 - Session record created in `session` table
-- File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 151-164
+- File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 151-164
 
 ```typescript
 export const session = pgTable("session", {
@@ -337,7 +337,7 @@ const session = await auth.api.getSession({ headers: req.headers });
 ### Session Validation Flow
 
 **Server-Side (Middleware):**
-File: `/Users/ashray/code/amxv/rag/middleware.ts` - Lines 34-35
+File: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` - Lines 34-35
 
 ```typescript
 const session = await auth.api.getSession({ headers: req.headers });
@@ -345,14 +345,14 @@ const isLoggedIn = !!session?.user;
 ```
 
 **Client-Side (React Hook):**
-File: `/Users/ashray/code/amxv/rag/lib/auth-client.ts` - Line 4
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/auth-client.ts` - Line 4
 
 ```typescript
 const { data: clientSessionRaw, isPending } = authClient.useSession();
 ```
 
 **Combined Usage (SessionProvider):**
-File: `/Users/ashray/code/amxv/rag/providers/session-provider.tsx` - Lines 23-32
+File: `/Users/ashray/code/amxv/agentdune-chat/providers/session-provider.tsx` - Lines 23-32
 
 ```typescript
 const { data: clientSessionRaw, isPending } = authClient.useSession();
@@ -375,7 +375,7 @@ const value = useMemo<SessionContextValue>(() => {
 - Expired sessions are invalidated
 
 **Verification Tables:**
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 186-196
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 186-196
 
 ```typescript
 export const verification = pgTable("verification", {
@@ -397,18 +397,18 @@ export const verification = pgTable("verification", {
 
 ### Middleware-Based Route Protection
 
-**Location:** `/Users/ashray/code/amxv/rag/middleware.ts`
+**Location:** `/Users/ashray/code/amxv/agentdune-chat/middleware.ts`
 
 The Next.js middleware implements route-based protection logic:
 
 **Runtime:** Node.js runtime (required for session validation)
-File: `/Users/ashray/code/amxv/rag/middleware.ts` - Line 6
+File: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` - Line 6
 ```typescript
 export const runtime = "nodejs";
 ```
 
 **Session Retrieval:**
-File: `/Users/ashray/code/amxv/rag/middleware.ts` - Lines 34-35
+File: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` - Lines 34-35
 ```typescript
 const session = await auth.api.getSession({ headers: req.headers });
 const isLoggedIn = !!session?.user;
@@ -437,7 +437,7 @@ const isLoggedIn = !!session?.user;
    - Redirect to `/login` if not authenticated
 
 **Matcher Configuration:**
-File: `/Users/ashray/code/amxv/rag/middleware.ts` - Lines 81-94
+File: `/Users/ashray/code/amxv/agentdune-chat/middleware.ts` - Lines 81-94
 
 ```typescript
 export const config = {
@@ -457,7 +457,7 @@ Excludes from middleware:
 
 ### tRPC Procedure-Level Authorization
 
-**Location:** `/Users/ashray/code/amxv/rag/trpc/init.ts`
+**Location:** `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts`
 
 #### Context Creation (Lines 29-34)
 
@@ -481,7 +481,7 @@ export const publicProcedure = t.procedure.use(timingMiddleware);
 **Usage:** Accessible by any client (logged in or anonymous)
 
 **Example - Chat Title Generation:**
-File: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` - Lines 220-239
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` - Lines 220-239
 
 ```typescript
 generateTitle: publicProcedure
@@ -525,7 +525,7 @@ export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
 - Passes user context to procedure with non-nullable user guarantee
 
 **Example - Get All Chats:**
-File: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` - Lines 40-55
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` - Lines 40-55
 
 ```typescript
 getAllChats: protectedProcedure.query(async ({ ctx }) => {
@@ -550,7 +550,7 @@ getAllChats: protectedProcedure.query(async ({ ctx }) => {
 
 All protected procedures validate that the user owns the resource:
 
-File: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` - Lines 57-74
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` - Lines 57-74
 
 ```typescript
 getChatById: protectedProcedure
@@ -579,7 +579,7 @@ getChatById: protectedProcedure
 
 ### User Table Schema
 
-**File:** `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 138-149
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 138-149
 
 ```typescript
 export type User = InferSelectModel<typeof user>;
@@ -612,7 +612,7 @@ export const user = pgTable("user", {
 
 ### Session Table Schema
 
-**File:** `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 151-164
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 151-164
 
 ```typescript
 export const session = pgTable("session", {
@@ -646,7 +646,7 @@ export const session = pgTable("session", {
 
 ### Account (OAuth) Table Schema
 
-**File:** `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 166-184
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 166-184
 
 ```typescript
 export const account = pgTable("account", {
@@ -690,7 +690,7 @@ export const account = pgTable("account", {
 
 ### Related User Credit Table
 
-**File:** `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 17-24
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 17-24
 
 ```typescript
 export const userCredit = pgTable("UserCredit", {
@@ -708,7 +708,7 @@ export const userCredit = pgTable("UserCredit", {
 ### User Retrieval and Access
 
 **Session Type Definition:**
-File: `/Users/ashray/code/amxv/rag/lib/auth.ts` - Lines 8-16
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Lines 8-16
 
 ```typescript
 export type Session = {
@@ -749,7 +749,7 @@ const user = session?.user;  // Optional until session loads
 
 ### Auth Client Configuration
 
-**Location:** `/Users/ashray/code/amxv/rag/lib/auth-client.ts`
+**Location:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth-client.ts`
 
 ```typescript
 import { nextCookies } from "better-auth/next-js";
@@ -770,7 +770,7 @@ export default authClient;
 
 ### Session Provider (React Context)
 
-**Location:** `/Users/ashray/code/amxv/rag/providers/session-provider.tsx`
+**Location:** `/Users/ashray/code/amxv/agentdune-chat/providers/session-provider.tsx`
 
 ```typescript
 "use client";
@@ -828,7 +828,7 @@ export function useSession(): SessionContextValue {
 4. **Graceful Fallback:** Uses server session until client hydration completes
 
 **Usage Pattern:**
-File: `/Users/ashray/code/amxv/rag/app/(chat)/layout.tsx` - Lines 16-37
+File: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/layout.tsx` - Lines 16-37
 
 ```typescript
 export default async function ChatLayout({
@@ -867,7 +867,7 @@ export default async function ChatLayout({
 ### Social Authentication UI Components
 
 **Login Form Component**
-File: `/Users/ashray/code/amxv/rag/components/login-form.tsx`
+File: `/Users/ashray/code/amxv/agentdune-chat/components/login-form.tsx`
 
 ```typescript
 "use client";
@@ -897,7 +897,7 @@ export function LoginForm({ className, ...props }: React.ComponentPropsWithoutRe
 ```
 
 **Social Auth Providers Component**
-File: `/Users/ashray/code/amxv/rag/components/social-auth-providers.tsx`
+File: `/Users/ashray/code/amxv/agentdune-chat/components/social-auth-providers.tsx`
 
 ```typescript
 "use client";
@@ -949,7 +949,7 @@ export function SocialAuthProviders() {
 ### Cookie Management
 
 **Plugin:** `nextCookies()` from BetterAuth
-**File:** `/Users/ashray/code/amxv/rag/lib/auth.ts` - Line 50
+**File:** `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` - Line 50
 
 BetterAuth's `nextCookies()` plugin handles all cookie operations transparently.
 
@@ -986,7 +986,7 @@ BetterAuth's `nextCookies()` plugin handles all cookie operations transparently.
 ### Access Token Storage
 
 **Location:** Database table `account.accessToken`
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Line 173
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Line 173
 
 ```typescript
 accessToken: text("access_token"),
@@ -999,7 +999,7 @@ accessToken: text("access_token"),
 ### Refresh Token Management
 
 **Location:** Database table `account.refreshToken`
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Line 174
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Line 174
 
 ```typescript
 refreshToken: text("refresh_token"),
@@ -1007,7 +1007,7 @@ refreshToken: text("refresh_token"),
 
 **Purpose:** Refresh access token when it expires
 **Expiration:** Tracked in `account.refreshTokenExpiresAt`
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Line 177
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Line 177
 
 ```typescript
 refreshTokenExpiresAt: timestamp("refresh_token_expires_at"),
@@ -1188,7 +1188,7 @@ The application uses simple binary authentication (authenticated vs. unauthentic
 All protected tRPC procedures verify resource ownership before allowing access.
 
 **Example: Chat Access Control**
-File: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` - Lines 66-70
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` - Lines 66-70
 
 ```typescript
 if (!chat || chat.userId !== ctx.user.id) {
@@ -1204,7 +1204,7 @@ if (!chat || chat.userId !== ctx.user.id) {
 ### Public vs. Private Resources
 
 **Visibility Model:**
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 36-38
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 36-38
 
 ```typescript
 visibility: varchar("visibility", { enum: ["public", "private"] })
@@ -1213,7 +1213,7 @@ visibility: varchar("visibility", { enum: ["public", "private"] })
 ```
 
 **Public Chats:** Accessible via public procedures (no auth required)
-File: `/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts` - Lines 241-258
+File: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts` - Lines 241-258
 
 ```typescript
 getPublicChat: publicProcedure
@@ -1241,7 +1241,7 @@ getPublicChat: publicProcedure
 ### User Credit/Quota System
 
 **Implementation:** User credit tracking for API usage
-File: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` - Lines 17-24
+File: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` - Lines 17-24
 
 ```typescript
 export const userCredit = pgTable("UserCredit", {

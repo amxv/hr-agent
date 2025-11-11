@@ -315,7 +315,7 @@ Successfully implemented a comprehensive feature flag system (`DISABLE_MODEL_SEL
 ## Research Documents
 
 ### Codebase Research
-- **`/Users/ashray/code/amxv/rag/gg/agent-outputs/codebase-researcher/2025-10-21_chat-infrastructure-research.md`**
+- **`/Users/ashray/code/amxv/agentdune-chat/gg/agent-outputs/codebase-researcher/2025-10-21_chat-infrastructure-research.md`**
   - Comprehensive documentation of chat infrastructure, Vercel AI SDK integration, and model selection
   - **Key sections**:
     - Model selection data flow (frontend → cookie → message metadata → backend)
@@ -628,7 +628,7 @@ grep -v "DISABLE_MODEL_SELECTION" .env.local > .env.local.tmp && mv .env.local.t
 - **Model Capabilities**: `lib/ai/app-models.ts` - See `input` and `output` properties on model definitions
 
 ### Prior Research
-- **Chat Infrastructure Research**: `/Users/ashray/code/amxv/rag/gg/agent-outputs/codebase-researcher/2025-10-21_chat-infrastructure-research.md`
+- **Chat Infrastructure Research**: `/Users/ashray/code/amxv/agentdune-chat/gg/agent-outputs/codebase-researcher/2025-10-21_chat-infrastructure-research.md`
   - Complete documentation of how chat and model selection works
   - Essential reading for understanding the architecture
 

@@ -22,15 +22,15 @@ trpc/
 ```
 
 ### Router Files Location
-- **Main router aggregation**: `/Users/ashray/code/amxv/rag/trpc/routers/_app.ts`
-- **API endpoint**: `/Users/ashray/code/amxv/rag/app/api/trpc/[trpc]/route.ts`
-- **tRPC initialization**: `/Users/ashray/code/amxv/rag/trpc/init.ts`
+- **Main router aggregation**: `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts`
+- **API endpoint**: `/Users/ashray/code/amxv/agentdune-chat/app/api/trpc/[trpc]/route.ts`
+- **tRPC initialization**: `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts`
 
 ---
 
 ## 2. How tRPC is Initialized
 
-### Step 1: Core Initialization (`/Users/ashray/code/amxv/rag/trpc/init.ts:1-57`)
+### Step 1: Core Initialization (`/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:1-57`)
 
 The tRPC instance is created at lines 45-57:
 
@@ -56,7 +56,7 @@ const t = initTRPC.context<typeof createTRPCContext>().create({
 - `protectedProcedure` (lines 120-135) - Authenticated procedure type
 - `createCallerFactory` (line 64) - For server-side calls
 
-### Step 2: Context Setup (`/Users/ashray/code/amxv/rag/trpc/init.ts:29-36`)
+### Step 2: Context Setup (`/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:29-36`)
 
 The context is created using React's `cache()` for request deduplication:
 
@@ -75,7 +75,7 @@ export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
 - `user?: { id: string; name?: string | null; email?: string | null; image?: string | null }`
 - Available in all procedures via `ctx.user`
 
-### Step 3: API Endpoint Setup (`/Users/ashray/code/amxv/rag/app/api/trpc/[trpc]/route.ts:1-12`)
+### Step 3: API Endpoint Setup (`/Users/ashray/code/amxv/agentdune-chat/app/api/trpc/[trpc]/route.ts:1-12`)
 
 The tRPC route handler uses the Fetch adapter:
 
@@ -101,7 +101,7 @@ The handler accepts both GET and POST requests at `/api/trpc`.
 
 ## 3. Main App Router Structure
 
-### Aggregation File (`/Users/ashray/code/amxv/rag/trpc/routers/_app.ts:1-31`)
+### Aggregation File (`/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts:1-31`)
 
 The main router aggregates all domain-specific routers:
 
@@ -136,7 +136,7 @@ export const createCaller = createCallerFactory(appRouter);
 
 ### Existing Middleware
 
-#### 1. Timing Middleware (`/Users/ashray/code/amxv/rag/trpc/init.ts:86-101`)
+#### 1. Timing Middleware (`/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:86-101`)
 
 Applied to all procedures:
 
@@ -161,7 +161,7 @@ const timingMiddleware = t.middleware(async ({ next, path }) => {
 
 Applied via: `publicProcedure = t.procedure.use(timingMiddleware)` (line 110)
 
-#### 2. Authentication Middleware - protectedProcedure (`/Users/ashray/code/amxv/rag/trpc/init.ts:120-135`)
+#### 2. Authentication Middleware - protectedProcedure (`/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:120-135`)
 
 ```typescript
 export const protectedProcedure = t.procedure.use(({ ctx, next }) => {
@@ -199,14 +199,14 @@ To create admin-only procedures, you need to:
 
 1. **First, extend the User model to include role information**
 
-   The current user schema at `/Users/ashray/code/amxv/rag/lib/db/schema.ts:138-149` doesn't have a role field. You would need to:
+   The current user schema at `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts:138-149` doesn't have a role field. You would need to:
    - Add a `role` field to the user table (via migration)
    - Update the auth session to include the role
    - Extend the Context type
 
 2. **Create an admin middleware in init.ts**
 
-   Pattern (add to `/Users/ashray/code/amxv/rag/trpc/init.ts` after line 135):
+   Pattern (add to `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts` after line 135):
 
    ```typescript
    /**
@@ -243,7 +243,7 @@ To create admin-only procedures, you need to:
 
 3. **Update the Context type**
 
-   Modify the context in `/Users/ashray/code/amxv/rag/trpc/init.ts:36`:
+   Modify the context in `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:36`:
 
    ```typescript
    export type Context = Awaited<ReturnType<typeof createTRPCContext>>;
@@ -255,7 +255,7 @@ To create admin-only procedures, you need to:
 
 ## 6. Router Pattern Examples
 
-### Example 1: Simple Query Router (`/Users/ashray/code/amxv/rag/trpc/routers/credits.router.ts:1-15`)
+### Example 1: Simple Query Router (`/Users/ashray/code/amxv/agentdune-chat/trpc/routers/credits.router.ts:1-15`)
 
 ```typescript
 import { getUserCreditsInfo } from "@/lib/repositories/credits";
@@ -282,7 +282,7 @@ export const creditsRouter = createTRPCRouter({
 - Async handler receives `{ ctx, input }`
 - Return typed data
 
-### Example 2: Query with Input Validation (`/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts:57-74`)
+### Example 2: Query with Input Validation (`/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts:57-74`)
 
 ```typescript
 getChatById: protectedProcedure
@@ -312,7 +312,7 @@ getChatById: protectedProcedure
 - Throw `TRPCError` with appropriate error codes
 - Return serializable data (superjson handles complex types)
 
-### Example 3: Mutation with Multiple Validations (`/Users/ashray/code/amxv/rag/trpc/routers/chat.router.ts:96-115`)
+### Example 3: Mutation with Multiple Validations (`/Users/ashray/code/amxv/agentdune-chat/trpc/routers/chat.router.ts:96-115`)
 
 ```typescript
 renameChat: protectedProcedure
@@ -343,7 +343,7 @@ renameChat: protectedProcedure
 - Validate ownership before modification
 - Can return void, objects, or any serializable type
 
-### Example 4: Authorization Check Pattern (`/Users/ashray/code/amxv/rag/trpc/routers/vote.router.ts:23-49`)
+### Example 4: Authorization Check Pattern (`/Users/ashray/code/amxv/agentdune-chat/trpc/routers/vote.router.ts:23-49`)
 
 ```typescript
 voteMessage: protectedProcedure
@@ -389,7 +389,7 @@ voteMessage: protectedProcedure
 
 ### Step 1: Create New Router File
 
-Create `/Users/ashray/code/amxv/rag/trpc/routers/users.router.ts`:
+Create `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/users.router.ts`:
 
 ```typescript
 import { TRPCError } from "@trpc/server";
@@ -453,7 +453,7 @@ export const usersRouter = createTRPCRouter({
 
 ### Step 2: Register in Main App Router
 
-Update `/Users/ashray/code/amxv/rag/trpc/routers/_app.ts`:
+Update `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts`:
 
 ```typescript
 import { createCallerFactory, createTRPCRouter } from "@/trpc/init";
@@ -495,7 +495,7 @@ trpc.users.updateUserRole.useMutation();
 
 ### Client Setup
 
-The router types are exposed through the `AppRouter` export in `/Users/ashray/code/amxv/rag/trpc/routers/_app.ts:21`:
+The router types are exposed through the `AppRouter` export in `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts:21`:
 
 ```typescript
 export type AppRouter = typeof appRouter;
@@ -566,7 +566,7 @@ throw new TRPCError({
 
 ### Error Formatter
 
-All ZodError validation errors are automatically formatted with `zodError` in the response (`/Users/ashray/code/amxv/rag/trpc/init.ts:47-56`):
+All ZodError validation errors are automatically formatted with `zodError` in the response (`/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts:47-56`):
 
 ```typescript
 errorFormatter({ shape, error }) {
@@ -610,19 +610,19 @@ Features:
 
 1. **Database Schema Extension** (required migration):
    - Add `role` column to `user` table: `VARCHAR('user' | 'admin') DEFAULT 'user'`
-   - Update `/Users/ashray/code/amxv/rag/lib/db/schema.ts:138-149`
+   - Update `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts:138-149`
 
 2. **Session Extension**:
    - Update `createTRPCContext()` to include role from session
-   - Modify `/Users/ashray/code/amxv/rag/lib/auth.ts` session structure
+   - Modify `/Users/ashray/code/amxv/agentdune-chat/lib/auth.ts` session structure
 
 3. **Middleware Creation**:
-   - Add `adminProcedure` to `/Users/ashray/code/amxv/rag/trpc/init.ts`
+   - Add `adminProcedure` to `/Users/ashray/code/amxv/agentdune-chat/trpc/init.ts`
    - Use pattern similar to `protectedProcedure` (lines 120-135)
 
 4. **Router Creation**:
-   - Create `/Users/ashray/code/amxv/rag/trpc/routers/users.router.ts`
-   - Register in `/Users/ashray/code/amxv/rag/trpc/routers/_app.ts`
+   - Create `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/users.router.ts`
+   - Register in `/Users/ashray/code/amxv/agentdune-chat/trpc/routers/_app.ts`
 
 ---
 

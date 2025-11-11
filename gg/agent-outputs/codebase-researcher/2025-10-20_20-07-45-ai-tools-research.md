@@ -10,7 +10,7 @@ This research analyzes the AI chat application architecture to understand what t
 
 ### Primary Framework
 - **Framework**: Vercel AI SDK (`ai` package v5.0.39)
-- **Location**: `/Users/ashray/code/amxv/rag/package.json:108`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/package.json:108`
 - **Type**: JavaScript/TypeScript SDK for AI model integration
 
 ### Related Packages
@@ -31,7 +31,7 @@ This research analyzes the AI chat application architecture to understand what t
 - `experimental_generateImage()` - Generate images
 - `experimental_createMCPClient()` - Create MCP protocol clients
 
-**Entry Point**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:1-9`
+**Entry Point**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:1-9`
 
 ---
 
@@ -40,9 +40,9 @@ This research analyzes the AI chat application architecture to understand what t
 ### Tool Definition Files
 
 #### Main Tool Registry
-- **Definitions File**: `/Users/ashray/code/amxv/rag/lib/ai/tools/tools-definitions.ts`
-- **Tools Factory**: `/Users/ashray/code/amxv/rag/lib/ai/tools/tools.ts`
-- **Type Definitions**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts`
+- **Definitions File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools-definitions.ts`
+- **Tools Factory**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools.ts`
+- **Type Definitions**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts`
 
 #### Tool Definition Structure
 Each tool in `toolsDefinitions` includes:
@@ -50,7 +50,7 @@ Each tool in `toolsDefinitions` includes:
 - `description`: string
 - `cost`: number (credit cost for using the tool)
 
-**Example from `/Users/ashray/code/amxv/rag/lib/ai/tools/tools-definitions.ts:3-64`**:
+**Example from `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools-definitions.ts:3-64`**:
 ```typescript
 export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
   getWeather: {
@@ -65,7 +65,7 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
 ### Tool Registration Mechanism
 
 #### Tool Factory Function
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/tools.ts:18-88`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools.ts:18-88`
 
 The `getTools()` function registers all available tools and returns them as a single tools object:
 
@@ -94,7 +94,7 @@ Tools are conditionally registered based on environment variables:
 - `env.NEXT_PUBLIC_SANDBOX_AVAILABLE` - Code interpreter and stock chart tools
 - `env.NEXT_PUBLIC_OPENAI_AVAILABLE` - Image generation tool
 
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/tools.ts:63-86`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools.ts:63-86`
 
 ### Tool Integration Flow
 
@@ -104,7 +104,7 @@ Tools are conditionally registered based on environment variables:
 4. **Tool filtering** → Filter based on availability and credits
 5. **AI uses tools** → AI SDK calls tools during streaming
 
-**Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:274-420`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:274-420`
 
 ---
 
@@ -115,7 +115,7 @@ Tools are conditionally registered based on environment variables:
 #### 1. **getWeather**
 - **Type**: Core Tool
 - **Cost**: 1 credit
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/get-weather.ts:4-24`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/get-weather.ts:4-24`
 - **Description**: Get the current weather at a location
 - **Input Schema**:
   - `latitude`: number (required)
@@ -127,7 +127,7 @@ Tools are conditionally registered based on environment variables:
 #### 2. **webSearch**
 - **Type**: Core Tool (Conditional)
 - **Cost**: 3 credits
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/web-search.ts:108-182`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/web-search.ts:108-182`
 - **Availability**: Requires `env.NEXT_PUBLIC_TAVILY_AVAILABLE`
 - **Description**: Multi-query web search with support for depth, topic filtering, and domain exclusion
 - **Input Schema**:
@@ -148,7 +148,7 @@ Tools are conditionally registered based on environment variables:
 #### 3. **retrieve**
 - **Type**: Core Tool
 - **Cost**: 1 credit
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/retrieve.ts:10-76`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/retrieve.ts:10-76`
 - **Description**: Fetch structured information from a single URL
 - **Input Schema**:
   - `url`: string (required) - The URL to retrieve
@@ -167,7 +167,7 @@ Tools are conditionally registered based on environment variables:
 #### 4. **generateImage**
 - **Type**: Core Tool (Conditional)
 - **Cost**: 50 credits
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/generate-image.ts:21-190`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/generate-image.ts:21-190`
 - **Availability**: Requires `env.NEXT_PUBLIC_OPENAI_AVAILABLE`
 - **Description**: Generate images from text descriptions
 - **Input Schema**:
@@ -189,7 +189,7 @@ Tools are conditionally registered based on environment variables:
 #### 5. **codeInterpreter**
 - **Type**: Core Tool (Conditional)
 - **Cost**: 10 credits
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/code-interpreter.ts:6-86`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/code-interpreter.ts:6-86`
 - **Availability**: Requires `env.NEXT_PUBLIC_SANDBOX_AVAILABLE`
 - **Description**: Python-only sandbox for calculations, data analysis, and visualizations
 - **Input Schema**:
@@ -210,7 +210,7 @@ Tools are conditionally registered based on environment variables:
 #### 6. **stockChart**
 - **Type**: Core Tool (Conditional)
 - **Cost**: 1 credit
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/stock-chart.ts:6-110`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/stock-chart.ts:6-110`
 - **Availability**: Requires `env.NEXT_PUBLIC_SANDBOX_AVAILABLE`
 - **Description**: Generate line stock charts and fetch historical price data
 - **Input Schema**:
@@ -226,17 +226,17 @@ Tools are conditionally registered based on environment variables:
 #### 7. **createDocument**
 - **Type**: Artifact Tool (Frontend-exposed)
 - **Cost**: 5 credits
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/create-document.ts:24-108`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/create-document.ts:24-108`
 - **Description**: Create persistent documents (text, code, or spreadsheet)
 - **Input Schema**:
   - `title`: string (required) - File name with extension for code artifacts
   - `description`: string (required) - What document should contain
   - `kind`: enum of artifact kinds (required) - Document type
 - **Supported Kinds**:
-  - Defined in `/Users/ashray/code/amxv/rag/lib/artifacts/artifact-kind.ts`
+  - Defined in `/Users/ashray/code/amxv/agentdune-chat/lib/artifacts/artifact-kind.ts`
   - Includes: text, code, spreadsheet, etc.
 - **Handler System**: Uses pluggable document handlers for different artifact types
-  - **Location**: `/Users/ashray/code/amxv/rag/lib/artifacts/server.ts`
+  - **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/artifacts/server.ts`
   - Each handler implements `onCreateDocument()` method
 - **Features**:
   - Streams document creation progress to UI
@@ -248,7 +248,7 @@ Tools are conditionally registered based on environment variables:
 #### 8. **updateDocument**
 - **Type**: Artifact Tool (Frontend-exposed)
 - **Cost**: 5 credits
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/update-document.ts:16-98`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/update-document.ts:16-98`
 - **Description**: Modify an existing document
 - **Input Schema**:
   - `id`: string (required) - Document ID to update
@@ -263,7 +263,7 @@ Tools are conditionally registered based on environment variables:
 #### 9. **readDocument**
 - **Type**: Artifact Tool
 - **Cost**: 1 credit
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/read-document.ts:12-50`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/read-document.ts:12-50`
 - **Description**: Read contents of a document created earlier in chat
 - **Input Schema**:
   - `id`: string (required) - Document ID
@@ -273,7 +273,7 @@ Tools are conditionally registered based on environment variables:
 #### 10. **requestSuggestions**
 - **Type**: Artifact Tool
 - **Cost**: 1 credit
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/request-suggestions.ts:16-114`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/request-suggestions.ts:16-114`
 - **Description**: Generate writing-improvement suggestions without applying edits
 - **Input Schema**:
   - `documentId`: string (required) - Existing document ID
@@ -296,7 +296,7 @@ Tools are conditionally registered based on environment variables:
 #### 11. **deepResearch**
 - **Type**: Core Tool (Frontend-exposed, Conditional)
 - **Cost**: 50 credits
-- **Implementation**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/deep-research.ts:10-81`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/deep-research.ts:10-81`
 - **Availability**: Requires `env.NEXT_PUBLIC_TAVILY_AVAILABLE`
 - **Description**: Autonomous research tool that conducts deep analysis with clarification, parallel research tasks, and synthesis
 - **Input Schema**: Empty object (uses conversation context)
@@ -312,7 +312,7 @@ Tools are conditionally registered based on environment variables:
   - `problem`: Error message
 - **Telemetry**: Integrates with Langfuse for tracing and observability
 - **Implementation Details**:
-  - **Core Runner**: `runDeepResearcher()` in `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/deep-researcher.ts`
+  - **Core Runner**: `runDeepResearcher()` in `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/deep-researcher.ts`
   - **Configuration**: Loaded from environment or config object
   - **Models**: Uses configurable models for different stages (default: gpt-4o-mini variants)
   - **Context Window**: Respects model context limits
@@ -351,7 +351,7 @@ All tools support **streaming via StreamWriter** for real-time UI updates:
 - Suggestion generation
 - Code execution results
 
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts:95-110`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts:95-110`
 
 ### Cost System
 Tools have credit costs to manage usage:
@@ -361,7 +361,7 @@ Tools have credit costs to manage usage:
 - Image Generation & Deep Research: 50 credits
 - Document Creation/Update: 5 credits each
 
-**Cost Filtering**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:372-379`
+**Cost Filtering**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:372-379`
 
 The system filters available tools based on user budget (credits remaining).
 
@@ -372,7 +372,7 @@ The system filters available tools based on user budget (credits remaining).
 ### MCP Overview
 The application supports **Model Context Protocol (MCP)** servers for extending tool capabilities. This is specifically implemented in the **deepResearch** tool.
 
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/utils.ts:1-75`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/utils.ts:1-75`
 
 ### MCP Implementation Details
 
@@ -386,10 +386,10 @@ client = await experimental_createMCPClient({
 });
 ```
 
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/utils.ts:26-31`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/utils.ts:26-31`
 
 #### MCP Configuration
-Defined in schema: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/configuration.ts:7-14`
+Defined in schema: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/configuration.ts:7-14`
 
 ```typescript
 export const MCPConfigSchema = z.object({
@@ -400,7 +400,7 @@ export const MCPConfigSchema = z.object({
 ```
 
 #### Tool Loading from MCP
-Function: `loadMcpTools()` in `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/utils.ts:14-75`
+Function: `loadMcpTools()` in `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/utils.ts:14-75`
 
 Process:
 1. Connects to MCP server via SSE transport
@@ -412,7 +412,7 @@ Process:
 5. Closes connection safely
 
 #### MCP Tool Integration
-In `getAllTools()`: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/utils.ts:101-117`
+In `getAllTools()`: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/utils.ts:101-117`
 
 MCP tools are merged with search tools:
 ```typescript
@@ -423,7 +423,7 @@ return { ...mcpTools, ...searchTools };
 This allows MCP tools to coexist with built-in search tools while preventing name conflicts.
 
 ### MCP Configuration Loading
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/configuration.ts:54-88`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/configuration.ts:54-88`
 
 Environment variables mapped to config:
 - `SEARCH_API`: Sets search provider (tavily, firecrawl, none)
@@ -447,7 +447,7 @@ Environment variables mapped to config:
 ### Configuration Sources
 
 #### 1. Environment Variables
-**Location**: `/Users/ashray/code/amxv/rag/lib/env.ts` (not shown but referenced)
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/env.ts` (not shown but referenced)
 
 Key environment variables:
 - `NEXT_PUBLIC_TAVILY_AVAILABLE`: Enable web search tools
@@ -458,7 +458,7 @@ Key environment variables:
 - `SANDBOX_TEMPLATE_ID`: E2B sandbox template ID
 
 #### 2. Deep Research Configuration
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/configuration.ts`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/configuration.ts`
 
 Can be configured via:
 - Environment variables (mapped in `loadConfigFromEnv()`)
@@ -488,7 +488,7 @@ Tools are conditionally exported in `getTools()`:
 
 ### Tool Registration Flow
 
-**Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:540-555`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:540-555`
 
 ```typescript
 tools: getTools({
@@ -511,7 +511,7 @@ tools: getTools({
 
 ### Tool Filtering Based on Credits
 
-**Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:372-420`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:372-420`
 
 Process:
 1. Get base model cost
@@ -529,7 +529,7 @@ Process:
 
 ### User Message Processing Flow
 
-**Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:161-772`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:161-772`
 
 #### Step 1: Receive Message (Lines 161-187)
 - Parse user message and selected model from request
@@ -627,7 +627,7 @@ Each tool receives:
 
 These tools are exposed to the user interface for explicit selection:
 
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts:42-47`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts:42-47`
 
 ```typescript
 export const frontendToolsSchema = z.enum([
@@ -643,7 +643,7 @@ Users can explicitly select one of these tools before sending a message. The sel
 - **Field**: `userMessage.metadata.selectedTool`
 - **Type**: `UiToolName` enum
 
-**Processing Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:334-345`
+**Processing Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:334-345`
 
 When explicitly selected, the tool becomes the only active tool (overriding normal tool filtering).
 
@@ -653,7 +653,7 @@ When explicitly selected, the tool becomes the only active tool (overriding norm
 
 ### Tool Type Definitions
 
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts:1-127`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts:1-127`
 
 #### ToolName Enum
 All available tools defined via Zod schema:
@@ -719,26 +719,26 @@ export type CustomUIDataTypes = {
 ### Tool-Level Error Handling
 
 #### Web Search Error Handling
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/web-search.ts:71-76`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/web-search.ts:71-76`
 - Logs search errors
 - Returns error in results
 - Continues processing other queries
 
 #### Image Generation Error Handling
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/generate-image.ts:170-188`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/generate-image.ts:170-188`
 - Detailed error logging with mode, timing, and error details
 - Error object serialization for safe logging
 - Re-throws errors for caller handling
 
 #### Document Validation
-**Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/read-document.ts:27-40`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/read-document.ts:27-40`
 - Validates document exists
 - Checks user authorization (document.userId match)
 - Returns error object if validation fails
 
 ### API-Level Error Handling
 
-**Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:755-772`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:755-772`
 
 ```typescript
 catch (error) {
@@ -768,29 +768,29 @@ catch (error) {
 ### 1. Resumable Streams
 - **Technology**: resumable-stream library
 - **Purpose**: Resume interrupted streams using Redis
-- **Implementation**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:66-106`
+- **Implementation**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:66-106`
 - **TTL**: 10 minutes with automatic cleanup
 
 ### 2. Telemetry & Observability
 - **Langfuse Integration**: Deep research tool traces
-- **Location**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/deep-research.ts:40-58`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/deep-research.ts:40-58`
 - **Purpose**: Track research execution and performance
 
 ### 3. Database Integration
 - **Read Operations**: `getDocumentById()`, `getMessageById()`, `getChatById()`
 - **Write Operations**: `saveMessage()`, `updateMessage()`, `saveSuggestions()`
-- **Location**: `/Users/ashray/code/amxv/rag/lib/db/queries.ts`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts`
 
 ### 4. File Storage
 - **Provider**: Vercel Blob
 - **Used By**: Image generation tool
-- **Function**: `uploadFile()` in `/Users/ashray/code/amxv/rag/lib/blob.ts`
+- **Function**: `uploadFile()` in `/Users/ashray/code/amxv/agentdune-chat/lib/blob.ts`
 
 ### 5. Redis Integration
 - **Purpose**: Rate limiting, session storage, stream tracking
 - **Publishers**: OpenAI API key management, stream coordination
 - **Subscribers**: Event-driven processing
-- **Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts:66-76`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts:66-76`
 
 ---
 

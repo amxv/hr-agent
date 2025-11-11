@@ -9,7 +9,7 @@ The chat interface is built on a sophisticated state management and streaming ar
 ## 1. Core Architecture Layers
 
 ### 1.1 UI Layer
-- **Location**: `/Users/ashray/code/amxv/rag/components/`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/components/`
 - **Main Components**:
   - `chat-system.tsx` - Root provider wrapper (`ChatSystem` component, line 15)
   - `chat.tsx` - Main chat container (line 17)
@@ -21,7 +21,7 @@ The chat interface is built on a sophisticated state management and streaming ar
   - `multimodal-input.tsx` - Input component with file upload (line 64)
 
 ### 1.2 State Management Layer
-- **Location**: `/Users/ashray/code/amxv/rag/lib/stores/`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/stores/`
 - **Core Store**: `chat-store.tsx` (line 1)
   - Uses Zustand with middleware: `devtools`, `subscribeWithSelector`
   - Composed of three layers:
@@ -30,7 +30,7 @@ The chat interface is built on a sophisticated state management and streaming ar
     3. **Markdown Memo** (`with-markdown-memo.ts`): Caches markdown rendering to optimize re-renders
 
 ### 1.3 API Layer
-- **Location**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/`
+- **Location**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/`
 - **Main Endpoint**: `route.ts` (POST `/api/chat`)
   - Handles user messages
   - Streams assistant responses using `createUIMessageStream`
@@ -44,7 +44,7 @@ The chat interface is built on a sophisticated state management and streaming ar
 ### 2.1 Message Entry Point
 
 **User Input → Submission**
-- Component: `MultimodalInput` (`/Users/ashray/code/amxv/rag/components/multimodal-input.tsx`, line 64)
+- Component: `MultimodalInput` (`/Users/ashray/code/amxv/agentdune-chat/components/multimodal-input.tsx`, line 64)
 - Captures text + file attachments via `useChatInput()` provider
 - Creates `ChatMessage` object (lines 249-270):
   ```typescript
@@ -67,7 +67,7 @@ The chat interface is built on a sophisticated state management and streaming ar
 ### 2.2 Message Dispatch & Streaming
 
 **Message Sent → API Stream**
-- Handler: `ChatSync` component (`/Users/ashray/code/amxv/rag/components/chat-sync.tsx`, line 28)
+- Handler: `ChatSync` component (`/Users/ashray/code/amxv/agentdune-chat/components/chat-sync.tsx`, line 28)
 - Creates `ZustandChat` instance that:
   1. Uses `DefaultChatTransport` to POST to `/api/chat` (line 54)
   2. Passes last user message + history (lines 56-65)
@@ -108,12 +108,12 @@ The chat interface is built on a sophisticated state management and streaming ar
 ### 2.3 Client-Side Stream Handling
 
 **Stream Data Reception**
-- Provider: `DataStreamProvider` (`/Users/ashray/code/amxv/rag/components/data-stream-provider.tsx`, line 17)
+- Provider: `DataStreamProvider` (`/Users/ashray/code/amxv/agentdune-chat/components/data-stream-provider.tsx`, line 17)
   - Maintains `dataStream` state array
   - Provides `setDataStream` for appending stream parts
 
 **Stream Part Processing**
-- Handler: `DataStreamHandler` (`/Users/ashray/code/amxv/rag/components/data-stream-handler.tsx`, line 27)
+- Handler: `DataStreamHandler` (`/Users/ashray/code/amxv/agentdune-chat/components/data-stream-handler.tsx`, line 27)
 - Watches dataStream for new deltas (line 44)
 - Processes parts by type (lines 47-116):
   - `data-id`, `data-messageId`, `data-title`, `data-kind`: Update artifact metadata

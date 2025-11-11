@@ -14,10 +14,10 @@ The AgentDune application uses **Drizzle ORM** with **PostgreSQL** as the primar
 - **Database**: PostgreSQL (via `postgres@3.4.4` from `package.json:150`)
 
 ### Configuration Files
-- **Schema definition**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
-- **Drizzle config**: `/Users/ashray/code/amxv/rag/drizzle.config.ts`
-- **Database client**: `/Users/ashray/code/amxv/rag/lib/db/client.ts`
-- **Migrations folder**: `/Users/ashray/code/amxv/rag/lib/db/migrations/`
+- **Schema definition**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
+- **Drizzle config**: `/Users/ashray/code/amxv/agentdune-chat/drizzle.config.ts`
+- **Database client**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/client.ts`
+- **Migrations folder**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/migrations/`
 
 ### Database Connection Setup (`lib/db/client.ts`)
 ```typescript
@@ -37,7 +37,7 @@ The connection uses environment variable `POSTGRES_URL` for database URL configu
 ## 2. Schema Definition Structure
 
 ### Location & Organization
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts` (203 lines)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts` (203 lines)
 
 The schema uses Drizzle's PostgreSQL core API to define tables declaratively:
 ```typescript
@@ -372,7 +372,7 @@ Message (many) ──── (self) Message [parentMessageId - for threading]
 
 ## 5. CRUD Operation Patterns
 
-All data access is located in `/Users/ashray/code/amxv/rag/lib/db/queries.ts` (700 lines)
+All data access is located in `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts` (700 lines)
 
 ### Pattern Characteristics
 - **Scope**: "server-only" directive at top (`queries.ts:1`) ensures server-side only usage
@@ -858,7 +858,7 @@ export async function getAllAttachmentUrls(): Promise<string[]> {
 ## 6. Migration Management
 
 ### Migration Structure
-**Location**: `/Users/ashray/code/amxv/rag/lib/db/migrations/`
+**Location**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/migrations/`
 
 Migration files:
 1. `0000_petite_morbius.sql` - Initial schema creation

@@ -3,14 +3,14 @@
 ## File Upload Flow
 
 ### 1. Frontend - File Selection & Upload
-**File**: `/Users/ashray/code/amxv/rag/components/multimodal-input.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/multimodal-input.tsx`
 - Lines 63-150: Main input component
 - Handles file drag-drop via `react-dropzone`
 - Auto-switches to PDF/image compatible models
 - Shows upload queue and attachments
 
 ### 2. File Validation & Compression
-**File**: `/Users/ashray/code/amxv/rag/lib/files/upload-prep.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/files/upload-prep.ts`
 ```typescript
 - compressImageIfNeeded() - Client-side image optimization
 - processFilesForUpload() - Categorizes files (images/PDFs/unsupported)
@@ -19,12 +19,12 @@
 
 ### 3. Upload UI Components
 **Files**:
-- `/Users/ashray/code/amxv/rag/components/attachment-list.tsx` - Display list
-- `/Users/ashray/code/amxv/rag/components/preview-attachment.tsx` - Individual preview
+- `/Users/ashray/code/amxv/agentdune-chat/components/attachment-list.tsx` - Display list
+- `/Users/ashray/code/amxv/agentdune-chat/components/preview-attachment.tsx` - Individual preview
 - Shows upload progress, PDF icon, open/download buttons
 
 ### 4. Backend Upload Endpoint
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/files/upload/route.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/files/upload/route.ts`
 ```typescript
 POST /api/chat/api/files/upload
 - Validates session (Better Auth)
@@ -34,7 +34,7 @@ POST /api/chat/api/files/upload
 ```
 
 ### 5. Blob Storage Utilities
-**File**: `/Users/ashray/code/amxv/rag/lib/blob.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/blob.ts`
 ```typescript
 - uploadFile() - Store in Vercel Blob with prefix
 - listFiles() - List stored files
@@ -47,7 +47,7 @@ POST /api/chat/api/files/upload
 ## Message Handling & Conversion
 
 ### 6. Message Types & Attachments
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts` (Lines 123-127)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts` (Lines 123-127)
 ```typescript
 type Attachment = {
   name: string;
@@ -57,13 +57,13 @@ type Attachment = {
 ```
 
 ### 7. Message Conversion
-**File**: `/Users/ashray/code/amxv/rag/lib/message-conversion.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/message-conversion.ts`
 - `dbMessageToChatMessage()` - DB to UI format
 - `chatMessageToDbMessage()` - UI to DB format
 - Maintains attachment metadata
 
 ### 8. Asset Download (URL to Binary)
-**File**: `/Users/ashray/code/amxv/rag/lib/utils/download-assets.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/utils/download-assets.ts`
 ```typescript
 - downloadAssetsFromModelMessages() - Fetch files from URLs
 - replaceFilePartUrlByBinaryDataInMessages() - Convert URLs to binary
@@ -75,14 +75,14 @@ type Attachment = {
 ## AI Chat & Tool Integration
 
 ### 9. Main Chat Route
-**File**: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts`
 - Converts messages to model format via `convertToModelMessages()`
 - Downloads binary data from blob URLs
 - Selects appropriate model and tools
 - Streams response via SSE
 
 ### 10. Tools Definition & Registration
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/tools/tools-definitions.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools-definitions.ts`
 ```typescript
 All available tools:
 - getWeather, createDocument, updateDocument
@@ -91,7 +91,7 @@ All available tools:
 - generateImage, deepResearch
 ```
 
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/tools/tools.ts` (Lines 18-88)
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools.ts` (Lines 18-88)
 - `getTools()` function - Configures available tools based on environment
 - Only includes tools if API keys present
 
@@ -100,7 +100,7 @@ All available tools:
 ## Document & Search Tools
 
 ### 11. Firecrawl Integration (URL Retrieval)
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/tools/retrieve.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/retrieve.ts`
 ```typescript
 - Tool name: "retrieve"
 - Input: URL string
@@ -109,7 +109,7 @@ All available tools:
 ```
 
 ### 12. Web Search Tool
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/tools/web-search.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/web-search.ts`
 ```typescript
 - Tool name: "webSearch"
 - Supports multi-query search (max 2 queries)
@@ -120,7 +120,7 @@ All available tools:
 ```
 
 ### 13. Deep Research Tool
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/deep-research.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/deep-research.ts`
 ```typescript
 - Tool name: "deepResearch"
 - Autonomous multi-step research agent
@@ -139,7 +139,7 @@ All available tools:
 ## Database & Persistence
 
 ### 14. Database Schema
-**File**: `/Users/ashray/code/amxv/rag/lib/db/schema.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts`
 
 **Message Table** (Lines 44-61):
 ```typescript
@@ -166,7 +166,7 @@ const document = pgTable("Document", {
 ```
 
 ### 15. Database Queries
-**File**: `/Users/ashray/code/amxv/rag/lib/db/queries.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts`
 - `getChatById()` - Fetch conversation
 - `getMessageById()` - Get specific message
 - `saveMessage()` - Store user/assistant message
@@ -177,19 +177,19 @@ const document = pgTable("Document", {
 ## File-Related Frontend Components
 
 ### 16. Multimodal Input
-**File**: `/Users/ashray/code/amxv/rag/components/multimodal-input.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/multimodal-input.tsx`
 - Main input container (Lines 63-77)
 - Attachment state management (Lines 85-98)
 - File input ref handling (Lines 122-132)
 - Model compatibility checking (Lines 104-120)
 
 ### 17. Image Modal
-**File**: `/Users/ashray/code/amxv/rag/components/image-modal.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/image-modal.tsx`
 - Full-screen image preview
 - Used when clicking attachment previews
 
 ### 18. Model Selector with File Support
-**File**: `/Users/ashray/code/amxv/rag/components/model-selector.tsx`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/components/model-selector.tsx`
 - Shows model capabilities
 - Filters based on attachment types
 - Prompts model switch for PDF/image support
@@ -199,7 +199,7 @@ const document = pgTable("Document", {
 ## Configuration & Initialization
 
 ### 19. Environment Variables
-**File**: `/Users/ashray/code/amxv/rag/.env.example`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/.env.example`
 ```
 BLOB_READ_WRITE_TOKEN=    # Required for file upload
 FIRECRAWL_API_KEY=        # Required for web scraping
@@ -209,7 +209,7 @@ REDIS_URL=                # Optional, for resumable streams
 ```
 
 ### 20. AI Models Definition
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts`
 - Model configurations and capabilities
 - Vision model detection
 - PDF support detection
@@ -219,7 +219,7 @@ REDIS_URL=                # Optional, for resumable streams
 ## Type Definitions
 
 ### 21. AI/Chat Types
-**File**: `/Users/ashray/code/amxv/rag/lib/ai/types.ts`
+**File**: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts`
 - `Attachment` type (Lines 123-127)
 - `ChatMessage` type (Lines 112-117)
 - `ChatTools` type (Lines 77-89)
@@ -314,29 +314,29 @@ Save to PostgreSQL
 
 ```
 Core Upload:
-  - /Users/ashray/code/amxv/rag/app/(chat)/api/files/upload/route.ts
-  - /Users/ashray/code/amxv/rag/lib/blob.ts
+  - /Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/files/upload/route.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/blob.ts
 
 Frontend Components:
-  - /Users/ashray/code/amxv/rag/components/multimodal-input.tsx
-  - /Users/ashray/code/amxv/rag/components/attachment-list.tsx
-  - /Users/ashray/code/amxv/rag/components/preview-attachment.tsx
+  - /Users/ashray/code/amxv/agentdune-chat/components/multimodal-input.tsx
+  - /Users/ashray/code/amxv/agentdune-chat/components/attachment-list.tsx
+  - /Users/ashray/code/amxv/agentdune-chat/components/preview-attachment.tsx
 
 File Processing:
-  - /Users/ashray/code/amxv/rag/lib/files/upload-prep.ts
-  - /Users/ashray/code/amxv/rag/lib/utils/download-assets.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/files/upload-prep.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/utils/download-assets.ts
 
 Chat & Tools:
-  - /Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts
-  - /Users/ashray/code/amxv/rag/lib/ai/tools/tools.ts
-  - /Users/ashray/code/amxv/rag/lib/ai/tools/retrieve.ts
-  - /Users/ashray/code/amxv/rag/lib/ai/tools/web-search.ts
+  - /Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/tools.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/retrieve.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/web-search.ts
 
 Database:
-  - /Users/ashray/code/amxv/rag/lib/db/schema.ts
-  - /Users/ashray/code/amxv/rag/lib/db/queries.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/db/schema.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/db/queries.ts
 
 Types:
-  - /Users/ashray/code/amxv/rag/lib/ai/types.ts
-  - /Users/ashray/code/amxv/rag/lib/message-conversion.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/ai/types.ts
+  - /Users/ashray/code/amxv/agentdune-chat/lib/message-conversion.ts
 ```

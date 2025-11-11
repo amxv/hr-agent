@@ -12,7 +12,7 @@ All API keys and configuration are managed through environment variables with ce
 
 ## Environment Configuration
 
-### File: `/Users/ashray/code/amxv/rag/lib/env.ts` (Lines 1-88)
+### File: `/Users/ashray/code/amxv/agentdune-chat/lib/env.ts` (Lines 1-88)
 
 The environment variables are centralized and validated using the t3-oss environment parsing library:
 
@@ -33,7 +33,7 @@ The environment variables are centralized and validated using the t3-oss environ
 
 ## Language Model Client Initialization
 
-### File: `/Users/ashray/code/amxv/rag/lib/ai/providers.ts` (Lines 1-120)
+### File: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/providers.ts` (Lines 1-120)
 
 #### Gateway Provider Setup (Lines 19-21)
 
@@ -126,7 +126,7 @@ export const getModelProviderOptions = (
 
 ## Image Generation Client
 
-### File: `/Users/ashray/code/amxv/rag/lib/ai/tools/generate-image.ts` (Lines 1-194)
+### File: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/generate-image.ts` (Lines 1-194)
 
 #### Direct OpenAI Client Instantiation (Lines 2, 15-17)
 
@@ -152,7 +152,7 @@ const imageModel = (env.IMAGE_GEN_MODEL ||
 ```
 
 - Fallback chain: `env.IMAGE_GEN_MODEL` → `DEFAULT_IMAGE_MODEL` ("openai/gpt-image-1")
-- Defined in `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts` line 139
+- Defined in `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts` line 139
 
 #### Image Generation Modes (Lines 25-194)
 
@@ -276,7 +276,7 @@ catch (error) {
 
 ## Chat API Call Patterns
 
-### File: `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts` (Lines 1-782)
+### File: `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts` (Lines 1-782)
 
 #### Main Chat Endpoint (Lines 161-782)
 
@@ -408,7 +408,7 @@ catch (error) {
 
 ## Deep Research Tool Usage
 
-### File: `/Users/ashray/code/amxv/rag/lib/ai/tools/deep-research/deep-researcher.ts`
+### File: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/tools/deep-research/deep-researcher.ts`
 
 The deep research tool demonstrates complex AI SDK usage patterns:
 
@@ -474,7 +474,7 @@ const result = await generateObject({
 
 ## Model Configuration and Defaults
 
-### File: `/Users/ashray/code/amxv/rag/lib/ai/app-models.ts` (Lines 1-150)
+### File: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/app-models.ts` (Lines 1-150)
 
 #### OpenAI Models with Reasoning
 
@@ -544,7 +544,7 @@ export const allAppModels = allModelsData
 
 ## Error Handling Architecture
 
-### File: `/Users/ashray/code/amxv/rag/lib/ai/errors.ts` (Lines 1-137)
+### File: `/Users/ashray/code/amxv/agentdune-chat/lib/ai/errors.ts` (Lines 1-137)
 
 #### ChatSDKError Class (Lines 37-75)
 
@@ -601,7 +601,7 @@ export class ChatSDKError extends Error {
 - `log`: Log only, generic message to client
 - `none`: No logging
 
-**Usage in chat route** (from `/Users/ashray/code/amxv/rag/app/(chat)/api/chat/route.ts` line 438):
+**Usage in chat route** (from `/Users/ashray/code/amxv/agentdune-chat/app/(chat)/api/chat/route.ts` line 438):
 ```typescript
 const error = new ChatSDKError(
   "input_too_long:chat",
