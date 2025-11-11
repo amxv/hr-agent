@@ -14,7 +14,7 @@ The codebase is well-prepared for implementing the HR Tools Admin Integration fe
 1. **Established Admin Panel Architecture** - Complete admin UI at `/admin` with CRUD patterns for users and documents
 2. **5 HR Tools with Mock Data** - Leave Balance, Benefits Info, HR Case, Team Availability, and People Search tools are fully implemented with hardcoded mock data
 3. **Mature Database Layer** - Drizzle ORM with PostgreSQL, comprehensive query patterns, and repository pattern for complex logic
-4. **Robust RBAC System** - Multi-layered authentication using Better Auth with admin role enforcement
+4. **Simple Two-Layer RBAC** - Admin and user roles using Better Auth; admin users have full access to all HR tools
 5. **Type-Safe tRPC Layer** - Full type safety from API to database with Zod validation
 
 The feature will extend existing patterns by:
@@ -120,7 +120,7 @@ The 5 HR tools are fully implemented with mock data stored as constants within e
    - Coverage calculation helper function
 
 5. **People Search** (`lib/ai/tools/people-search.ts:102-290`)
-   - `MOCK_HR_USER` context for RBAC
+   - `MOCK_HR_USER` context (will be removed - not needed for demo)
    - `EMPLOYEE_DIRECTORY` array with 5 employee profiles
    - Includes work authorization status, visa expiry dates
    - Employment statuses: active, probation, leave_of_absence, notice_period
@@ -159,9 +159,8 @@ export const toolName = ({ dataStream }: ToolProps) =>
 3. Remove simulated delays
 4. Keep the same return structure for UI compatibility
 
-**RBAC Enforcement:**
-- Team Availability: `if (!manager.isManager)` check in execute function (`team-availability.ts:287-296`)
-- People Search: `if (!hrUser.isHR)` check in execute function (`people-search.ts:359-366`)
+**Note on RBAC:**
+For this demo application, admin users have full access to all HR tools. The existing manager/HR role checks in the tool execute functions will be removed to simplify the implementation.
 
 **Code References:**
 - `lib/ai/tools/leave-balance.ts:58-115` - Mock leave balance data
@@ -287,11 +286,11 @@ export default defineConfig({
 ### 4. Authentication & RBAC Implementation
 
 **Authentication:** Better Auth with Drizzle adapter
-**Location:** `lib/auth.ts`, middleware at `proxy.ts` (⚠️ not active)
+**Location:** `lib/auth.ts`, middleware at `proxy.ts`
 
 #### Multi-Layer Security
 
-The codebase implements 5 security layers (though middleware is currently inactive):
+The codebase implements 5 security layers:
 
 **Layer 1: Database Schema** (`lib/db/schema.ts:214`)
 ```typescript
@@ -305,7 +304,7 @@ if (isOnAdminRoute) {
   if (session.user.role !== "admin") return NextResponse.redirect(new URL("/?error=forbidden", url));
 }
 ```
-⚠️ **CRITICAL:** This file is named `proxy.ts` and not `middleware.ts`, so it's not active! The admin routes are currently protected only by tRPC/API checks.
+Note: In Next.js 16, the middleware file is named `proxy.ts` instead of `middleware.ts`.
 
 **Layer 3: tRPC Admin Procedure** (`trpc/init.ts:143-170`)
 ```typescript
@@ -356,14 +355,14 @@ export const adminRouter = createTRPCRouter({
 The HR data admin routes will follow the same pattern:
 1. Create procedures in `trpc/routers/admin.router.ts` using `adminProcedure`
 2. Add API routes (if needed for file uploads) with session checks
-3. Tool RBAC enforcement remains in execute functions (Team Availability for managers, People Search for HR)
-4. Consider fixing the middleware issue by renaming `proxy.ts` to `middleware.ts`
+
+**Note:** For this demo, all admin users have full access to all HR tools and data. No additional role-based restrictions (manager-only, HR-only) are needed within the tools.
 
 **Code References:**
 - `lib/auth.ts:21-44` - Better Auth configuration
 - `trpc/init.ts:143-170` - adminProcedure middleware
 - `trpc/routers/admin.router.ts:90-140` - Create user example
-- `proxy.ts:48-65` - Middleware admin check (not active)
+- `proxy.ts:48-65` - Middleware admin check
 
 ---
 
@@ -390,8 +389,8 @@ export function getTools({
     leaveBalance: leaveBalance({ dataStream }),
     benefitsInfo: benefitsInfo({ dataStream }),
     hrCase: hrCase({ dataStream }),
-    teamAvailability: teamAvailability({ dataStream }),  // RBAC in execute
-    peopleSearch: peopleSearch({ dataStream }),  // RBAC in execute
+    teamAvailability: teamAvailability({ dataStream }),
+    peopleSearch: peopleSearch({ dataStream }),
 
     // Other tools...
   };
@@ -476,7 +475,7 @@ The tool integration remains mostly unchanged:
 2. Replace mock data constants with database queries
 3. Remove artificial delays
 4. Maintain same return structure for UI compatibility
-5. Keep RBAC checks in execute functions
+5. Remove existing RBAC checks (isManager, isHR) from execute functions - admin users have full access
 6. Keep streaming updates for real-time feedback
 
 **Example Transformation:**
@@ -495,7 +494,7 @@ return balances;
 **Code References:**
 - `lib/ai/tools/tools.ts:100-106` - HR tool registration
 - `lib/ai/tools/leave-balance.ts:117-241` - Tool structure example
-- `lib/ai/tools/team-availability.ts:287-296` - RBAC check pattern
+- `lib/ai/tools/team-availability.ts:287-296` - Tool execute function pattern
 - `app/(chat)/api/chat/route.ts:381-403` - Budget filtering
 
 ---
@@ -1174,7 +1173,7 @@ Based on all 5 tools, here's the complete list of database tables:
 - `trpc/init.ts:143-170` - adminProcedure middleware
 - `trpc/routers/admin.router.ts:12-88` - List users query
 - `trpc/routers/admin.router.ts:90-140` - Create user mutation
-- `proxy.ts:48-65` - Middleware admin check (not active)
+- `proxy.ts:48-65` - Middleware admin check
 
 ### Tool Integration
 - `lib/ai/tools/tools.ts:25-108` - getTools() registry
@@ -1294,22 +1293,22 @@ For each of the 5 HR tools:
    }
    ```
 
-3. **Handle RBAC Context**:
-   - Team Availability needs `session.user.managerId` to load team
-   - People Search needs `session.user.role === "hr"` check
-   - Pass session context to tool execute functions
+3. **Remove RBAC Checks**:
+   - Remove `isManager` checks from Team Availability tool
+   - Remove `isHR` checks from People Search tool
+   - Admin users have full access to all HR data and tools
 
 4. **Test Tool Output**:
    - Ensure return structure matches current mock data
    - Verify UI components still render correctly
-   - Test all RBAC scenarios
+   - Test with admin user session
 
 ## Web Research Documents
 
 No external dependencies or framework-specific features required for this feature so no web research documents were created.
 
 All necessary technology is already in use in the codebase:
-- **Next.js 15** - App Router, Server Components, API Routes
+- **Next.js 16** - App Router, Server Components, API Routes
 - **Drizzle ORM** - PostgreSQL database with migrations
 - **tRPC** - Type-safe API layer with React Query integration
 - **Better Auth** - Authentication and RBAC
