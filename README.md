@@ -6,11 +6,11 @@
 
 ### Production-Ready Multi-Model AI Chat Platform
 
-Build enterprise-grade AI chat applications with 120+ models, document RAG, admin panels, and advanced AI capabilities.
+Enterprise-grade AI chat platform with 120+ models, document RAG, admin panels, and advanced AI capabilities.
 
 **Next.js 15 • Vercel AI SDK v5 • Better Auth • Drizzle ORM • PostgreSQL**
 
-[**Live Demo**](https://agentdune.com) • [Documentation](#documentation) • [Features](#features)
+[**Live Demo**](https://agentdune.com)
 
 </div>
 
@@ -20,7 +20,7 @@ Build enterprise-grade AI chat applications with 120+ models, document RAG, admi
 
 ## Overview
 
-**AgentDune Chat** is a comprehensive, production-ready AI chat application that provides everything you need to build and deploy sophisticated conversational AI products. Unlike basic chat wrappers, this is a complete platform with enterprise features including:
+**AgentDune Chat** is a production-ready, enterprise-grade AI chat platform with sophisticated conversational AI capabilities. This platform provides a complete solution with advanced features including:
 
 - 🏢 **Admin panel** with user and document management
 - 📚 **Document RAG system** with semantic search and citations
@@ -30,7 +30,7 @@ Build enterprise-grade AI chat applications with 120+ models, document RAG, admi
 - ⚡ **Resumable streaming** for network resilience
 - 🧠 **Reasoning model support** across multiple providers
 
-Perfect for building internal AI assistants, customer support chatbots, or AI-powered SaaS products.
+Designed for internal AI assistants, customer support, and AI-powered automation.
 
 ## Features
 
@@ -150,11 +150,9 @@ Perfect for building internal AI assistants, customer support chatbots, or AI-po
 - **PostgreSQL** database
 - **Vercel AI Gateway** account ([sign up](https://vercel.com/ai-gateway))
 
-### 1. Clone and Install
+### 1. Install Dependencies
 
 ```bash
-git clone https://github.com/amxv/agentdune-chat.git
-cd agentdune-chat
 bun install  # or npm install
 ```
 
@@ -419,9 +417,7 @@ bun run check
 
 The easiest way to deploy is with [Vercel](https://vercel.com):
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/amxv/agentdune-chat)
-
-1. Click "Deploy" button above
+1. Connect your repository to Vercel
 2. Configure environment variables
 3. Set up PostgreSQL database (Vercel Postgres recommended)
 4. Set up Blob storage (auto-configured on Vercel)
@@ -501,25 +497,9 @@ Detailed specifications are available in `gg/features/`:
 - [ ] Webhook integrations
 - [ ] Plugin system for custom tools
 
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
-
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing-feature`)
-3. Commit your changes (`git commit -m 'Add some amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing-feature`)
-5. Open a Pull Request
-
-## License
-
-This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
 ## Support
 
-- **Documentation**: Check out our [documentation](#documentation)
-- **Issues**: Report bugs or request features on [GitHub Issues](https://github.com/amxv/agentdune-chat/issues)
-- **Discussions**: Join conversations on [GitHub Discussions](https://github.com/amxv/agentdune-chat/discussions)
+For questions or issues, please contact the development team.
 
 ## Acknowledgments
 
