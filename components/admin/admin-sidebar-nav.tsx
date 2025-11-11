@@ -2,8 +2,8 @@
 
 import { FileText, Home, Users } from "lucide-react";
 import { motion } from "motion/react";
-import Image from "next/image";
 import type { Route } from "next";
+import Image from "next/image";
 import { useState } from "react";
 import {
   AdminSidebar,

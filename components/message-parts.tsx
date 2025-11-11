@@ -8,18 +8,23 @@ import {
   useMessagePartsByPartRange,
   useMessagePartTypesById,
 } from "@/lib/stores/hooks";
+import { BenefitsInfoResult } from "./benefits-info-result";
 import { CodeInterpreterMessage } from "./code-interpreter-message";
 import { DocumentToolCall, DocumentToolResult } from "./document";
 import { DocumentPreview } from "./document-preview";
 import { FileRetrieveResult } from "./file-retrieve-result";
 import { GeneratedImage } from "./generated-image";
+import { HRCaseResult } from "./hr-case-result";
+import { LeaveBalanceResult } from "./leave-balance-result";
 import { ResearchUpdates } from "./message-annotations";
 import { MessageChainOfThought } from "./message-chain-of-thought";
 import { MessageReasoning } from "./message-reasoning";
+import { PeopleSearchResult } from "./people-search-result";
 import { ReadDocument } from "./read-document";
 import { Retrieve } from "./retrieve";
 import { SemanticSearchResult } from "./semantic-search-result";
 import { StockChartMessage } from "./stock-chart-message";
+import { TeamAvailabilityResult } from "./team-availability-result";
 import { TextMessagePart } from "./text-message-part";
 import { Weather } from "./weather";
 
@@ -510,6 +515,106 @@ function PureMessagePart({
     }
   }
 
+  if (type === "tool-leaveBalance") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <LeaveBalanceResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <LeaveBalanceResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-benefitsInfo") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <BenefitsInfoResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <BenefitsInfoResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-hrCase") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <HRCaseResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <HRCaseResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-teamAvailability") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <TeamAvailabilityResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <TeamAvailabilityResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
+  if (type === "tool-peopleSearch") {
+    const { toolCallId, state } = part;
+    if (state === "input-available") {
+      const { input } = part;
+      return (
+        <div key={toolCallId}>
+          <PeopleSearchResult input={input} state={state} />
+        </div>
+      );
+    }
+    if (state === "output-available") {
+      const { input, output } = part;
+      return (
+        <div key={toolCallId}>
+          <PeopleSearchResult input={input} output={output} state={state} />
+        </div>
+      );
+    }
+  }
+
   return null;
 }
 
@@ -576,6 +681,20 @@ export function PureMessageParts({
     // Tools that should be integrated into Chain of Thought
     const cotTools = new Set<ChatMessage["parts"][number]["type"]>([
       "tool-semanticSearch",
+      "tool-leaveBalance",
+      "tool-benefitsInfo",
+      "tool-hrCase",
+      "tool-teamAvailability",
+      "tool-peopleSearch",
+    ]);
+
+    // HR tools that should also render as full UI cards after the response
+    const hrToolsForFullDisplay = new Set<ChatMessage["parts"][number]["type"]>([
+      "tool-leaveBalance",
+      "tool-benefitsInfo",
+      "tool-hrCase",
+      "tool-teamAvailability",
+      "tool-peopleSearch",
     ]);
 
     const result: Array<
@@ -583,14 +702,24 @@ export function PureMessageParts({
       | { kind: NonReasoningPartType; index: number }
     > = [];
 
+    // Track HR tool indices for later rendering
+    const hrToolIndices: number[] = [];
+
     // Find the first and last CoT-compatible parts
     let cotStart = -1;
     let cotEnd = -1;
 
     for (let i = 0; i < types.length; i++) {
       if (types[i] === "reasoning" || cotTools.has(types[i])) {
-        if (cotStart === -1) cotStart = i;
+        if (cotStart === -1) {
+          cotStart = i;
+        }
         cotEnd = i;
+
+        // Track HR tools for full display later
+        if (hrToolsForFullDisplay.has(types[i])) {
+          hrToolIndices.push(i);
+        }
       }
     }
 
@@ -608,7 +737,12 @@ export function PureMessageParts({
         endIndex: cotEnd,
       });
 
-      // Add any non-CoT parts after the CoT group
+      // Add HR tools again as individual parts for full UI display (BEFORE text responses)
+      for (const idx of hrToolIndices) {
+        result.push({ kind: types[idx] as NonReasoningPartType, index: idx });
+      }
+
+      // Add any non-CoT parts after the CoT group (text responses come after HR cards)
       for (let i = cotEnd + 1; i < types.length; i++) {
         result.push({ kind: types[i] as NonReasoningPartType, index: i });
       }
@@ -651,6 +785,28 @@ export function PureMessageParts({
         }
 
         const key = `message-${messageId}-part-${group.index}-${group.kind}`;
+
+        // Add spacing for HR tool result cards
+        const isHRTool = [
+          "tool-leaveBalance",
+          "tool-benefitsInfo",
+          "tool-hrCase",
+          "tool-teamAvailability",
+          "tool-peopleSearch",
+        ].includes(group.kind);
+
+        if (isHRTool) {
+          return (
+            <div className="my-4" key={key}>
+              <MessagePart
+                isReadonly={isReadonly}
+                messageId={messageId}
+                partIdx={group.index}
+              />
+            </div>
+          );
+        }
+
         return (
           <MessagePart
             isReadonly={isReadonly}

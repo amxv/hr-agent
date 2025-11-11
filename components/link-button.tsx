@@ -1,6 +1,6 @@
 import type { VariantProps } from "class-variance-authority";
-import Link from "next/link";
 import type { Route } from "next";
+import Link from "next/link";
 import type * as React from "react";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";

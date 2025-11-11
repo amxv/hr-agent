@@ -5,16 +5,21 @@ import type {
   UIMessageStreamWriter,
 } from "ai";
 import { z } from "zod";
+import type { benefitsInfo } from "@/lib/ai/tools/benefits-info";
 import type { codeInterpreter } from "@/lib/ai/tools/code-interpreter";
 import type { deepResearch } from "@/lib/ai/tools/deep-research/deep-research";
 import type { fileRetrieve } from "@/lib/ai/tools/file-retrieve";
 import type { generateImage } from "@/lib/ai/tools/generate-image";
 import type { getWeather } from "@/lib/ai/tools/get-weather";
+import type { hrCase } from "@/lib/ai/tools/hr-case";
+import type { leaveBalance } from "@/lib/ai/tools/leave-balance";
+import type { peopleSearch } from "@/lib/ai/tools/people-search";
 import type { readDocument } from "@/lib/ai/tools/read-document";
 import type { requestSuggestions } from "@/lib/ai/tools/request-suggestions";
 import type { retrieve } from "@/lib/ai/tools/retrieve";
 import type { semanticSearch } from "@/lib/ai/tools/semantic-search";
 import type { stockChart } from "@/lib/ai/tools/stock-chart";
+import type { teamAvailability } from "@/lib/ai/tools/team-availability";
 import type { updateDocument } from "@/lib/ai/tools/update-document";
 import type { tavilyWebSearch } from "@/lib/ai/tools/web-search";
 import type { Suggestion } from "@/lib/db/schema";
@@ -37,6 +42,11 @@ export const toolNameSchema = z.enum([
   "deepResearch",
   "semanticSearch",
   "fileRetrieve",
+  "leaveBalance",
+  "benefitsInfo",
+  "hrCase",
+  "teamAvailability",
+  "peopleSearch",
 ]);
 
 const _ = toolNameSchema.options satisfies ToolName[];
@@ -79,6 +89,11 @@ type codeInterpreterTool = InferUITool<typeof codeInterpreter>;
 type retrieveTool = InferUITool<typeof retrieve>;
 type semanticSearchTool = InferUITool<ReturnType<typeof semanticSearch>>;
 type fileRetrieveTool = InferUITool<ReturnType<typeof fileRetrieve>>;
+type leaveBalanceTool = InferUITool<ReturnType<typeof leaveBalance>>;
+type benefitsInfoTool = InferUITool<ReturnType<typeof benefitsInfo>>;
+type hrCaseTool = InferUITool<ReturnType<typeof hrCase>>;
+type teamAvailabilityTool = InferUITool<ReturnType<typeof teamAvailability>>;
+type peopleSearchTool = InferUITool<ReturnType<typeof peopleSearch>>;
 
 export type ChatTools = {
   getWeather: weatherTool;
@@ -94,6 +109,11 @@ export type ChatTools = {
   retrieve: retrieveTool;
   semanticSearch: semanticSearchTool;
   fileRetrieve: fileRetrieveTool;
+  leaveBalance: leaveBalanceTool;
+  benefitsInfo: benefitsInfoTool;
+  hrCase: hrCaseTool;
+  teamAvailability: teamAvailabilityTool;
+  peopleSearch: peopleSearchTool;
 };
 
 type FollowupSuggestions = {
