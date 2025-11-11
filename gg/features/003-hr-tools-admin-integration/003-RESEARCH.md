@@ -500,6 +500,649 @@ return balances;
 
 ---
 
+## Mock Data Structure Analysis
+
+This section provides the complete structure of mock data from each tool to inform database schema design.
+
+### Leave Balance Mock Data Structure
+
+**Location:** `lib/ai/tools/leave-balance.ts:58-115`
+
+```typescript
+const MOCK_EMPLOYEE_DATA = {
+  employeeId: "EMP001",
+  employeeName: "John Doe",
+  department: "Engineering",
+  hireDate: "2020-03-15",
+
+  balances: [
+    {
+      leaveType: "vacation",
+      currentBalance: 18.5,
+      accruedYTD: 20.0,
+      usedYTD: 1.5,
+      accrualRate: 1.67,           // days per month
+      accrualSchedule: "monthly",
+      carryoverLimit: 40,
+      carryoverDeadline: "2025-03-31",
+      projectedYearEnd: 38.54,
+    },
+    {
+      leaveType: "sick",
+      currentBalance: 12.0,
+      accruedYTD: 12.0,
+      usedYTD: 0,
+      accrualRate: 1.0,
+      accrualSchedule: "monthly",
+      carryoverLimit: 0,            // No carryover
+      carryoverDeadline: null,
+      projectedYearEnd: 24.0,
+    },
+    {
+      leaveType: "personal",
+      currentBalance: 3.0,
+      accruedYTD: 3.0,
+      usedYTD: 0,
+      accrualRate: 0.25,
+      accrualSchedule: "monthly",
+      carryoverLimit: 5,
+      carryoverDeadline: "2025-12-31",
+      projectedYearEnd: 6.0,
+    },
+  ],
+
+  blackoutDates: [
+    {
+      startDate: "2025-11-15",
+      endDate: "2025-11-30",
+      reason: "Engineering Feature Freeze",
+      department: "Engineering",
+    },
+    {
+      startDate: "2025-12-15",
+      endDate: "2025-12-31",
+      reason: "Holiday Season",
+      department: "All",
+    },
+  ],
+
+  policies: {
+    minimumNotice: 14,              // days
+    maxConsecutiveDays: 15,
+    requireApproval: true,
+  },
+};
+```
+
+**Database Tables Needed:**
+- `employee` - employeeId, employeeName, department, hireDate
+- `leaveBalance` - One-to-many with employee, stores balances array
+- `blackoutDate` - Department-specific or company-wide
+- `leavePolicy` - Global or department-specific policies
+
+### Benefits Info Mock Data Structure
+
+**Location:** `lib/ai/tools/benefits-info.ts:83-251`
+
+```typescript
+const MOCK_EMPLOYEE_BENEFITS = {
+  employeeId: "EMP001",
+
+  currentEnrollments: [
+    {
+      category: "medical",
+      planId: "MED-001",
+      planName: "Blue Shield PPO Gold",
+      carrier: "Blue Shield",
+      type: "PPO",
+      monthlyPremium: 450.00,
+      employeeContribution: 150.00,
+      employerContribution: 300.00,
+      deductible: { individual: 1500, family: 3000 },
+      outOfPocketMax: { individual: 6000, family: 12000 },
+      enrollmentDate: "2025-01-01",
+      coverageLevel: "employee + spouse",
+    },
+    {
+      category: "dental",
+      planId: "DEN-001",
+      planName: "Delta Dental PPO",
+      carrier: "Delta Dental",
+      type: "PPO",
+      monthlyPremium: 85.00,
+      employeeContribution: 25.00,
+      employerContribution: 60.00,
+      deductible: { individual: 50 },
+      annualMaximum: 2000,
+      coverageLevel: "family",
+    },
+    {
+      category: "vision",
+      planId: "VIS-001",
+      planName: "VSP",
+      carrier: "VSP",
+      monthlyPremium: 18.00,
+      coverageLevel: "employee only",
+    },
+    {
+      category: "401k",
+      planName: "Fidelity Traditional 401(k)",
+      employeeContributionPercent: 6.0,
+      employerMatchPercent: 4.0,
+      vestingSchedule: "4 years cliff",
+      currentBalance: 45000.00,
+    },
+  ],
+
+  dependents: [
+    {
+      name: "Jane Doe",
+      relationship: "spouse",
+      dateOfBirth: "1988-07-22",
+      coveredUnder: ["medical", "dental", "vision"],
+    },
+    {
+      name: "Jimmy Doe",
+      relationship: "child",
+      dateOfBirth: "2015-03-10",
+      coveredUnder: ["dental"],
+    },
+  ],
+
+  enrollmentWindow: {
+    openEnrollmentStart: "2025-11-01",
+    openEnrollmentEnd: "2025-11-30",
+    effectiveDate: "2026-01-01",
+    daysRemaining: 20,
+  },
+
+  benefits: {
+    hsaContribution: { employer: 1000, employee: 2000 },
+    fsaElection: 2500,
+  },
+};
+
+const MOCK_PLAN_OPTIONS = [
+  {
+    planId: "MED-001",
+    category: "medical",
+    planName: "Blue Shield PPO Gold",
+    carrier: "Blue Shield",
+    type: "PPO",
+    monthlyPremium: {
+      employeeOnly: 250.00,
+      employeeSpouse: 450.00,
+      family: 600.00,
+    },
+    deductible: {
+      individual: 1500,
+      family: 3000,
+    },
+    outOfPocketMax: {
+      individual: 6000,
+      family: 12000,
+    },
+    coverage: {
+      inNetwork: "80%",
+      outOfNetwork: "60%",
+      primaryCareCopay: 25,
+      specialistCopay: 50,
+      prescriptionCoverage: "Generic $10, Brand $30, Specialty $75",
+    },
+  },
+  // ... more plans
+];
+```
+
+**Database Tables Needed:**
+- `benefitsPlan` - All available plans with pricing tiers
+- `benefitsEnrollment` - One-to-one with employee, current selections
+- `dependent` - One-to-many with employee
+- `enrollmentPeriod` - Company-wide enrollment windows
+
+### HR Case Mock Data Structure
+
+**Location:** `lib/ai/tools/hr-case.ts:95-220`
+
+```typescript
+const MOCK_EXISTING_CASES = [
+  {
+    caseId: "HR-2025-001234",
+    title: "FSA Claim Reimbursement Issue",
+    category: "benefits",
+    description: "Submitted FSA claim for $850 medical expense...",
+    priority: "medium",
+    status: "in_progress",
+    submittedBy: "EMP001",
+    submittedByName: "John Doe",
+    assignedTeam: "Benefits Administration",
+    createdAt: "2025-11-08T10:30:00Z",
+
+    sla: {
+      firstResponseHours: 8,
+      firstResponseDue: "2025-11-08T18:30:00Z",
+      firstResponseMet: true,
+      resolutionDays: 3,
+      resolutionDue: "2025-11-11T10:30:00Z",
+      hoursRemaining: 12,
+    },
+
+    updates: [
+      {
+        timestamp: "2025-11-08T10:30:00Z",
+        author: "System",
+        type: "system",
+        message: "Case created and assigned to Benefits Administration team",
+      },
+      {
+        timestamp: "2025-11-08T14:15:00Z",
+        author: "Sarah Chen (HR Specialist)",
+        type: "hr_response",
+        message: "Thank you for reporting this issue...",
+      },
+      {
+        timestamp: "2025-11-09T09:00:00Z",
+        author: "Sarah Chen (HR Specialist)",
+        type: "internal_note",
+        message: "Internal note: Contacted Finance team...",
+        visibility: "internal",
+      },
+    ],
+  },
+];
+
+const SLA_CONFIG = {
+  payroll: { firstResponseHours: 4, resolutionDays: 2, priority: "high" },
+  benefits: { firstResponseHours: 8, resolutionDays: 3, priority: "medium" },
+  equipment: { firstResponseHours: 24, resolutionDays: 7, priority: "low" },
+  leave: { firstResponseHours: 8, resolutionDays: 2, priority: "medium" },
+  policy: { firstResponseHours: 24, resolutionDays: 5, priority: "low" },
+  performance: { firstResponseHours: 24, resolutionDays: 10, priority: "medium" },
+  other: { firstResponseHours: 24, resolutionDays: 7, priority: "low" },
+};
+
+const TEAM_ASSIGNMENT = {
+  payroll: "Payroll Services",
+  benefits: "Benefits Administration",
+  equipment: "IT & Facilities",
+  leave: "HR Operations",
+  policy: "HR Compliance",
+  performance: "HR Business Partners",
+  other: "General HR Support",
+};
+```
+
+**Database Tables Needed:**
+- `hrCase` - Main case record with SLA tracking
+- `caseUpdate` - One-to-many timeline of updates
+- `slaConfig` - Configuration table (or JSON config)
+- `teamAssignment` - Configuration table (or JSON config)
+
+### Team Availability Mock Data Structure
+
+**Location:** `lib/ai/tools/team-availability.ts:92-175`
+
+```typescript
+const MOCK_MANAGER = {
+  employeeId: "EMP001",
+  isManager: true,
+  teamMembers: ["EMP101", "EMP102", "EMP103", "EMP104", "EMP105"],
+  department: "Engineering",
+};
+
+const TEAM_DIRECTORY = {
+  EMP101: { name: "Alice Johnson", title: "Senior Engineer" },
+  EMP102: { name: "Bob Smith", title: "Engineer" },
+  EMP103: { name: "Carol Martinez", title: "Engineer" },
+  EMP104: { name: "David Chen", title: "Junior Engineer" },
+  EMP105: { name: "Eva Patel", title: "Senior Engineer" },
+};
+
+const APPROVED_ABSENCES = [
+  {
+    employeeId: "EMP101",
+    employeeName: "Alice Johnson",
+    absenceType: "vacation",
+    startDate: "2025-11-18",
+    endDate: "2025-11-22",
+    totalDays: 5,
+    approvalDate: "2025-10-15",
+    approvedBy: "EMP001",
+  },
+  // ... more absences
+];
+
+const PENDING_REQUESTS = [
+  {
+    requestId: "REQ-2025-0042",
+    employeeId: "EMP102",
+    employeeName: "Bob Smith",
+    requestType: "vacation",
+    requestedStartDate: "2025-11-20",
+    requestedEndDate: "2025-11-27",
+    totalDaysRequested: 6,
+    submittedDate: "2025-11-05",
+    status: "pending",
+
+    conflicts: {
+      hasConflict: true,
+      conflictsWith: ["EMP101"],
+      reason: "Overlaps with Alice Johnson's vacation (Nov 18-22)",
+    },
+
+    coverageImpact: {
+      affectedDates: ["2025-11-20", "2025-11-21", "2025-11-22"],
+      teamSize: 5,
+      availableCount: 3,
+      coveragePercent: 60,
+      isCritical: true,  // < 70% coverage
+    },
+  },
+];
+```
+
+**Database Tables Needed:**
+- `employee` - with managerId field for hierarchy
+- `absence` - Approved time off records
+- `leaveRequest` - Pending requests with conflict detection
+- Coverage calculations done at query time
+
+### People Search Mock Data Structure
+
+**Location:** `lib/ai/tools/people-search.ts:102-290`
+
+```typescript
+const EMPLOYEE_DIRECTORY = [
+  {
+    employeeId: "EMP200",
+    fullName: "Noor Al-Harbi",
+    preferredName: "Noor",
+    email: "noor.alharbi@company.com",
+    phoneExtension: "x4521",
+
+    jobTitle: "Senior Software Engineer",
+    department: "Engineering",
+    team: "Backend Services",
+
+    manager: {
+      employeeId: "EMP001",
+      fullName: "John Doe",
+      email: "john.doe@company.com",
+    },
+
+    directReports: [],
+
+    employmentStatus: "active",
+    location: "San Francisco HQ",
+    workMode: "hybrid",  // "office", "remote", "hybrid"
+    officeLocation: "SF-Building A, Floor 3",
+
+    workAuthorization: {
+      status: "h1b_visa",
+      expiryDate: "2026-06-14",
+      requiresRenewal: true,
+      daysUntilExpiry: 215,
+    },
+
+    startDate: "2021-07-15",
+    yearsOfService: 3.4,
+
+    skills: ["Python", "Go", "Kubernetes", "AWS"],
+    certifications: ["AWS Solutions Architect"],
+  },
+  {
+    employeeId: "EMP001",
+    fullName: "John Doe",
+    email: "john.doe@company.com",
+    phoneExtension: "x1001",
+
+    jobTitle: "Engineering Manager",
+    department: "Engineering",
+    team: "Backend Services",
+
+    manager: {
+      employeeId: "EMP999",
+      fullName: "Jane Smith",
+      email: "jane.smith@company.com",
+    },
+
+    directReports: [
+      { employeeId: "EMP200", fullName: "Noor Al-Harbi" },
+      { employeeId: "EMP101", fullName: "Alice Johnson" },
+      { employeeId: "EMP102", fullName: "Bob Smith" },
+      { employeeId: "EMP103", fullName: "Carol Martinez" },
+      { employeeId: "EMP104", fullName: "David Chen" },
+      { employeeId: "EMP105", fullName: "Eva Patel" },
+    ],
+
+    employmentStatus: "active",
+    location: "San Francisco HQ",
+    workMode: "hybrid",
+
+    workAuthorization: {
+      status: "citizen",
+      expiryDate: null,
+      requiresRenewal: false,
+    },
+
+    startDate: "2020-03-15",
+    yearsOfService: 4.6,
+  },
+  {
+    employeeId: "EMP301",
+    fullName: "Maria Garcia",
+    employmentStatus: "leave_of_absence",
+    expectedReturnDate: "2026-01-15",
+    // ... other fields
+  },
+  {
+    employeeId: "EMP401",
+    fullName: "Ahmed Hassan",
+    employmentStatus: "probation",
+    probationEndDate: "2025-12-01",
+    // ... other fields
+  },
+  {
+    employeeId: "EMP501",
+    fullName: "Jennifer Lee",
+    employmentStatus: "notice_period",
+    lastWorkingDay: "2025-12-15",
+    // ... other fields
+  },
+];
+```
+
+**Database Tables Needed:**
+- `employee` - Core employee table with all fields above
+- Self-referential foreign key: `managerId` references `employee.id`
+- Status enum: active, probation, leave_of_absence, notice_period, terminated
+- JSON field for work authorization details
+- JSON field for skills/certifications
+
+## Data Flow: Complete Example
+
+Here's a complete data flow example showing how the admin panel and tools will interact:
+
+### Scenario: Admin Updates Employee's Leave Balance
+
+**Step 1: Admin UI → tRPC Mutation**
+```typescript
+// components/admin/edit-leave-balance-dialog.tsx
+const { mutate } = useMutation(trpc.admin.updateLeaveBalance.mutate);
+
+mutate({
+  employeeId: "EMP001",
+  leaveType: "vacation",
+  currentBalance: 25.0,  // Changed from 18.5
+});
+```
+
+**Step 2: tRPC Router → Database Query**
+```typescript
+// trpc/routers/admin.router.ts
+updateLeaveBalance: adminProcedure
+  .input(z.object({
+    employeeId: z.string(),
+    leaveType: z.string(),
+    currentBalance: z.number(),
+  }))
+  .mutation(async ({ input }) => {
+    const { updateLeaveBalance } = await import("@/lib/db/queries");
+    await updateLeaveBalance(input);
+    return { success: true };
+  }),
+```
+
+**Step 3: Database Query Function**
+```typescript
+// lib/db/queries.ts
+export async function updateLeaveBalance({
+  employeeId,
+  leaveType,
+  currentBalance,
+}: {
+  employeeId: string;
+  leaveType: string;
+  currentBalance: number;
+}) {
+  await db
+    .update(leaveBalance)
+    .set({ currentBalance, updatedAt: new Date() })
+    .where(
+      and(
+        eq(leaveBalance.employeeId, employeeId),
+        eq(leaveBalance.leaveType, leaveType)
+      )
+    );
+}
+```
+
+**Step 4: User Asks Agent About Leave Balance**
+```typescript
+// User message: "How many vacation days does John Doe have?"
+// Agent invokes: leaveBalance tool
+```
+
+**Step 5: Tool Executes with Database Query**
+```typescript
+// lib/ai/tools/leave-balance.ts
+execute: async ({ employeeId }) => {
+  // OLD (mock data):
+  // const data = MOCK_EMPLOYEE_DATA;
+
+  // NEW (database query):
+  const { getLeaveBalanceByEmployeeId } = await import("@/lib/db/queries");
+  const balances = await getLeaveBalanceByEmployeeId(employeeId);
+
+  return {
+    employeeId,
+    employeeName: balances.employee.name,
+    balances: balances.items,  // Same structure as before
+    blackoutDates: balances.blackoutDates,
+    policies: balances.policies,
+  };
+}
+```
+
+**Step 6: Agent Responds**
+```
+"John Doe currently has 25.0 vacation days available."
+```
+
+### Key Insight: Data Flow Architecture
+
+```
+┌─────────────────────────────────────────────────────────────┐
+│                      Admin Panel                             │
+│  (Manages HR data - the "source of truth")                  │
+│                                                              │
+│  Admin UI → tRPC Mutation → Database Write                  │
+│  /admin/hr-data                                              │
+└─────────────────────────┬───────────────────────────────────┘
+                          │
+                          ▼
+                   ┌──────────────┐
+                   │  PostgreSQL   │
+                   │  (via Drizzle)│
+                   └──────┬───────┘
+                          │
+                          ▼
+┌─────────────────────────────────────────────────────────────┐
+│                      AI Agent Tools                          │
+│  (Read HR data - real-time retrieval)                       │
+│                                                              │
+│  Tool Execute → Database Read → Return to Agent             │
+│  lib/ai/tools/                                               │
+└─────────────────────────────────────────────────────────────┘
+```
+
+**Bidirectional Flow:**
+- **Admin → Database:** Create/Update/Delete HR data
+- **Database → Tools:** Read current data for agent responses
+- **No direct connection:** Admin panel and tools are decoupled via database
+
+## Mock Data to Database Table Mapping
+
+### Complete Table Structure Needed
+
+Based on all 5 tools, here's the complete list of database tables:
+
+**1. employee** (extends or replaces user table)
+- Maps to: All tools use employeeId
+- Fields: employeeId, fullName, preferredName, email, phoneExtension, jobTitle, department, team, managerId, directReports (JSON), employmentStatus, location, workMode, officeLocation, workAuthorization (JSON), startDate, yearsOfService, skills (JSON), certifications (JSON)
+
+**2. leaveBalance** (one-to-one with employee)
+- Maps to: Leave Balance tool MOCK_EMPLOYEE_DATA.balances
+- Fields: employeeId, leaveType, currentBalance, accruedYTD, usedYTD, accrualRate, accrualSchedule, carryoverLimit, carryoverDeadline, projectedYearEnd
+
+**3. blackoutDate** (company-wide or department-specific)
+- Maps to: Leave Balance tool MOCK_EMPLOYEE_DATA.blackoutDates
+- Fields: id, startDate, endDate, reason, department (null = all departments)
+
+**4. leavePolicy** (global or department-specific)
+- Maps to: Leave Balance tool MOCK_EMPLOYEE_DATA.policies
+- Fields: id, department (null = global), minimumNotice, maxConsecutiveDays, requireApproval
+
+**5. benefitsPlan** (available plans catalog)
+- Maps to: Benefits Info tool MOCK_PLAN_OPTIONS
+- Fields: planId, category, planName, carrier, type, monthlyPremium (JSON for tiers), deductible (JSON), outOfPocketMax (JSON), coverage (JSON), annualMaximum
+
+**6. benefitsEnrollment** (one-to-one with employee)
+- Maps to: Benefits Info tool MOCK_EMPLOYEE_BENEFITS.currentEnrollments
+- Fields: employeeId, medicalPlanId, dentalPlanId, visionPlanId, monthlyPremium, employeeContribution, employerContribution, enrollmentDate, coverageLevel, employeeContributionPercent (401k), currentBalance (401k)
+
+**7. dependent** (one-to-many with employee)
+- Maps to: Benefits Info tool MOCK_EMPLOYEE_BENEFITS.dependents
+- Fields: id, employeeId, name, relationship, dateOfBirth, coveredUnder (JSON array)
+
+**8. enrollmentPeriod** (company-wide config)
+- Maps to: Benefits Info tool MOCK_EMPLOYEE_BENEFITS.enrollmentWindow
+- Fields: id, openEnrollmentStart, openEnrollmentEnd, effectiveDate, planYear
+
+**9. hrCase** (support tickets)
+- Maps to: HR Case tool MOCK_EXISTING_CASES
+- Fields: caseId, title, category, description, priority, status, submittedBy (employeeId), assignedTeam, createdAt, updatedAt, firstResponseDue, firstResponseMet, resolutionDue, slaHoursRemaining
+
+**10. caseUpdate** (one-to-many with hrCase)
+- Maps to: HR Case tool MOCK_EXISTING_CASES[].updates
+- Fields: id, caseId, timestamp, author, type, message, visibility
+
+**11. absence** (approved time off)
+- Maps to: Team Availability tool APPROVED_ABSENCES
+- Fields: id, employeeId, absenceType, startDate, endDate, totalDays, approvalDate, approvedBy (managerId)
+
+**12. leaveRequest** (pending approvals)
+- Maps to: Team Availability tool PENDING_REQUESTS
+- Fields: requestId, employeeId, requestType, requestedStartDate, requestedEndDate, totalDaysRequested, submittedDate, status, hasConflict, conflictsWith (JSON), coveragePercent, notes
+
+**13. slaConfig** (optional - could be JSON config file)
+- Maps to: HR Case tool SLA_CONFIG
+- Fields: category, firstResponseHours, resolutionDays, priority
+
+**14. teamAssignment** (optional - could be JSON config file)
+- Maps to: HR Case tool TEAM_ASSIGNMENT
+- Fields: category, assignedTeam
+
 ## Code References
 
 ### Admin Panel
