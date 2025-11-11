@@ -18,7 +18,6 @@ const ToolActionKind = ({
 }) => (
   <div
     className={cn("flex shrink-0 gap-1", className)}
-    // @ts-expect-error - ref is a valid ref
     ref={ref}
     {...props}
   >
@@ -43,7 +42,6 @@ const ToolActionContent = ({
 }) => (
   <div
     className={cn("flex items-center gap-2", className)}
-    // @ts-expect-error - ref is a valid ref
     ref={ref}
     {...props}
   >
@@ -85,7 +83,6 @@ const ToolActionContainer = ({
     )}
     href={href}
     initial={{ opacity: 0, y: 10 }}
-    // @ts-expect-error - ref is a valid ref
     ref={ref}
     rel="noopener noreferrer"
     target="_blank"
