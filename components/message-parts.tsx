@@ -681,6 +681,11 @@ export function PureMessageParts({
     // Tools that should be integrated into Chain of Thought
     const cotTools = new Set<ChatMessage["parts"][number]["type"]>([
       "tool-semanticSearch",
+      "tool-leaveBalance",
+      "tool-benefitsInfo",
+      "tool-hrCase",
+      "tool-teamAvailability",
+      "tool-peopleSearch",
     ]);
 
     const result: Array<

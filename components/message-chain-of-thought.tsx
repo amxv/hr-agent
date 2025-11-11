@@ -1,11 +1,15 @@
 "use client";
 import {
   BrainIcon,
+  CalendarIcon,
   CheckIcon,
+  ClipboardListIcon,
   FileTextIcon,
+  HeartIcon,
   Lightbulb,
   type LucideIcon,
   SearchIcon,
+  UsersIcon,
 } from "lucide-react";
 import { memo, useEffect, useMemo, useRef, useState } from "react";
 import {
@@ -201,6 +205,383 @@ const SemanticSearchStep = memo(function SemanticSearchStep({
   return null;
 });
 
+// Component to render leave balance as a CoT step
+const LeaveBalanceStep = memo(function LeaveBalanceStep({
+  part,
+  isActive,
+}: {
+  part: Extract<ChatMessage["parts"][number], { type: "tool-leaveBalance" }>;
+  isActive: boolean;
+}) {
+  const { state, input } = part;
+
+  // Loading state
+  if (state === "input-available") {
+    return (
+      <ChainOfThoughtStep
+        icon={CalendarIcon}
+        label="Checking leave balances..."
+        status={isActive ? "active" : "complete"}
+      />
+    );
+  }
+
+  // Results state
+  if (state === "output-available") {
+    const { output } = part;
+
+    // Error state
+    if ("error" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={CalendarIcon}
+          label="Failed to retrieve leave balances"
+          status="complete"
+        >
+          <div className="text-red-500 text-sm">{output.error}</div>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    const { balances } = output;
+
+    // Success - show compact summary
+    return (
+      <ChainOfThoughtStep
+        icon={CalendarIcon}
+        label={`Retrieved ${balances.length} leave balance${balances.length !== 1 ? "s" : ""}`}
+        status="complete"
+      >
+        <ChainOfThoughtSearchResults className="flex-wrap gap-2">
+          {balances.map((balance, idx) => (
+            <ChainOfThoughtSearchResult
+              key={idx}
+              className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+            >
+              <span className="capitalize">{balance.leaveType}:</span>
+              <span className="font-medium">{balance.currentBalance} days</span>
+            </ChainOfThoughtSearchResult>
+          ))}
+        </ChainOfThoughtSearchResults>
+      </ChainOfThoughtStep>
+    );
+  }
+
+  return null;
+});
+
+// Component to render benefits info as a CoT step
+const BenefitsInfoStep = memo(function BenefitsInfoStep({
+  part,
+  isActive,
+}: {
+  part: Extract<ChatMessage["parts"][number], { type: "tool-benefitsInfo" }>;
+  isActive: boolean;
+}) {
+  const { state, input } = part;
+
+  // Loading state
+  if (state === "input-available") {
+    return (
+      <ChainOfThoughtStep
+        icon={HeartIcon}
+        label="Retrieving benefits information..."
+        status={isActive ? "active" : "complete"}
+      />
+    );
+  }
+
+  // Results state
+  if (state === "output-available") {
+    const { output } = part;
+
+    // Error state
+    if ("error" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={HeartIcon}
+          label="Failed to retrieve benefits"
+          status="complete"
+        >
+          <div className="text-red-500 text-sm">{output.error}</div>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    const { currentEnrollments } = output;
+
+    // Success - show compact summary
+    return (
+      <ChainOfThoughtStep
+        icon={HeartIcon}
+        label={`Retrieved ${currentEnrollments.length} enrollment${currentEnrollments.length !== 1 ? "s" : ""}`}
+        status="complete"
+      >
+        <ChainOfThoughtSearchResults className="flex-wrap gap-2">
+          {currentEnrollments.slice(0, 5).map((enrollment, idx) => (
+            <ChainOfThoughtSearchResult
+              key={idx}
+              className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+            >
+              <span className="font-medium">{enrollment.planName}</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="capitalize">{enrollment.planType}</span>
+            </ChainOfThoughtSearchResult>
+          ))}
+        </ChainOfThoughtSearchResults>
+      </ChainOfThoughtStep>
+    );
+  }
+
+  return null;
+});
+
+// Component to render HR case as a CoT step
+const HRCaseStep = memo(function HRCaseStep({
+  part,
+  isActive,
+}: {
+  part: Extract<ChatMessage["parts"][number], { type: "tool-hrCase" }>;
+  isActive: boolean;
+}) {
+  const { state, input } = part;
+
+  // Loading state
+  if (state === "input-available") {
+    return (
+      <ChainOfThoughtStep
+        icon={ClipboardListIcon}
+        label="Submitting HR case..."
+        status={isActive ? "active" : "complete"}
+      />
+    );
+  }
+
+  // Results state
+  if (state === "output-available") {
+    const { output } = part;
+
+    // Error state
+    if ("error" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={ClipboardListIcon}
+          label="Failed to submit case"
+          status="complete"
+        >
+          <div className="text-red-500 text-sm">{output.error}</div>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    // Success - narrow the type to variants with 'case' property
+    if ("case" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={ClipboardListIcon}
+          label={`Case ${output.case.caseId} submitted successfully`}
+          status="complete"
+        >
+          <ChainOfThoughtSearchResults className="flex-wrap gap-2">
+            <ChainOfThoughtSearchResult className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs">
+              <span>Case #{output.case.caseId}</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="capitalize">{output.case.status}</span>
+              <span className="text-muted-foreground">•</span>
+              <span className="capitalize">{output.case.priority} priority</span>
+            </ChainOfThoughtSearchResult>
+          </ChainOfThoughtSearchResults>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    // List action
+    return (
+      <ChainOfThoughtStep
+        icon={ClipboardListIcon}
+        label="Cases retrieved"
+        status="complete"
+      />
+    );
+  }
+
+  return null;
+});
+
+// Component to render team availability as a CoT step
+const TeamAvailabilityStep = memo(function TeamAvailabilityStep({
+  part,
+  isActive,
+}: {
+  part: Extract<
+    ChatMessage["parts"][number],
+    { type: "tool-teamAvailability" }
+  >;
+  isActive: boolean;
+}) {
+  const { state, input } = part;
+
+  // Loading state
+  if (state === "input-available") {
+    return (
+      <ChainOfThoughtStep
+        icon={UsersIcon}
+        label="Checking team availability..."
+        status={isActive ? "active" : "complete"}
+      />
+    );
+  }
+
+  // Results state
+  if (state === "output-available") {
+    const { output } = part;
+
+    // Error state
+    if ("error" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={UsersIcon}
+          label="Failed to retrieve team availability"
+          status="complete"
+        >
+          <div className="text-red-500 text-sm">{output.error}</div>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    // Narrow to view_schedule action which has absences
+    if ("absences" in output) {
+      const { absences } = output;
+
+      // Success - show compact summary
+      return (
+        <ChainOfThoughtStep
+          icon={UsersIcon}
+          label={`Retrieved ${absences.length} team ${absences.length === 1 ? "absence" : "absences"}`}
+          status="complete"
+        >
+          <ChainOfThoughtSearchResults className="flex-wrap gap-2">
+            {absences.slice(0, 5).map((absence, idx) => (
+              <ChainOfThoughtSearchResult
+                key={idx}
+                className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+              >
+                <span className="font-medium">{absence.employeeName}</span>
+                <span className="text-muted-foreground">•</span>
+                <span className="capitalize">{absence.leaveType}</span>
+                <span className="text-muted-foreground">•</span>
+                <span>{absence.totalDays}d</span>
+              </ChainOfThoughtSearchResult>
+            ))}
+          </ChainOfThoughtSearchResults>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    // For other actions (view_approvals, approve_request, deny_request)
+    if ("pendingRequests" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={UsersIcon}
+          label={`${output.totalPending} pending ${output.totalPending === 1 ? "request" : "requests"}`}
+          status="complete"
+        />
+      );
+    }
+
+    if ("request" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={UsersIcon}
+          label={output.message}
+          status="complete"
+        />
+      );
+    }
+
+    return null;
+  }
+
+  return null;
+});
+
+// Component to render people search as a CoT step
+const PeopleSearchStep = memo(function PeopleSearchStep({
+  part,
+  isActive,
+}: {
+  part: Extract<ChatMessage["parts"][number], { type: "tool-peopleSearch" }>;
+  isActive: boolean;
+}) {
+  const { state, input } = part;
+
+  // Loading state
+  if (state === "input-available") {
+    return (
+      <ChainOfThoughtStep
+        icon={UsersIcon}
+        label={`Searching for "${input.query}"`}
+        status={isActive ? "active" : "complete"}
+      />
+    );
+  }
+
+  // Results state
+  if (state === "output-available") {
+    const { output } = part;
+
+    // Error state
+    if ("error" in output) {
+      return (
+        <ChainOfThoughtStep
+          icon={UsersIcon}
+          label="Search failed"
+          status="complete"
+        >
+          <div className="text-red-500 text-sm">{output.error}</div>
+        </ChainOfThoughtStep>
+      );
+    }
+
+    const { results, totalResults } = output;
+
+    // No results
+    if (totalResults === 0) {
+      return (
+        <ChainOfThoughtStep
+          icon={UsersIcon}
+          label={`No people found for "${input.query}"`}
+          status="complete"
+        />
+      );
+    }
+
+    // Success - show compact summary
+    return (
+      <ChainOfThoughtStep
+        icon={UsersIcon}
+        label={`Found ${totalResults} ${totalResults === 1 ? "person" : "people"}`}
+        status="complete"
+      >
+        <ChainOfThoughtSearchResults className="flex-wrap gap-2">
+          {results.slice(0, 5).map((person, idx) => (
+            <ChainOfThoughtSearchResult
+              key={idx}
+              className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+            >
+              <span className="font-medium">{person.fullName}</span>
+              <span className="text-muted-foreground">•</span>
+              <span>{person.jobTitle}</span>
+            </ChainOfThoughtSearchResult>
+          ))}
+        </ChainOfThoughtSearchResults>
+      </ChainOfThoughtStep>
+    );
+  }
+
+  return null;
+});
+
 // Component to render a reasoning part as a CoT step
 const ReasoningStepItem = memo(function ReasoningStepItem({
   text,
@@ -320,7 +701,61 @@ function PureMessageChainOfThought({
             );
           }
 
-          // Future: Add other tool types here
+          // Leave Balance tool
+          if (part.type === "tool-leaveBalance") {
+            return (
+              <LeaveBalanceStep
+                isActive={step.isActive}
+                key={`leave-balance-${index}`}
+                part={part}
+              />
+            );
+          }
+
+          // Benefits Info tool
+          if (part.type === "tool-benefitsInfo") {
+            return (
+              <BenefitsInfoStep
+                isActive={step.isActive}
+                key={`benefits-info-${index}`}
+                part={part}
+              />
+            );
+          }
+
+          // HR Case tool
+          if (part.type === "tool-hrCase") {
+            return (
+              <HRCaseStep
+                isActive={step.isActive}
+                key={`hr-case-${index}`}
+                part={part}
+              />
+            );
+          }
+
+          // Team Availability tool
+          if (part.type === "tool-teamAvailability") {
+            return (
+              <TeamAvailabilityStep
+                isActive={step.isActive}
+                key={`team-availability-${index}`}
+                part={part}
+              />
+            );
+          }
+
+          // People Search tool
+          if (part.type === "tool-peopleSearch") {
+            return (
+              <PeopleSearchStep
+                isActive={step.isActive}
+                key={`people-search-${index}`}
+                part={part}
+              />
+            );
+          }
+
           return null;
         })}
       </ChainOfThoughtContent>
