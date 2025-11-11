@@ -25,7 +25,7 @@ type MarkdownNode = {
   position?: MarkdownPosition;
   properties?: { className?: string };
 };
-type WithNode<T> = T & {
+type WithNode<T> = Omit<T, 'ref'> & {
   node?: MarkdownNode;
   children?: React.ReactNode;
   className?: string;
@@ -44,7 +44,7 @@ function sameNodePosition(a?: MarkdownNode, b?: MarkdownNode) {
   );
 }
 
-type OlProps = WithNode<JSX.IntrinsicElements["ol"]>;
+type OlProps = WithNode<React.ComponentPropsWithoutRef<"ol">>;
 const MemoOl = memo<OlProps>(
   ({ node, children, className, ...props }: OlProps) => (
     <ol className={cn("ml-4 list-outside list-decimal", className)} {...props}>
@@ -55,7 +55,7 @@ const MemoOl = memo<OlProps>(
 );
 MemoOl.displayName = "MarkdownOl";
 
-type LiProps = WithNode<JSX.IntrinsicElements["li"]>;
+type LiProps = WithNode<React.ComponentPropsWithoutRef<"li">>;
 const MemoLi = memo<LiProps>(
   ({ node, children, className, ...props }: LiProps) => (
     <li className={cn("py-1", className)} {...props}>
@@ -66,7 +66,7 @@ const MemoLi = memo<LiProps>(
 );
 MemoLi.displayName = "MarkdownLi";
 
-type UlProps = WithNode<JSX.IntrinsicElements["ul"]>;
+type UlProps = WithNode<React.ComponentPropsWithoutRef<"ul">>;
 const MemoUl = memo<UlProps>(
   ({ node, children, className, ...props }: UlProps) => (
     <ul className={cn("ml-4 list-outside list-disc", className)} {...props}>
@@ -77,7 +77,7 @@ const MemoUl = memo<UlProps>(
 );
 MemoUl.displayName = "MarkdownUl";
 
-type HrProps = WithNode<JSX.IntrinsicElements["hr"]>;
+type HrProps = WithNode<React.ComponentPropsWithoutRef<"hr">>;
 const MemoHr = memo<HrProps>(
   ({ node, className, ...props }: HrProps) => (
     <hr className={cn("my-6 border-border", className)} {...props} />
@@ -86,7 +86,7 @@ const MemoHr = memo<HrProps>(
 );
 MemoHr.displayName = "MarkdownHr";
 
-type StrongProps = WithNode<JSX.IntrinsicElements["span"]>;
+type StrongProps = WithNode<React.ComponentPropsWithoutRef<"span">>;
 const MemoStrong = memo<StrongProps>(
   ({ node, children, className, ...props }: StrongProps) => (
     <span className={cn("font-semibold", className)} {...props}>
@@ -97,7 +97,7 @@ const MemoStrong = memo<StrongProps>(
 );
 MemoStrong.displayName = "MarkdownStrong";
 
-type AProps = WithNode<JSX.IntrinsicElements["a"]>;
+type AProps = WithNode<React.ComponentPropsWithoutRef<"a">>;
 const MemoA = memo<AProps>(
   ({ node, children, className, href, ...props }: AProps) => (
     <LinkMarkdown className={className} href={href || "#"} {...props}>
@@ -111,7 +111,7 @@ const MemoA = memo<AProps>(
 );
 MemoA.displayName = "MarkdownA";
 
-type H1Props = WithNode<JSX.IntrinsicElements["h1"]>;
+type H1Props = WithNode<React.ComponentPropsWithoutRef<"h1">>;
 const MemoH1 = memo<H1Props>(
   ({ node, children, className, ...props }: H1Props) => (
     <h1
@@ -125,7 +125,7 @@ const MemoH1 = memo<H1Props>(
 );
 MemoH1.displayName = "MarkdownH1";
 
-type H2Props = WithNode<JSX.IntrinsicElements["h2"]>;
+type H2Props = WithNode<React.ComponentPropsWithoutRef<"h2">>;
 const MemoH2 = memo<H2Props>(
   ({ node, children, className, ...props }: H2Props) => (
     <h2
@@ -139,7 +139,7 @@ const MemoH2 = memo<H2Props>(
 );
 MemoH2.displayName = "MarkdownH2";
 
-type H3Props = WithNode<JSX.IntrinsicElements["h3"]>;
+type H3Props = WithNode<React.ComponentPropsWithoutRef<"h3">>;
 const MemoH3 = memo<H3Props>(
   ({ node, children, className, ...props }: H3Props) => (
     <h3 className={cn("mt-6 mb-2 font-semibold text-xl", className)} {...props}>
@@ -150,7 +150,7 @@ const MemoH3 = memo<H3Props>(
 );
 MemoH3.displayName = "MarkdownH3";
 
-type H4Props = WithNode<JSX.IntrinsicElements["h4"]>;
+type H4Props = WithNode<React.ComponentPropsWithoutRef<"h4">>;
 const MemoH4 = memo<H4Props>(
   ({ node, children, className, ...props }: H4Props) => (
     <h4 className={cn("mt-6 mb-2 font-semibold text-lg", className)} {...props}>
@@ -161,7 +161,7 @@ const MemoH4 = memo<H4Props>(
 );
 MemoH4.displayName = "MarkdownH4";
 
-type H5Props = WithNode<JSX.IntrinsicElements["h5"]>;
+type H5Props = WithNode<React.ComponentPropsWithoutRef<"h5">>;
 const MemoH5 = memo<H5Props>(
   ({ node, children, className, ...props }: H5Props) => (
     <h5
@@ -175,7 +175,7 @@ const MemoH5 = memo<H5Props>(
 );
 MemoH5.displayName = "MarkdownH5";
 
-type H6Props = WithNode<JSX.IntrinsicElements["h6"]>;
+type H6Props = WithNode<React.ComponentPropsWithoutRef<"h6">>;
 const MemoH6 = memo<H6Props>(
   ({ node, children, className, ...props }: H6Props) => (
     <h6 className={cn("mt-6 mb-2 font-semibold text-sm", className)} {...props}>
@@ -186,7 +186,7 @@ const MemoH6 = memo<H6Props>(
 );
 MemoH6.displayName = "MarkdownH6";
 
-type TableProps = WithNode<JSX.IntrinsicElements["table"]>;
+type TableProps = WithNode<React.ComponentPropsWithoutRef<"table">>;
 const MemoTable = memo<TableProps>(
   ({ node, children, className, ...props }: TableProps) => (
     <div className="my-6 overflow-x-auto rounded border border-border">
@@ -199,7 +199,7 @@ const MemoTable = memo<TableProps>(
 );
 MemoTable.displayName = "MarkdownTable";
 
-type TrProps = WithNode<JSX.IntrinsicElements["tr"]>;
+type TrProps = WithNode<React.ComponentPropsWithoutRef<"tr">>;
 const MemoTr = memo<TrProps>(
   ({ node, children, className, ...props }: TrProps) => (
     <tr
@@ -217,7 +217,7 @@ const MemoTr = memo<TrProps>(
 );
 MemoTr.displayName = "MarkdownTr";
 
-type TheadProps = WithNode<JSX.IntrinsicElements["thead"]>;
+type TheadProps = WithNode<React.ComponentPropsWithoutRef<"thead">>;
 const MemoThead = memo<TheadProps>(
   ({ node, children, className, ...props }: TheadProps) => (
     <thead className={className} {...props}>
@@ -228,7 +228,7 @@ const MemoThead = memo<TheadProps>(
 );
 MemoThead.displayName = "MarkdownThead";
 
-type ThProps = WithNode<JSX.IntrinsicElements["th"]> & { align?: string };
+type ThProps = WithNode<React.ComponentPropsWithoutRef<"th">> & { align?: string };
 const MemoTh = memo<ThProps>(
   ({ node, children, className, align, ...props }: ThProps) => {
     const alignClass = align ? `text-${align}` : "text-left";
@@ -255,7 +255,7 @@ const MemoTh = memo<ThProps>(
 );
 MemoTh.displayName = "MarkdownTh";
 
-type TdProps = WithNode<JSX.IntrinsicElements["td"]> & { align?: string };
+type TdProps = WithNode<React.ComponentPropsWithoutRef<"td">> & { align?: string };
 const MemoTd = memo<TdProps>(
   ({ node, children, className, align, ...props }: TdProps) => {
     const alignClass = align ? `text-${align}` : "text-left";
@@ -281,7 +281,7 @@ const MemoTd = memo<TdProps>(
 );
 MemoTd.displayName = "MarkdownTd";
 
-type TbodyProps = WithNode<JSX.IntrinsicElements["tbody"]>;
+type TbodyProps = WithNode<React.ComponentPropsWithoutRef<"tbody">>;
 const MemoTbody = memo<TbodyProps>(
   ({ node, children, className, ...props }: TbodyProps) => (
     <tbody className={className} {...props}>
@@ -292,7 +292,7 @@ const MemoTbody = memo<TbodyProps>(
 );
 MemoTbody.displayName = "MarkdownTbody";
 
-type BlockquoteProps = WithNode<JSX.IntrinsicElements["blockquote"]>;
+type BlockquoteProps = WithNode<React.ComponentPropsWithoutRef<"blockquote">>;
 const MemoBlockquote = memo<BlockquoteProps>(
   ({ node, children, className, ...props }: BlockquoteProps) => (
     <blockquote
@@ -311,7 +311,7 @@ const MemoBlockquote = memo<BlockquoteProps>(
 );
 MemoBlockquote.displayName = "MarkdownBlockquote";
 
-type CodeProps = WithNode<JSX.IntrinsicElements["code"]>;
+type CodeProps = WithNode<React.ComponentPropsWithoutRef<"code">>;
 const MemoCode = memo<CodeProps>(
   ({ node, className, children, ...props }: CodeProps) => {
     const startLine = node?.position?.start?.line;
@@ -354,7 +354,7 @@ const MemoCode = memo<CodeProps>(
 );
 MemoCode.displayName = "MarkdownCode";
 
-type PreProps = WithNode<JSX.IntrinsicElements["pre"]>;
+type PreProps = WithNode<React.ComponentPropsWithoutRef<"pre">>;
 const MemoPre = memo<PreProps>(
   ({ children }: PreProps) => <>{children}</>,
   (p, n) => sameNodePosition(p.node, n.node)

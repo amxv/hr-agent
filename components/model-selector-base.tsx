@@ -67,7 +67,7 @@ const initialFilters = enabledFeatures.reduce<FeatureFilter>((acc, feature) => {
 function getFeatureIcons(modelDefinition: ModelDefinitionLike) {
   const features = modelDefinition;
 
-  const icons: JSX.Element[] = [];
+  const icons: React.ReactElement[] = [];
 
   const enabled = getEnabledFeatures();
   const featureIconMap = [

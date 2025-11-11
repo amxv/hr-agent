@@ -19,7 +19,7 @@ const VARIANT_CONFIG: Record<
     }: {
       remaining: number;
       isAtLimit: boolean;
-    }) => JSX.Element;
+    }) => React.ReactElement;
     getClasses: ({ isAtLimit }: { isAtLimit: boolean }) => string;
   }
 > = {
