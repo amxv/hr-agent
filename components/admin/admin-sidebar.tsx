@@ -94,7 +94,7 @@ export const AdminDesktopSidebar = ({
         width: animate ? (open ? "220px" : "75px") : "220px",
       }}
       className={cn(
-        "hidden h-full w-[220px] flex-shrink-0 bg-background px-4 py-4 md:flex md:flex-col dark:bg-neutral-900",
+        "hidden h-full w-[220px] flex-shrink-0 bg-background px-4 py-4 md:flex md:flex-col",
         className
       )}
       onMouseEnter={() => setOpen(true)}
@@ -115,7 +115,7 @@ export const AdminMobileSidebar = ({
   return (
     <div
       className={cn(
-        "flex h-10 w-full flex-row items-center bg-white px-4 py-4 md:hidden dark:bg-neutral-900"
+        "flex h-10 w-full flex-row items-center bg-white px-4 py-4 md:hidden"
       )}
       {...props}
     >
@@ -130,7 +130,7 @@ export const AdminMobileSidebar = ({
           <motion.div
             animate={{ x: 0, opacity: 1 }}
             className={cn(
-              "fixed inset-0 z-[100] flex h-full w-full flex-col justify-between bg-white p-10 dark:bg-neutral-900",
+              "fixed inset-0 z-[100] flex h-full w-full flex-col justify-between bg-white p-10",
               className
             )}
             exit={{ x: "-100%", opacity: 0 }}

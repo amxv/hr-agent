@@ -1,4 +1,4 @@
-import {
+import React, {
   type DetailedHTMLProps,
   type HTMLAttributes,
   isValidElement,
@@ -19,7 +19,7 @@ type MarkdownNode = {
   properties?: { className?: string };
 };
 
-type WithNode<T> = T & {
+type WithNode<T> = Omit<T, 'ref'> & {
   node?: MarkdownNode;
   children?: React.ReactNode;
   className?: string;
@@ -56,7 +56,7 @@ function sameClassAndNode(
   );
 }
 
-type OlProps = WithNode<JSX.IntrinsicElements["ol"]>;
+type OlProps = WithNode<React.ComponentPropsWithoutRef<"ol">>;
 const MemoOl = memo<OlProps>(
   ({ children, className, ...props }: OlProps) => (
     <ol className={cn("ml-4 list-outside list-decimal", className)} {...props}>
@@ -67,7 +67,7 @@ const MemoOl = memo<OlProps>(
 );
 MemoOl.displayName = "MarkdownOl";
 
-type UlProps = WithNode<JSX.IntrinsicElements["ul"]>;
+type UlProps = WithNode<React.ComponentPropsWithoutRef<"ul">>;
 const MemoUl = memo<UlProps>(
   ({ children, className, ...props }: UlProps) => (
     <ul className={cn("ml-4 list-outside list-disc", className)} {...props}>
@@ -78,7 +78,7 @@ const MemoUl = memo<UlProps>(
 );
 MemoUl.displayName = "MarkdownUl";
 
-type HrProps = WithNode<JSX.IntrinsicElements["hr"]>;
+type HrProps = WithNode<React.ComponentPropsWithoutRef<"hr">>;
 const MemoHr = memo<HrProps>(
   ({ className, ...props }: HrProps) => (
     <hr className={cn("my-6 border-border", className)} {...props} />
@@ -87,7 +87,7 @@ const MemoHr = memo<HrProps>(
 );
 MemoHr.displayName = "MarkdownHr";
 
-type StrongProps = WithNode<JSX.IntrinsicElements["span"]>;
+type StrongProps = WithNode<React.ComponentPropsWithoutRef<"span">>;
 const MemoStrong = memo<StrongProps>(
   ({ children, className, ...props }: StrongProps) => (
     <span className={cn("font-semibold", className)} {...props}>
@@ -98,7 +98,7 @@ const MemoStrong = memo<StrongProps>(
 );
 MemoStrong.displayName = "MarkdownStrong";
 
-type AProps = WithNode<JSX.IntrinsicElements["a"]> & { href?: string };
+type AProps = WithNode<React.ComponentPropsWithoutRef<"a">> & { href?: string };
 const MemoA = memo<AProps>(
   ({ children, className, href, ...props }: AProps) => (
     <a
@@ -115,8 +115,8 @@ const MemoA = memo<AProps>(
 );
 MemoA.displayName = "MarkdownA";
 
-type HeadingProps<TTag extends keyof JSX.IntrinsicElements> = WithNode<
-  JSX.IntrinsicElements[TTag]
+type HeadingProps<TTag extends keyof React.JSX.IntrinsicElements> = WithNode<
+  React.ComponentPropsWithoutRef<TTag>
 >;
 
 const MemoH1 = memo<HeadingProps<"h1">>(
@@ -188,7 +188,7 @@ const MemoH6 = memo<HeadingProps<"h6">>(
 );
 MemoH6.displayName = "MarkdownH6";
 
-type TableProps = WithNode<JSX.IntrinsicElements["table"]>;
+type TableProps = WithNode<React.ComponentPropsWithoutRef<"table">>;
 const MemoTable = memo<TableProps>(
   ({ children, className, ...props }: TableProps) => (
     <div className="my-4 overflow-x-auto">
@@ -204,7 +204,7 @@ const MemoTable = memo<TableProps>(
 );
 MemoTable.displayName = "MarkdownTable";
 
-type TheadProps = WithNode<JSX.IntrinsicElements["thead"]>;
+type TheadProps = WithNode<React.ComponentPropsWithoutRef<"thead">>;
 const MemoThead = memo<TheadProps>(
   ({ children, className, ...props }: TheadProps) => (
     <thead className={cn("bg-muted/50", className)} {...props}>
@@ -215,7 +215,7 @@ const MemoThead = memo<TheadProps>(
 );
 MemoThead.displayName = "MarkdownThead";
 
-type TbodyProps = WithNode<JSX.IntrinsicElements["tbody"]>;
+type TbodyProps = WithNode<React.ComponentPropsWithoutRef<"tbody">>;
 const MemoTbody = memo<TbodyProps>(
   ({ children, className, ...props }: TbodyProps) => (
     <tbody className={cn("divide-y divide-border", className)} {...props}>
@@ -226,7 +226,7 @@ const MemoTbody = memo<TbodyProps>(
 );
 MemoTbody.displayName = "MarkdownTbody";
 
-type TrProps = WithNode<JSX.IntrinsicElements["tr"]>;
+type TrProps = WithNode<React.ComponentPropsWithoutRef<"tr">>;
 const MemoTr = memo<TrProps>(
   ({ children, className, ...props }: TrProps) => (
     <tr className={cn("border-border border-b", className)} {...props}>
@@ -237,7 +237,7 @@ const MemoTr = memo<TrProps>(
 );
 MemoTr.displayName = "MarkdownTr";
 
-type ThProps = WithNode<JSX.IntrinsicElements["th"]>;
+type ThProps = WithNode<React.ComponentPropsWithoutRef<"th">>;
 const MemoTh = memo<ThProps>(
   ({ children, className, ...props }: ThProps) => (
     <th
@@ -251,7 +251,7 @@ const MemoTh = memo<ThProps>(
 );
 MemoTh.displayName = "MarkdownTh";
 
-type TdProps = WithNode<JSX.IntrinsicElements["td"]>;
+type TdProps = WithNode<React.ComponentPropsWithoutRef<"td">>;
 const MemoTd = memo<TdProps>(
   ({ children, className, ...props }: TdProps) => (
     <td className={cn("px-4 py-2 text-sm", className)} {...props}>
@@ -262,7 +262,7 @@ const MemoTd = memo<TdProps>(
 );
 MemoTd.displayName = "MarkdownTd";
 
-type BlockquoteProps = WithNode<JSX.IntrinsicElements["blockquote"]>;
+type BlockquoteProps = WithNode<React.ComponentPropsWithoutRef<"blockquote">>;
 const MemoBlockquote = memo<BlockquoteProps>(
   ({ children, className, ...props }: BlockquoteProps) => (
     <blockquote
@@ -279,7 +279,7 @@ const MemoBlockquote = memo<BlockquoteProps>(
 );
 MemoBlockquote.displayName = "MarkdownBlockquote";
 
-type SupProps = WithNode<JSX.IntrinsicElements["sup"]>;
+type SupProps = WithNode<React.ComponentPropsWithoutRef<"sup">>;
 const MemoSup = memo<SupProps>(
   ({ children, className, ...props }: SupProps) => (
     <sup className={cn("text-sm", className)} {...props}>
@@ -290,7 +290,7 @@ const MemoSup = memo<SupProps>(
 );
 MemoSup.displayName = "MarkdownSup";
 
-type SubProps = WithNode<JSX.IntrinsicElements["sub"]>;
+type SubProps = WithNode<React.ComponentPropsWithoutRef<"sub">>;
 const MemoSub = memo<SubProps>(
   ({ children, className, ...props }: SubProps) => (
     <sub className={cn("text-sm", className)} {...props}>
@@ -301,7 +301,7 @@ const MemoSub = memo<SubProps>(
 );
 MemoSub.displayName = "MarkdownSub";
 
-type LiProps = WithNode<JSX.IntrinsicElements["li"]>;
+type LiProps = WithNode<React.ComponentPropsWithoutRef<"li">>;
 
 const MemoLi = memo<LiProps>(
   ({ node, children, className, ...props }: LiProps) => (

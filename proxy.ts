@@ -3,9 +3,7 @@ import { NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { env } from "@/lib/env";
 
-export const runtime = "nodejs";
-
-export default async function middleware(req: NextRequest) {
+export default async function proxy(req: NextRequest) {
   // Mirror previous authorized() logic using Better Auth session
   const url = req.nextUrl;
 
