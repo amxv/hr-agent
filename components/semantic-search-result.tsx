@@ -66,7 +66,7 @@ export function SemanticSearchResult({
     }
 
     return (
-      <div className="space-y-3">
+      <div className="space-y-2">
         <div className="flex items-center gap-2 text-gray-700 text-sm dark:text-gray-300">
           <span className="font-medium">
             Found {totalResults} result{totalResults !== 1 ? "s" : ""}

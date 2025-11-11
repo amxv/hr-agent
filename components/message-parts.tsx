@@ -797,7 +797,7 @@ export function PureMessageParts({
 
         if (isHRTool) {
           return (
-            <div className="my-4" key={key}>
+            <div className="my-2" key={key}>
               <MessagePart
                 isReadonly={isReadonly}
                 messageId={messageId}

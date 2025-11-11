@@ -275,7 +275,7 @@ export function ShareButton({
   const isAuthenticated = !!session?.user;
 
   const triggerButton = (
-    <Button className={cn("", className)} size="sm" variant="outline">
+    <Button className={cn("cursor-pointer", className)} size="sm" variant="outline">
       <Share size={16} />
       <span className="sr-only">Share chat</span>
       <p className="hidden md:block">Share</p>

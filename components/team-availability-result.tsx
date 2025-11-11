@@ -65,7 +65,7 @@ export function TeamAvailabilityResult({
       const { absences, coverageSummary, criticalDates } = output;
 
       return (
-        <div className="space-y-4">
+        <div className="space-y-2">
           {/* Critical Coverage Alert */}
           {criticalDates.length > 0 && (
             <Alert variant="destructive">
@@ -176,7 +176,7 @@ export function TeamAvailabilityResult({
       const { pendingRequests, totalPending } = output;
 
       return (
-        <div className="space-y-3">
+        <div className="space-y-2">
           <div className="flex items-center justify-between">
             <h3 className="flex items-center gap-2 font-medium text-sm">
               <Clock className="h-4 w-4" />
@@ -191,7 +191,7 @@ export function TeamAvailabilityResult({
               No pending approval requests
             </Card>
           ) : (
-            <div className="space-y-3">
+            <div className="space-y-2">
               {pendingRequests.map((request) => (
                 <Card
                   className={`p-3 ${
@@ -287,7 +287,7 @@ export function TeamAvailabilityResult({
         <Card
           className={`border-l-4 ${isApproved ? "border-green-400" : "border-red-400"}`}
         >
-          <div className="space-y-3 p-4">
+          <div className="space-y-2 p-4">
             {/* Success Message */}
             <div
               className={`flex items-start gap-2 ${

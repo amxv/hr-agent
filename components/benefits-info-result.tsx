@@ -58,7 +58,7 @@ export function BenefitsInfoResult({
     } = output;
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Enrollment Window Alert */}
         {enrollmentWindow && enrollmentWindow.daysRemaining > 0 && (
           <Alert className="border-amber-200 bg-amber-50 dark:border-amber-800 dark:bg-amber-950">

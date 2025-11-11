@@ -778,11 +778,11 @@ function PureChatInputBottomControls({
             selectedModelId={selectedModelId}
           />
         )}
-        <ResponsiveTools
+        {/* <ResponsiveTools
           selectedModelId={selectedModelId}
           setTools={setSelectedTool}
           tools={selectedTool}
-        />
+        /> */}
       </PromptInputTools>
       <PromptInputTools className="flex min-w-0 items-center @[400px]:gap-2 gap-1">
         <CompactContextUsage
