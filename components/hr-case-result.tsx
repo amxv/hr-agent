@@ -71,7 +71,7 @@ export function HRCaseResult({ state, input, output }: HRCaseResultProps) {
       const { case: hrCase, message } = output;
       return (
         <Card className={`border-l-4 ${PRIORITY_COLORS[hrCase.priority]}`}>
-          <div className="space-y-3 p-4">
+          <div className="space-y-2 p-4">
             {/* Success Message */}
             <div className="flex items-start gap-2 text-green-700 dark:text-green-400">
               <CheckCircle className="mt-0.5 h-5 w-5" />
@@ -148,7 +148,7 @@ export function HRCaseResult({ state, input, output }: HRCaseResultProps) {
       const hrCase = output.case;
       return (
         <Card className={`border-l-4 ${PRIORITY_COLORS[hrCase.priority]}`}>
-          <div className="space-y-3 p-4">
+          <div className="space-y-2 p-4">
             {/* Case Header */}
             <div className="space-y-2">
               <div className="flex items-center justify-between">
@@ -255,7 +255,7 @@ export function HRCaseResult({ state, input, output }: HRCaseResultProps) {
     if (output.action === "list") {
       const { cases, totalOpen, totalClosed } = output;
       return (
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Summary */}
           <div className="flex gap-2">
             <Badge variant="outline">

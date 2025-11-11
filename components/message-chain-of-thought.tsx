@@ -665,7 +665,7 @@ function PureMessageChainOfThought({
 
   return (
     <ChainOfThought
-      className="mb-12"
+      className="mb-4"
       data-testid="message-chain-of-thought"
       defaultOpen={isLoading}
     >

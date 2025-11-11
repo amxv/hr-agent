@@ -63,7 +63,7 @@ export function FileRetrieveResult({
 
     return (
       <Card className="p-4">
-        <div className="space-y-3">
+        <div className="space-y-2">
           {/* Header */}
           <div className="flex items-start gap-3">
             <FileText className="mt-0.5 h-5 w-5 shrink-0 text-green-600 dark:text-green-400" />

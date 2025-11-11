@@ -45,7 +45,7 @@ export function LeaveBalanceResult({
     const { balances, blackoutDates, projection, policies } = output;
 
     return (
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Projection Warning (if applicable) */}
         {projection?.warning && (
           <Alert variant="destructive">
@@ -141,7 +141,7 @@ export function LeaveBalanceResult({
 
         {/* Policies */}
         <Card className="border-blue-200 bg-blue-50 p-3 dark:border-blue-800 dark:bg-blue-950">
-          <h3 className="mb-2 font-medium text-sm">Leave Policies</h3>
+          <h3 className="mb-1 font-medium text-sm">Leave Policies</h3>
           <div className="space-y-1 text-blue-900 text-xs dark:text-blue-100">
             <p>• Minimum notice: {policies.minNotice} days</p>
             <p>• Maximum consecutive days: {policies.maxConsecutive}</p>

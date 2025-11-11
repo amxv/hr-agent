@@ -49,7 +49,7 @@ const WORK_AUTH_COLORS: Record<string, string> = {
 function EmployeeCard({ employee }: { employee: EmployeeProfile }) {
   return (
     <Card className="p-4">
-      <div className="space-y-3">
+      <div className="space-y-2">
         {/* Header */}
         <div className="flex items-start justify-between">
           <div className="space-y-1">
@@ -268,7 +268,7 @@ export function PeopleSearchResult({
 
     // SUCCESS STATE WITH RESULTS
     return (
-      <div className="space-y-4">
+      <div className="space-y-2">
         {/* Results Count */}
         <div className="flex items-center gap-2">
           <Users className="h-4 w-4 text-muted-foreground" />
@@ -278,7 +278,7 @@ export function PeopleSearchResult({
         </div>
 
         {/* Employee Cards */}
-        <div className="space-y-3">
+        <div className="space-y-2">
           {results.map((employee) => (
             <EmployeeCard employee={employee} key={employee.employeeId} />
           ))}
