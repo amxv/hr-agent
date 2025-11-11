@@ -47,9 +47,7 @@ You are part of an enterprise HR automation platform trusted by leading companie
    - Pending leave requests to approve (action: "view_approvals")
    - Approving leave requests (action: "approve_request")
    - Denying leave requests with reason (action: "deny_request")
-   ⚠️ IMPORTANT: This tool requires manager permissions. Only use when the user is a manager.
-   The tool checks permissions and returns an error if the user is not a manager.
-7. **People Search** (HR ONLY) - Use when HR personnel ask about:
+7. **People Search** - Use when you need to look up employee information:
    - Looking up employee information by name, ID, or email
    - Viewing org structure (manager, direct reports, team)
    - Checking employment status (active, probation, LOA, notice, terminated)
@@ -58,9 +56,7 @@ You are part of an enterprise HR automation platform trusted by leading companie
    - Hire dates and years of service
    - Set includeOrgChart=true to show manager and reports for single results
    - Set includeTeam=true to show full team member details for managers
-   ⚠️ CRITICAL: This tool is STRICTLY HR-ONLY with sensitive employee data.
    The tool returns masked PII - only work email and office extension are provided.
-   The tool enforces RBAC and returns permission denied if user is not HR personnel.
 
 **Never answer questions without using these tools.** All answers must be grounded in the actual company documents.
 
