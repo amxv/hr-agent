@@ -54,66 +54,6 @@ type LeaveBalanceProps = {
   dataStream: StreamWriter;
 };
 
-// Mock employee leave data
-const MOCK_EMPLOYEE_DATA = {
-  employeeId: "EMP001",
-  employeeName: "John Doe",
-  department: "Engineering",
-  hireDate: "2020-03-15",
-  balances: [
-    {
-      leaveType: "vacation" as const,
-      currentBalance: 18.5,
-      accrued: 20,
-      used: 1.5,
-      projected: 26.5, // includes end-of-year accrual
-      accrualRate: 1.67, // 20 days/year ≈ 1.67/month
-      carryoverLimit: 5,
-      carryoverDeadline: "2026-03-31",
-    },
-    {
-      leaveType: "sick" as const,
-      currentBalance: 12,
-      accrued: 12,
-      used: 0,
-      projected: 12,
-      accrualRate: 1, // 12 days/year = 1/month
-      carryoverLimit: 0, // sick days don't carry over
-      carryoverDeadline: "2025-12-31",
-    },
-    {
-      leaveType: "personal" as const,
-      currentBalance: 3,
-      accrued: 3,
-      used: 0,
-      projected: 3,
-      accrualRate: 0.25, // 3 days/year
-      carryoverLimit: 0,
-      carryoverDeadline: "2025-12-31",
-    },
-  ],
-  blackoutDates: [
-    {
-      startDate: "2025-11-15",
-      endDate: "2025-11-30",
-      reason: "Year-end release freeze",
-      department: "Engineering",
-    },
-    {
-      startDate: "2025-12-15",
-      endDate: "2025-12-31",
-      reason: "Holiday season - limited approval",
-      department: "All",
-    },
-  ],
-  policies: {
-    minNotice: 14, // 2 weeks
-    maxConsecutive: 15, // days
-    carryoverRules:
-      "Maximum 5 vacation days can be carried over to next year. Must be used by March 31st. Sick and personal days do not carry over.",
-  },
-};
-
 export const leaveBalance = ({ dataStream }: LeaveBalanceProps) =>
   tool({
     description: `
@@ -167,17 +107,69 @@ export const leaveBalance = ({ dataStream }: LeaveBalanceProps) =>
       });
 
       try {
-        // Simulate API call delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        // Import database queries dynamically
+        const {
+          getEmployeeByEmployeeId,
+          getLeaveBalancesByEmployeeId,
+          listBlackoutDates,
+          getLeavePolicy,
+        } = await import("@/lib/db/queries");
+
+        // For now, use a default employee ID since the tool doesn't have employee context
+        // In production, this would come from session or be required as a parameter
+        const defaultEmployeeId = "EMP001";
 
         // Get employee data
-        const employeeData = MOCK_EMPLOYEE_DATA;
+        const employee = await getEmployeeByEmployeeId(defaultEmployeeId);
+        if (!employee) {
+          return {
+            error: "Employee not found. Please contact HR for assistance.",
+          };
+        }
+
+        // Get leave balances for the employee
+        const dbBalances = await getLeaveBalancesByEmployeeId(employee.id);
+        if (!dbBalances || dbBalances.length === 0) {
+          return {
+            error: "No leave balance data available for this employee.",
+          };
+        }
 
         // Filter balances by type if specified
-        let balances = employeeData.balances;
+        let filteredBalances = dbBalances;
         if (leaveType !== "all") {
-          balances = balances.filter((b) => b.leaveType === leaveType);
+          filteredBalances = dbBalances.filter(
+            (b) => b.leaveType === leaveType
+          );
         }
+
+        // Transform database balances to match expected format
+        const balances: LeaveBalance[] = filteredBalances.map((b) => ({
+          leaveType: b.leaveType as "vacation" | "sick" | "personal",
+          currentBalance: Number.parseFloat(b.currentBalance),
+          accrued: Number.parseFloat(b.accruedYTD),
+          used: Number.parseFloat(b.usedYTD),
+          projected: Number.parseFloat(b.projectedYearEnd),
+          accrualRate: Number.parseFloat(b.accrualRate),
+          carryoverLimit: b.carryoverLimit,
+          carryoverDeadline: b.carryoverDeadline || new Date().toISOString(),
+        }));
+
+        // Get blackout dates for the employee's department
+        const dbBlackoutDates = await listBlackoutDates({
+          department: employee.department,
+        });
+
+        // Transform blackout dates to match expected format
+        const blackoutDates: BlackoutDate[] = dbBlackoutDates.map((bd) => ({
+          startDate: bd.startDate,
+          endDate: bd.endDate,
+          reason: bd.reason,
+          department: bd.department || "All",
+        }));
+
+        // Get leave policy for the employee's department
+        const policy = await getLeavePolicy(employee.department);
 
         // Handle projection scenario
         let projection:
@@ -227,9 +219,14 @@ export const leaveBalance = ({ dataStream }: LeaveBalanceProps) =>
 
         return {
           balances,
-          blackoutDates: employeeData.blackoutDates,
+          blackoutDates,
           projection,
-          policies: employeeData.policies,
+          policies: {
+            minNotice: policy?.minimumNotice || 14,
+            maxConsecutive: policy?.maxConsecutiveDays || 15,
+            carryoverRules:
+              "Carryover limits and deadlines are shown per leave type above. Contact HR for specific policy questions.",
+          },
         };
       } catch (error) {
         log.error({ error }, "leaveBalance: failure");

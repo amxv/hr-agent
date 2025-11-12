@@ -90,105 +90,7 @@ export type HRCaseOutput =
       error: string;
     };
 
-// ===== MOCK DATA =====
-
-const MOCK_EXISTING_CASES: HRCase[] = [
-  {
-    caseId: "HR-2025-001234",
-    createdDate: "2025-11-05T10:30:00Z",
-    category: "benefits",
-    priority: "medium",
-    status: "in_progress",
-    subject: "FSA claim reimbursement delay",
-    description:
-      "Submitted FSA claim on Oct 15th but haven't received reimbursement yet. Claim #FSA-2025-0892.",
-    assignedTo: "Sarah Chen",
-    assignedTeam: "Benefits Administration",
-    sla: {
-      firstResponseDue: "2025-11-05T18:30:00Z",
-      firstResponseMet: true,
-      resolutionDue: "2025-11-08T18:30:00Z",
-      resolutionMet: false,
-      hoursRemaining: 12,
-    },
-    updates: [
-      {
-        timestamp: "2025-11-05T10:30:00Z",
-        author: "System",
-        authorRole: "system",
-        message: "Case created and assigned to Benefits Administration team",
-        isInternal: false,
-      },
-      {
-        timestamp: "2025-11-05T14:20:00Z",
-        author: "Sarah Chen",
-        authorRole: "hr_specialist",
-        message:
-          "Hi John, I've located your claim. It's currently in processing with our FSA vendor. I've escalated it for faster processing. You should see the reimbursement within 2-3 business days.",
-        isInternal: false,
-      },
-      {
-        timestamp: "2025-11-06T09:15:00Z",
-        author: "Sarah Chen",
-        authorRole: "hr_specialist",
-        message: "Claim approved by vendor, payment initiated",
-        isInternal: true,
-      },
-    ],
-    attachments: ["FSA Claim #0892"],
-  },
-  {
-    caseId: "HR-2025-001198",
-    createdDate: "2025-10-28T15:45:00Z",
-    category: "equipment",
-    priority: "low",
-    status: "resolved",
-    subject: "Request additional monitor for home office",
-    description:
-      "Would like to request a second monitor for my home office setup to improve productivity.",
-    assignedTo: "IT Support",
-    assignedTeam: "IT & Facilities",
-    sla: {
-      firstResponseDue: "2025-10-29T15:45:00Z",
-      firstResponseMet: true,
-      resolutionDue: "2025-11-04T15:45:00Z",
-      resolutionMet: true,
-      hoursRemaining: 0,
-    },
-    updates: [
-      {
-        timestamp: "2025-10-28T15:45:00Z",
-        author: "System",
-        authorRole: "system",
-        message: "Case created and assigned to IT & Facilities team",
-        isInternal: false,
-      },
-      {
-        timestamp: "2025-10-29T09:30:00Z",
-        author: "IT Support",
-        authorRole: "hr_specialist",
-        message:
-          "Request approved. Monitor will be shipped to your home address on file. Expected delivery: Nov 1-3.",
-        isInternal: false,
-      },
-      {
-        timestamp: "2025-11-02T14:20:00Z",
-        author: "John Doe",
-        authorRole: "employee",
-        message: "Monitor received. Thank you!",
-        isInternal: false,
-      },
-      {
-        timestamp: "2025-11-02T14:25:00Z",
-        author: "IT Support",
-        authorRole: "hr_specialist",
-        message:
-          "Great! Closing this case. Let us know if you need anything else.",
-        isInternal: false,
-      },
-    ],
-  },
-];
+// ===== CONFIGURATION =====
 
 // SLA configurations by category
 const SLA_CONFIG: Record<
@@ -391,8 +293,10 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
       });
 
       try {
-        // Simulate processing delay
-        await new Promise((resolve) => setTimeout(resolve, 1000));
+        // Import database queries dynamically
+        const { listHRCases, getHRCaseByCaseId, createHRCase } = await import(
+          "@/lib/db/queries"
+        );
 
         // ===== CREATE ACTION =====
         if (action === "create") {
@@ -413,33 +317,48 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
             now.getTime() + slaConfig.resolutionDays * 24 * 60 * 60 * 1000
           );
 
+          // Default employee for submission (in production, get from session)
+          const submittedBy = "EMP001";
+          const submittedByName = "Demo User"; // In production, get from employee record
+
+          // Create the case in database
+          const dbCase = await createHRCase(
+            {
+              title:
+                description.slice(0, 100) +
+                (description.length > 100 ? "..." : ""),
+              description,
+              category: finalCategory,
+              priority: slaConfig.priority,
+              status: "open",
+              assignedTeam: TEAM_ASSIGNMENT[finalCategory],
+              submittedBy,
+              submittedByName,
+              createdBy: submittedBy,
+              updatedBy: submittedBy,
+            },
+            submittedBy
+          );
+
+          // Build response matching expected format
           const newCase: HRCase = {
-            caseId: generateCaseId(),
-            createdDate: now.toISOString(),
-            category: finalCategory,
-            priority: slaConfig.priority,
-            status: "new",
-            subject:
-              description.slice(0, 100) +
-              (description.length > 100 ? "..." : ""),
-            description,
-            assignedTeam: TEAM_ASSIGNMENT[finalCategory],
+            caseId: dbCase.caseId,
+            createdDate: dbCase.createdAt.toISOString(),
+            category: dbCase.category as CaseCategory,
+            priority: dbCase.priority as CasePriority,
+            status: dbCase.status as CaseStatus,
+            subject: dbCase.title,
+            description: dbCase.description,
+            assignedTo: undefined,
+            assignedTeam: dbCase.assignedTeam,
             sla: {
-              firstResponseDue: firstResponseDue.toISOString(),
+              firstResponseDue: dbCase.firstResponseDue.toISOString(),
               firstResponseMet: false,
-              resolutionDue: resolutionDue.toISOString(),
+              resolutionDue: dbCase.resolutionDue.toISOString(),
               resolutionMet: false,
               hoursRemaining: slaConfig.resolutionDays * 24,
             },
-            updates: [
-              {
-                timestamp: now.toISOString(),
-                author: "System",
-                authorRole: "system",
-                message: `Case created and assigned to ${TEAM_ASSIGNMENT[finalCategory]} team`,
-                isInternal: false,
-              },
-            ],
+            updates: [],
             attachments: attachChat
               ? ["Chat conversation transcript"]
               : undefined,
@@ -472,12 +391,49 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
             return { error: "Case ID is required to check status" };
           }
 
-          const existingCase = MOCK_EXISTING_CASES.find(
-            (c) => c.caseId === caseId
-          );
-          if (!existingCase) {
+          const dbCase = await getHRCaseByCaseId(caseId);
+          if (!dbCase) {
             return { error: `Case ${caseId} not found` };
           }
+
+          // Calculate SLA hours remaining
+          const resolutionDueDate = new Date(dbCase.resolutionDue);
+          const now = new Date();
+          const hoursRemaining = Math.round(
+            (resolutionDueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+          );
+
+          const existingCase: HRCase = {
+            caseId: dbCase.caseId,
+            createdDate: dbCase.createdAt.toISOString(),
+            category: dbCase.category as CaseCategory,
+            priority: dbCase.priority as CasePriority,
+            status: dbCase.status as CaseStatus,
+            subject: dbCase.title,
+            description: dbCase.description,
+            assignedTo: undefined,
+            assignedTeam: dbCase.assignedTeam,
+            sla: {
+              firstResponseDue: dbCase.firstResponseDue.toISOString(),
+              firstResponseMet: dbCase.firstResponseMet,
+              resolutionDue: dbCase.resolutionDue.toISOString(),
+              resolutionMet:
+                dbCase.status === "resolved" || dbCase.status === "closed",
+              hoursRemaining,
+            },
+            updates:
+              dbCase.updates?.map((u) => ({
+                timestamp: u.timestamp.toISOString(),
+                author: u.author,
+                authorRole: (u.type === "system"
+                  ? "system"
+                  : u.type === "hr_response"
+                    ? "hr_specialist"
+                    : "employee") as "employee" | "hr_specialist" | "system",
+                message: u.message,
+                isInternal: u.visibility === "internal",
+              })) || [],
+          };
 
           dataStream.write({
             type: "data-researchUpdate",
@@ -501,10 +457,41 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
 
         // ===== LIST ACTION =====
         if (action === "list") {
-          const openCases = MOCK_EXISTING_CASES.filter(
+          const dbCasesResult = await listHRCases();
+
+          const cases: HRCase[] = dbCasesResult.cases.map((dbCase) => {
+            const resolutionDueDate = new Date(dbCase.resolutionDue);
+            const now = new Date();
+            const hoursRemaining = Math.round(
+              (resolutionDueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+            );
+
+            return {
+              caseId: dbCase.caseId,
+              createdDate: dbCase.createdAt.toISOString(),
+              category: dbCase.category as CaseCategory,
+              priority: dbCase.priority as CasePriority,
+              status: dbCase.status as CaseStatus,
+              subject: dbCase.title,
+              description: dbCase.description,
+              assignedTo: undefined,
+              assignedTeam: dbCase.assignedTeam,
+              sla: {
+                firstResponseDue: dbCase.firstResponseDue.toISOString(),
+                firstResponseMet: dbCase.firstResponseMet,
+                resolutionDue: dbCase.resolutionDue.toISOString(),
+                resolutionMet:
+                  dbCase.status === "resolved" || dbCase.status === "closed",
+                hoursRemaining,
+              },
+              updates: [],
+            };
+          });
+
+          const openCases = cases.filter(
             (c) => c.status !== "resolved" && c.status !== "closed"
           );
-          const closedCases = MOCK_EXISTING_CASES.filter(
+          const closedCases = cases.filter(
             (c) => c.status === "resolved" || c.status === "closed"
           );
 
@@ -524,7 +511,7 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
 
           return {
             action: "list",
-            cases: MOCK_EXISTING_CASES,
+            cases,
             totalOpen: openCases.length,
             totalClosed: closedCases.length,
           };

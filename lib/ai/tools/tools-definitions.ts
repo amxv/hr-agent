@@ -73,27 +73,32 @@ export const toolsDefinitions: Record<ToolName, ToolDefinition> = {
   },
   leaveBalance: {
     name: "leaveBalance",
-    description: "Check leave balances and projections",
+    description:
+      "Check employee leave balances, accrual rates, and blackout dates",
     cost: 2,
   },
   benefitsInfo: {
     name: "benefitsInfo",
-    description: "Query benefits and plan information",
+    description:
+      "Query employee benefits enrollments, plan options, and dependents",
     cost: 2,
   },
   hrCase: {
     name: "hrCase",
-    description: "Create and manage HR support tickets",
+    description:
+      "Create, update, and manage HR support cases with SLA tracking",
     cost: 3,
   },
   teamAvailability: {
     name: "teamAvailability",
-    description: "Team Availability & Approvals",
+    description:
+      "View team availability, approved absences, and pending leave requests",
     cost: 3,
   },
   peopleSearch: {
     name: "peopleSearch",
-    description: "People Search & Org Context",
+    description:
+      "Search employee directory by name, title, department, skills, or location",
     cost: 2,
   },
 };

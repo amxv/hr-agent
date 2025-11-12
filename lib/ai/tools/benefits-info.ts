@@ -79,177 +79,6 @@ export type BenefitsInfoOutput =
       error: string;
     };
 
-// Mock data
-const MOCK_EMPLOYEE_BENEFITS = {
-  employeeId: "EMP001",
-  employeeName: "John Doe",
-
-  currentEnrollments: [
-    {
-      planType: "medical" as const,
-      planName: "Blue Shield PPO Gold",
-      tier: "Employee + Spouse",
-      carrier: "Blue Shield of California",
-      monthlyPremium: 450,
-      deductible: 1500,
-      outOfPocketMax: 6000,
-      effectiveDate: "2025-01-01",
-      terminationDate: null,
-      status: "active" as const,
-    },
-    {
-      planType: "dental" as const,
-      planName: "Delta Dental PPO",
-      tier: "Family",
-      carrier: "Delta Dental",
-      monthlyPremium: 85,
-      deductible: 50,
-      outOfPocketMax: 2000,
-      effectiveDate: "2025-01-01",
-      terminationDate: null,
-      status: "active" as const,
-    },
-    {
-      planType: "vision" as const,
-      planName: "VSP Vision Care",
-      tier: "Employee + Spouse",
-      carrier: "VSP",
-      monthlyPremium: 18,
-      effectiveDate: "2025-01-01",
-      terminationDate: null,
-      status: "active" as const,
-    },
-    {
-      planType: "401k" as const,
-      planName: "Traditional 401(k)",
-      tier: "Employee",
-      carrier: "Fidelity",
-      monthlyPremium: 0, // contribution is pre-tax
-      effectiveDate: "2020-04-01",
-      terminationDate: null,
-      status: "active" as const,
-    },
-  ],
-
-  dependents: [
-    {
-      id: "DEP001",
-      name: "Jane Doe",
-      relationship: "spouse" as const,
-      dateOfBirth: "1988-07-22",
-      coverageTypes: ["medical", "dental", "vision"],
-    },
-    {
-      id: "DEP002",
-      name: "Jimmy Doe",
-      relationship: "child" as const,
-      dateOfBirth: "2015-03-10",
-      coverageTypes: ["dental"],
-    },
-  ],
-
-  enrollmentWindow: {
-    type: "open_enrollment" as const,
-    startDate: "2025-11-01",
-    endDate: "2025-11-30",
-    daysRemaining: 20,
-    description:
-      "Annual open enrollment period for 2026 benefits. Changes will be effective January 1, 2026.",
-  },
-
-  benefits: {
-    employerHSAContribution: 1000, // annual
-    employerRetirementMatch: "100% match up to 6% of salary",
-    ptoPolicy: "20 vacation days, 12 sick days, 3 personal days per year",
-  },
-};
-
-const MOCK_PLAN_OPTIONS: PlanOption[] = [
-  {
-    planId: "MED001",
-    planType: "medical",
-    planName: "Blue Shield PPO Gold",
-    carrier: "Blue Shield of California",
-    monthlyPremiumEmployeeOnly: 250,
-    monthlyPremiumEmployeeSpouse: 450,
-    monthlyPremiumFamily: 650,
-    deductibleIndividual: 1500,
-    deductibleFamily: 3000,
-    outOfPocketMaxIndividual: 6000,
-    outOfPocketMaxFamily: 12_000,
-    coPayPrimaryCare: 25,
-    coPaySpecialist: 50,
-    coverage: {
-      inNetworkCoverage: 80,
-      outOfNetworkCoverage: 60,
-      preventiveCare: "Covered 100%",
-      prescriptionDrugs: "$10 generic, $30 brand name, $50 specialty",
-    },
-    highlights: [
-      "Access to large provider network",
-      "No referrals needed for specialists",
-      "Higher out-of-pocket costs",
-      "Good for frequent healthcare users",
-    ],
-  },
-  {
-    planId: "MED002",
-    planType: "medical",
-    planName: "Kaiser HMO Platinum",
-    carrier: "Kaiser Permanente",
-    monthlyPremiumEmployeeOnly: 200,
-    monthlyPremiumEmployeeSpouse: 380,
-    monthlyPremiumFamily: 550,
-    deductibleIndividual: 500,
-    deductibleFamily: 1000,
-    outOfPocketMaxIndividual: 4000,
-    outOfPocketMaxFamily: 8000,
-    coPayPrimaryCare: 15,
-    coPaySpecialist: 30,
-    coverage: {
-      inNetworkCoverage: 100,
-      outOfNetworkCoverage: 0,
-      preventiveCare: "Covered 100%",
-      prescriptionDrugs: "$5 generic, $20 brand name, $40 specialty",
-    },
-    highlights: [
-      "Integrated care model",
-      "Lower monthly premiums",
-      "Must use Kaiser facilities",
-      "Referrals required for specialists",
-      "No out-of-network coverage",
-    ],
-  },
-  {
-    planId: "MED003",
-    planType: "medical",
-    planName: "Blue Shield HDHP with HSA",
-    carrier: "Blue Shield of California",
-    monthlyPremiumEmployeeOnly: 150,
-    monthlyPremiumEmployeeSpouse: 300,
-    monthlyPremiumFamily: 450,
-    deductibleIndividual: 3000,
-    deductibleFamily: 6000,
-    outOfPocketMaxIndividual: 6000,
-    outOfPocketMaxFamily: 12_000,
-    coPayPrimaryCare: 0, // after deductible
-    coPaySpecialist: 0, // after deductible
-    coverage: {
-      inNetworkCoverage: 100,
-      outOfNetworkCoverage: 70,
-      preventiveCare: "Covered 100%",
-      prescriptionDrugs: "After deductible, then 80% covered",
-    },
-    highlights: [
-      "Lowest monthly premium",
-      "HSA-eligible (employer contributes $1,000/year)",
-      "High deductible",
-      "Best for healthy individuals",
-      "Tax-advantaged savings",
-    ],
-  },
-];
-
 type BenefitsInfoProps = {
   dataStream: StreamWriter;
 };
@@ -298,20 +127,231 @@ export const benefitsInfo = ({ dataStream }: BenefitsInfoProps) =>
       });
 
       try {
-        await new Promise((resolve) => setTimeout(resolve, 900));
+        // Import database queries dynamically
+        const {
+          getEmployeeByEmployeeId,
+          getEnrollmentByEmployeeId,
+          getBenefitsPlanById,
+          listBenefitsPlans,
+          getCurrentEnrollmentPeriod,
+          listDependents,
+        } = await import("@/lib/db/queries");
 
-        const employeeData = MOCK_EMPLOYEE_BENEFITS;
+        // For now, use a default employee ID since the tool doesn't have employee context
+        // In production, this would come from session or be parsed from the query
+        const defaultEmployeeId = "EMP001";
 
-        // Filter enrollments by category if specified
-        let enrollments = employeeData.currentEnrollments;
-        if (category !== "all") {
-          enrollments = enrollments.filter((e) => e.planType === category);
+        // Get employee data
+        const employee = await getEmployeeByEmployeeId(defaultEmployeeId);
+        if (!employee) {
+          return {
+            error: "Employee not found. Please contact HR for assistance.",
+          };
         }
 
-        // Include plan comparison if requested
+        // Get enrollment data for the employee
+        const enrollment = await getEnrollmentByEmployeeId(employee.id);
+
+        // Build current enrollments array
+        const currentEnrollments: PlanEnrollment[] = [];
+
+        if (enrollment) {
+          // Add medical enrollment if exists
+          if (
+            enrollment.medicalPlanId &&
+            (category === "all" || category === "medical")
+          ) {
+            const medicalPlan = await getBenefitsPlanById(
+              enrollment.medicalPlanId
+            );
+            if (medicalPlan) {
+              const monthlyPremium = medicalPlan.monthlyPremium as {
+                employeeOnly?: number;
+                employeeSpouse?: number;
+                family?: number;
+              } | null;
+              const deductible = medicalPlan.deductible as {
+                individual?: number;
+                family?: number;
+              } | null;
+              const outOfPocketMax = medicalPlan.outOfPocketMax as {
+                individual?: number;
+                family?: number;
+              } | null;
+
+              currentEnrollments.push({
+                planType: "medical",
+                planName: medicalPlan.planName,
+                tier: enrollment.medicalCoverageLevel || "Employee Only",
+                carrier: medicalPlan.carrier || "Unknown",
+                monthlyPremium: enrollment.medicalEmployeeContribution
+                  ? Number.parseFloat(enrollment.medicalEmployeeContribution)
+                  : 0,
+                deductible: deductible?.individual,
+                outOfPocketMax: outOfPocketMax?.individual,
+                effectiveDate: enrollment.updatedAt.toISOString(),
+                terminationDate: null,
+                status: "active",
+              });
+            }
+          }
+
+          // Add dental enrollment if exists
+          if (
+            enrollment.dentalPlanId &&
+            (category === "all" || category === "dental")
+          ) {
+            const dentalPlan = await getBenefitsPlanById(
+              enrollment.dentalPlanId
+            );
+            if (dentalPlan) {
+              const coverage = dentalPlan.coverage as {
+                annualMaxBenefit?: number;
+              } | null;
+
+              currentEnrollments.push({
+                planType: "dental",
+                planName: dentalPlan.planName,
+                tier: enrollment.dentalCoverageLevel || "Employee Only",
+                carrier: dentalPlan.carrier || "Unknown",
+                monthlyPremium: enrollment.dentalEmployeeContribution
+                  ? Number.parseFloat(enrollment.dentalEmployeeContribution)
+                  : 0,
+                deductible: coverage?.annualMaxBenefit,
+                effectiveDate: enrollment.updatedAt.toISOString(),
+                terminationDate: null,
+                status: "active",
+              });
+            }
+          }
+
+          // Add vision enrollment if exists
+          if (
+            enrollment.visionPlanId &&
+            (category === "all" || category === "vision")
+          ) {
+            const visionPlan = await getBenefitsPlanById(
+              enrollment.visionPlanId
+            );
+            if (visionPlan) {
+              currentEnrollments.push({
+                planType: "vision",
+                planName: visionPlan.planName,
+                tier: enrollment.visionCoverageLevel || "Employee Only",
+                carrier: visionPlan.carrier || "Unknown",
+                monthlyPremium: enrollment.visionMonthlyPremium
+                  ? Number.parseFloat(enrollment.visionMonthlyPremium)
+                  : 0,
+                effectiveDate: enrollment.updatedAt.toISOString(),
+                terminationDate: null,
+                status: "active",
+              });
+            }
+          }
+
+          // Add 401k enrollment if exists
+          if (category === "all" || category === "retirement") {
+            currentEnrollments.push({
+              planType: "401k",
+              planName: "Traditional 401(k)",
+              tier: "Employee",
+              carrier: "Fidelity",
+              monthlyPremium: 0,
+              effectiveDate: enrollment.updatedAt.toISOString(),
+              terminationDate: null,
+              status: "active",
+            });
+          }
+        }
+
+        // Get dependents
+        const dbDependents = enrollment
+          ? await listDependents(employee.id)
+          : [];
+        const dependents: Dependent[] = dbDependents.map((d) => ({
+          id: d.id,
+          name: d.name,
+          relationship: d.relationship as
+            | "spouse"
+            | "domestic_partner"
+            | "child",
+          dateOfBirth: d.dateOfBirth,
+          coverageTypes: Array.isArray(d.coveredUnder) ? d.coveredUnder : [],
+        }));
+
+        // Get enrollment period
+        const enrollmentPeriod = await getCurrentEnrollmentPeriod();
+        let enrollmentWindow: EnrollmentWindow | undefined;
+        if (enrollmentPeriod) {
+          const endDate = new Date(enrollmentPeriod.openEnrollmentEnd);
+          const now = new Date();
+          const daysRemaining = Math.max(
+            0,
+            Math.ceil(
+              (endDate.getTime() - now.getTime()) / (1000 * 60 * 60 * 24)
+            )
+          );
+
+          enrollmentWindow = {
+            type: "open_enrollment",
+            startDate: enrollmentPeriod.openEnrollmentStart,
+            endDate: enrollmentPeriod.openEnrollmentEnd,
+            daysRemaining,
+            description: `Annual open enrollment period for ${enrollmentPeriod.planYear} benefits. Changes will be effective ${enrollmentPeriod.effectiveDate}.`,
+          };
+        }
+
+        // Get plan comparison if requested
         let planComparison: PlanOption[] | undefined;
         if (compareMode) {
-          planComparison = MOCK_PLAN_OPTIONS;
+          const dbPlansResult = await listBenefitsPlans();
+          const dbPlans = dbPlansResult.plans;
+          planComparison = dbPlans
+            .filter((p) => p.category === "medical")
+            .map((p) => {
+              const monthlyPremium = p.monthlyPremium as {
+                employeeOnly?: number;
+                employeeSpouse?: number;
+                family?: number;
+              } | null;
+              const deductible = p.deductible as {
+                individual?: number;
+                family?: number;
+              } | null;
+              const outOfPocketMax = p.outOfPocketMax as {
+                individual?: number;
+                family?: number;
+              } | null;
+              const coverage = p.coverage as Record<string, any> | null;
+
+              return {
+                planId: p.planId,
+                planType: "medical" as const,
+                planName: p.planName,
+                carrier: p.carrier || "Unknown",
+                monthlyPremiumEmployeeOnly: monthlyPremium?.employeeOnly || 0,
+                monthlyPremiumEmployeeSpouse:
+                  monthlyPremium?.employeeSpouse || 0,
+                monthlyPremiumFamily: monthlyPremium?.family || 0,
+                deductibleIndividual: deductible?.individual || 0,
+                deductibleFamily: deductible?.family || 0,
+                outOfPocketMaxIndividual: outOfPocketMax?.individual || 0,
+                outOfPocketMaxFamily: outOfPocketMax?.family || 0,
+                coPayPrimaryCare: coverage?.coPayPrimaryCare || 0,
+                coPaySpecialist: coverage?.coPaySpecialist || 0,
+                coverage: {
+                  inNetworkCoverage: coverage?.inNetworkCoverage || 0,
+                  outOfNetworkCoverage: coverage?.outOfNetworkCoverage || 0,
+                  preventiveCare:
+                    (coverage?.preventiveCare as
+                      | "Covered 100%"
+                      | "After deductible") || "After deductible",
+                  prescriptionDrugs:
+                    coverage?.prescriptionDrugs || "Not covered",
+                },
+                highlights: coverage?.highlights || [],
+              };
+            });
         }
 
         dataStream.write({
@@ -326,11 +366,19 @@ export const benefitsInfo = ({ dataStream }: BenefitsInfoProps) =>
         log.info({ ms: Date.now() - startMs }, "benefitsInfo: success");
 
         return {
-          currentEnrollments: enrollments,
-          dependents: employeeData.dependents,
-          enrollmentWindow: employeeData.enrollmentWindow,
+          currentEnrollments,
+          dependents,
+          enrollmentWindow,
           planComparison,
-          benefits: employeeData.benefits,
+          benefits: {
+            employerHSAContribution: enrollment?.hsaEmployerContribution
+              ? Number.parseFloat(enrollment.hsaEmployerContribution)
+              : undefined,
+            employerRetirementMatch: enrollment?.retirementEmployerMatchPercent
+              ? `${enrollment.retirementEmployerMatchPercent}% match`
+              : undefined,
+            ptoPolicy: "Check leave balance tool for PTO details",
+          },
         };
       } catch (error) {
         log.error({ error }, "benefitsInfo: failure");

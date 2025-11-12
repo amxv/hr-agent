@@ -86,106 +86,18 @@ export type ManagerContext = {
   department: string;
 };
 
-// ===== MOCK DATA =====
-
-// Mock manager context (in production, fetch from session)
-const MOCK_MANAGER: ManagerContext = {
-  employeeId: "EMP001",
-  isManager: true,
-  teamMembers: ["EMP101", "EMP102", "EMP103", "EMP104", "EMP105"],
-  department: "Engineering",
-};
-
-// Mock team member directory
-const TEAM_DIRECTORY: Record<string, { name: string; role: string }> = {
-  EMP101: { name: "Alice Johnson", role: "Senior Engineer" },
-  EMP102: { name: "Bob Smith", role: "Engineer" },
-  EMP103: { name: "Carol Martinez", role: "Engineer" },
-  EMP104: { name: "David Chen", role: "Junior Engineer" },
-  EMP105: { name: "Eva Patel", role: "Senior Engineer" },
-};
-
-// Mock approved absences
-const APPROVED_ABSENCES: TeamMemberAbsence[] = [
-  {
-    employeeId: "EMP101",
-    employeeName: "Alice Johnson",
-    startDate: "2025-11-18",
-    endDate: "2025-11-22",
-    leaveType: "vacation",
-    totalDays: 5,
-    status: "approved",
-  },
-  {
-    employeeId: "EMP103",
-    employeeName: "Carol Martinez",
-    startDate: "2025-11-25",
-    endDate: "2025-11-26",
-    leaveType: "personal",
-    totalDays: 2,
-    status: "approved",
-  },
-  {
-    employeeId: "EMP104",
-    employeeName: "David Chen",
-    startDate: "2025-12-02",
-    endDate: "2025-12-06",
-    leaveType: "vacation",
-    totalDays: 5,
-    status: "approved",
-  },
-];
-
-// Mock pending requests
-const PENDING_REQUESTS: LeaveRequest[] = [
-  {
-    requestId: "REQ-2025-0891",
-    employeeId: "EMP102",
-    employeeName: "Bob Smith",
-    leaveType: "vacation",
-    startDate: "2025-11-20",
-    endDate: "2025-11-27",
-    totalDays: 6,
-    requestDate: "2025-11-08",
-    status: "pending",
-    reason: "Family vacation - Thanksgiving week",
-    conflicts: {
-      hasConflict: true,
-      conflictingEmployees: ["Alice Johnson"], // overlap with Alice's leave
-      teamCoveragePercentage: 60, // only 3/5 available
-    },
-  },
-  {
-    requestId: "REQ-2025-0892",
-    employeeId: "EMP105",
-    employeeName: "Eva Patel",
-    leaveType: "vacation",
-    startDate: "2025-12-09",
-    endDate: "2025-12-13",
-    totalDays: 5,
-    requestDate: "2025-11-09",
-    status: "pending",
-    reason: "Holiday travel",
-    conflicts: {
-      hasConflict: false,
-      conflictingEmployees: [],
-      teamCoveragePercentage: 80, // 4/5 available
-    },
-  },
-];
-
 // ===== HELPER FUNCTIONS =====
 
 // Helper to calculate coverage for date range
 function calculateCoverage(
   startDate: string,
   endDate: string,
-  absences: TeamMemberAbsence[]
+  absences: TeamMemberAbsence[],
+  teamSize: number
 ): TeamCoverage[] {
   const coverage: TeamCoverage[] = [];
   const start = new Date(startDate);
   const end = new Date(endDate);
-  const teamSize = MOCK_MANAGER.teamMembers.length;
 
   for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
     const dateStr = d.toISOString().split("T")[0];
@@ -281,20 +193,6 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
         "teamAvailability: start"
       );
 
-      // ⚠️ CRITICAL: Check manager permissions
-      // In production: const user = await getUser(session);
-      // For demo, use mock:
-      const manager = MOCK_MANAGER;
-
-      if (!manager.isManager) {
-        log.warn({ action }, "teamAvailability: permission denied");
-        return {
-          error:
-            "This tool is only available to managers. Please contact your HR administrator if you believe you should have access.",
-          permissionDenied: true,
-        };
-      }
-
       dataStream.write({
         type: "data-researchUpdate",
         data: {
@@ -305,8 +203,31 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
       });
 
       try {
-        // Simulate API delay
-        await new Promise((resolve) => setTimeout(resolve, 800));
+        // Import database queries dynamically
+        const {
+          getEmployeeByEmployeeId,
+          listAbsences,
+          listLeaveRequests,
+          listEmployees,
+          approveLeaveRequest,
+          denyLeaveRequest,
+        } = await import("@/lib/db/queries");
+
+        // For now, use a default manager/department
+        // In production, get from session context
+        const defaultManagerId = "EMP001";
+        const manager = await getEmployeeByEmployeeId(defaultManagerId);
+        if (!manager) {
+          return {
+            error: "Manager context not found. Please contact HR.",
+          };
+        }
+
+        const department = manager.department;
+
+        // Get team members in the same department
+        const teamMembersResult = await listEmployees({ department });
+        const teamMembers = teamMembersResult.employees;
 
         // VIEW SCHEDULE
         if (action === "view_schedule") {
@@ -318,11 +239,36 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
               .toISOString()
               .split("T")[0];
 
-          const absences = APPROVED_ABSENCES.filter(
-            (absence) => absence.endDate >= start && absence.startDate <= end
+          // Get absences for the department in the date range
+          const dbAbsencesResult = await listAbsences({
+            department,
+            startDate: new Date(start),
+            endDate: new Date(end),
+          });
+
+          // Transform to expected format
+          const absences: TeamMemberAbsence[] = dbAbsencesResult.absences.map(
+            (record) => ({
+              employeeId: record.employee.id,
+              employeeName: record.employee.fullName,
+              startDate: record.absence.startDate,
+              endDate: record.absence.endDate,
+              leaveType: record.absence.absenceType as
+                | "vacation"
+                | "sick"
+                | "personal"
+                | "other",
+              totalDays: Number.parseFloat(record.absence.totalDays),
+              status: "approved",
+            })
           );
 
-          const coverageSummary = calculateCoverage(start, end, absences);
+          const coverageSummary = calculateCoverage(
+            start,
+            end,
+            absences,
+            teamMembers.length
+          );
 
           const criticalDates = coverageSummary
             .filter((c) => c.coveragePercentage < 70)
@@ -352,6 +298,52 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
 
         // VIEW APPROVALS
         if (action === "view_approvals") {
+          const dbRequestsResult = await listLeaveRequests({
+            status: "pending",
+            department,
+          });
+
+          // Transform to expected format
+          const pendingRequests: LeaveRequest[] = dbRequestsResult.requests.map(
+            (record) => {
+              // Calculate team coverage if this request is approved
+              const teamSize = teamMembers.length;
+              const coveragePercent = Math.round(
+                ((teamSize - 1) / teamSize) * 100
+              );
+
+              return {
+                requestId: record.request.requestId,
+                employeeId: record.employee.id,
+                employeeName: record.employee.fullName,
+                leaveType: record.request.requestType as
+                  | "vacation"
+                  | "sick"
+                  | "personal"
+                  | "other",
+                startDate: record.request.requestedStartDate,
+                endDate: record.request.requestedEndDate,
+                totalDays: Number.parseFloat(record.request.totalDaysRequested),
+                requestDate: record.request.submittedDate,
+                status: record.request.status as
+                  | "pending"
+                  | "approved"
+                  | "denied",
+                reason: record.request.notes || undefined,
+                managerNotes: undefined,
+                conflicts: {
+                  hasConflict: record.request.hasConflict,
+                  conflictingEmployees: Array.isArray(
+                    record.request.conflictsWith
+                  )
+                    ? record.request.conflictsWith
+                    : [],
+                  teamCoveragePercentage: coveragePercent,
+                },
+              };
+            }
+          );
+
           dataStream.write({
             type: "data-researchUpdate",
             data: {
@@ -362,14 +354,14 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
           });
 
           log.info(
-            { ms: Date.now() - startMs, pendingCount: PENDING_REQUESTS.length },
+            { ms: Date.now() - startMs, pendingCount: pendingRequests.length },
             "teamAvailability: view_approvals success"
           );
 
           return {
             action: "view_approvals",
-            pendingRequests: PENDING_REQUESTS,
-            totalPending: PENDING_REQUESTS.length,
+            pendingRequests,
+            totalPending: pendingRequests.length,
           };
         }
 
@@ -379,16 +371,45 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             return { error: "Request ID is required to approve" };
           }
 
-          const request = PENDING_REQUESTS.find(
-            (r) => r.requestId === requestId
-          );
-          if (!request) {
+          const result = await approveLeaveRequest(requestId, manager.id);
+          if (!result) {
             return { error: `Request ${requestId} not found` };
           }
 
-          // Update status
-          request.status = "approved";
-          request.managerNotes = `Approved by manager on ${new Date().toISOString()}`;
+          // Get employee details
+          const employeeRecord = await getEmployeeByEmployeeId(
+            result.request.employeeId
+          );
+          if (!employeeRecord) {
+            return { error: "Employee not found for this request" };
+          }
+
+          // Transform to expected format
+          const teamSize = teamMembers.length;
+          const coveragePercent = Math.round(((teamSize - 1) / teamSize) * 100);
+
+          const request: LeaveRequest = {
+            requestId: result.request.requestId,
+            employeeId: employeeRecord.employeeId,
+            employeeName: employeeRecord.fullName,
+            leaveType: result.request.requestType as
+              | "vacation"
+              | "sick"
+              | "personal"
+              | "other",
+            startDate: result.request.requestedStartDate,
+            endDate: result.request.requestedEndDate,
+            totalDays: Number.parseFloat(result.request.totalDaysRequested),
+            requestDate: result.request.submittedDate,
+            status: "approved",
+            reason: result.request.notes || undefined,
+            managerNotes: undefined,
+            conflicts: {
+              hasConflict: false,
+              conflictingEmployees: [],
+              teamCoveragePercentage: coveragePercent,
+            },
+          };
 
           dataStream.write({
             type: "data-researchUpdate",
@@ -420,16 +441,49 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             return { error: "Reason is required to deny a request" };
           }
 
-          const request = PENDING_REQUESTS.find(
-            (r) => r.requestId === requestId
+          const updatedRequest = await denyLeaveRequest(
+            requestId,
+            manager.id,
+            reason
           );
-          if (!request) {
+          if (!updatedRequest) {
             return { error: `Request ${requestId} not found` };
           }
 
-          // Update status
-          request.status = "denied";
-          request.managerNotes = reason;
+          // Get employee details
+          const employeeRecord = await getEmployeeByEmployeeId(
+            updatedRequest.employeeId
+          );
+          if (!employeeRecord) {
+            return { error: "Employee not found for this request" };
+          }
+
+          // Transform to expected format
+          const teamSize = teamMembers.length;
+          const coveragePercent = Math.round(((teamSize - 1) / teamSize) * 100);
+
+          const request: LeaveRequest = {
+            requestId: updatedRequest.requestId,
+            employeeId: employeeRecord.employeeId,
+            employeeName: employeeRecord.fullName,
+            leaveType: updatedRequest.requestType as
+              | "vacation"
+              | "sick"
+              | "personal"
+              | "other",
+            startDate: updatedRequest.requestedStartDate,
+            endDate: updatedRequest.requestedEndDate,
+            totalDays: Number.parseFloat(updatedRequest.totalDaysRequested),
+            requestDate: updatedRequest.submittedDate,
+            status: "denied",
+            reason: updatedRequest.notes || undefined,
+            managerNotes: undefined,
+            conflicts: {
+              hasConflict: false,
+              conflictingEmployees: [],
+              teamCoveragePercentage: coveragePercent,
+            },
+          };
 
           dataStream.write({
             type: "data-researchUpdate",
