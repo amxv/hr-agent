@@ -255,8 +255,8 @@ const LeaveBalanceStep = memo(function LeaveBalanceStep({
         <ChainOfThoughtSearchResults className="flex-wrap gap-2">
           {balances.map((balance, idx) => (
             <ChainOfThoughtSearchResult
-              key={idx}
               className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+              key={idx}
             >
               <span className="capitalize">{balance.leaveType}:</span>
               <span className="font-medium">{balance.currentBalance} days</span>
@@ -320,8 +320,8 @@ const BenefitsInfoStep = memo(function BenefitsInfoStep({
         <ChainOfThoughtSearchResults className="flex-wrap gap-2">
           {currentEnrollments.slice(0, 5).map((enrollment, idx) => (
             <ChainOfThoughtSearchResult
-              key={idx}
               className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+              key={idx}
             >
               <span className="font-medium">{enrollment.planName}</span>
               <span className="text-muted-foreground">•</span>
@@ -388,7 +388,9 @@ const HRCaseStep = memo(function HRCaseStep({
               <span className="text-muted-foreground">•</span>
               <span className="capitalize">{output.case.status}</span>
               <span className="text-muted-foreground">•</span>
-              <span className="capitalize">{output.case.priority} priority</span>
+              <span className="capitalize">
+                {output.case.priority} priority
+              </span>
             </ChainOfThoughtSearchResult>
           </ChainOfThoughtSearchResults>
         </ChainOfThoughtStep>
@@ -463,8 +465,8 @@ const TeamAvailabilityStep = memo(function TeamAvailabilityStep({
           <ChainOfThoughtSearchResults className="flex-wrap gap-2">
             {absences.slice(0, 5).map((absence, idx) => (
               <ChainOfThoughtSearchResult
-                key={idx}
                 className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+                key={idx}
               >
                 <span className="font-medium">{absence.employeeName}</span>
                 <span className="text-muted-foreground">•</span>
@@ -566,8 +568,8 @@ const PeopleSearchStep = memo(function PeopleSearchStep({
         <ChainOfThoughtSearchResults className="flex-wrap gap-2">
           {results.slice(0, 5).map((person, idx) => (
             <ChainOfThoughtSearchResult
-              key={idx}
               className="inline-flex h-8 items-center gap-1.5 px-3 py-1 text-xs"
+              key={idx}
             >
               <span className="font-medium">{person.fullName}</span>
               <span className="text-muted-foreground">•</span>

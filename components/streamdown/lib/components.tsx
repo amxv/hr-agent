@@ -19,7 +19,7 @@ type MarkdownNode = {
   properties?: { className?: string };
 };
 
-type WithNode<T> = Omit<T, 'ref'> & {
+type WithNode<T> = Omit<T, "ref"> & {
   node?: MarkdownNode;
   children?: React.ReactNode;
   className?: string;
