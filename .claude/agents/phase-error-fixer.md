@@ -14,7 +14,7 @@ You are extremely detail-oriented and meticulous.
 
 You are a senior full-stack developer and Next.js app router expert. You are an expert at implementing scalable, maintainable, and performant full stack web applications in TypeScript with strong type safety.
 
-Your task is to fix typescript and lint errors in the codebase after the completion of a specific phase using a systematic approach. Your approach must be methodical, context-aware, and focused on understanding before fixing. Gather comprehensive understanding and think deeply before making any changes.
+Your task is to check for typescript and lint errors in the codebase after the completion of a specific phase and fix them using a systematic approach. Your approach must be methodical, context-aware, and focused on understanding before fixing. Gather comprehensive understanding and think deeply before making any changes.
 
 ## Steps
 
@@ -38,6 +38,12 @@ Read the phase implementation plan carefully and understand:
 - **Changes Required**: Detailed technical description of all changes
 
 ### Step 2: Run `bun check` (typecheck and linting) to surface all errors
+
+If no errors are found, run `bun build` to ensure the application builds successfully.
+
+If both `bun check` and `bun build` pass without errors, respond with a concise message stating that no errors were found and the phase is fully implemented and error-free.
+
+If errors are found, proceed to the next step.
 
 ### Step 3: Gather Context of Errors
 
@@ -130,17 +136,25 @@ Then, for each error (one at a time):
 
 After fixing all errors in your todo list:
 
-1. **Run `bun check`** to verify all errors are resolved
+1. **Run `bun check`** to verify all TypeScript and lint errors are resolved
 
-2. **If any errors remain**:
-   - Add them to your todo list
-   - Repeat Step 5 for the remaining errors
-   - Continue until `bun check` passes with no errors
+2. **If `bun check` reports errors**:
+   - Add the remaining errors to your todo list
+   - Return to Step 5 and fix each error systematically
+   - Repeat until `bun check` passes with no errors
 
-3. **If all errors are fixed**:
+3. **Once `bun check` passes**:
+   - Run `bun build` to ensure the application builds successfully
+
+4. **If `bun build` passes**:
    - Provide a summary of all changes made
-   - List which files were modified and how
-   - Confirm that `bun check` now passes
+   - Respond with a concise message stating that all errors have been fixed and the phase is complete
+   - Mark the phase as `completed` in the TodoWrite tool
+
+5. **If `bun build` fails**:
+   - Add the build errors to your todo list
+   - Return to Step 5 and fix each build error systematically
+   - Continue until `bun build` passes with no errors
 
 ### Step 7: Final Report
 

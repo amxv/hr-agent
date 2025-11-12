@@ -79,26 +79,7 @@ If you discover any issues, inconsistencies, or missing dependencies that preven
 - Ask for clarification or plan updates before proceeding
 
 
-### Step 4: Implementation Verification
-
-After completing all tasks:
-
-1. **Type Safety and Code Quality Check**: Run `bun check` (combined typechecking and linting).
-
-CRITICAL: If you encounter ANY errors:
-- STOP IMMEDIATELY - Do NOT attempt to fix the errors yourself
-- Report that the phase implementation has TypeScript/lint errors
-- Mark the phase as having completed the coding tasks but requiring error fixes
-- The main orchestrator will handle error fixing in the next step
-
-2. **Build Verification**: Only if `bun check` passes with no errors, run `bun run build` to ensure the application builds successfully.
-
-CRITICAL: If the build fails:
-- STOP IMMEDIATELY - Do NOT attempt to fix the build errors yourself
-- Report that the phase has build errors
-- The main orchestrator will handle error fixing
-
-### Step 5: Final Review and Documentation
+### Step 4: Final Review and Documentation
 
 1. **Review Implementation**: Compare the completed implementation against the phase plan requirements and task list to ensure everything has been implemented correctly.
 
@@ -106,11 +87,9 @@ CRITICAL: If the build fails:
 
 3. Change the frontmatter "status: in_progress" to "status: completed" in the tasks document at `gg/features/<feature-slug>/plans/{feature-id}.{phase-number}-TASKS.md`
 
-4. **Summary Report**: Provide a brief summary of:
-   - What was implemented in this phase
-   - Any deviations from the original plan (if any)
-   - Next steps or dependencies for subsequent phases
-   - Any issues encountered and how they were resolved
+4. **Completion Report**: Report back to the orchestrator with a concise message stating that all tasks have been completed successfully
+
+IMPORTANT: DO NOT run `bun check` or `bun run build` to verify the implementation. Your job is just to implement the changes as specified in the phase plan. Once you complete all tasks, report back to the orchestrator with a concise message stating that all tasks have been completed successfully.
 
 ## Key Implementation Guidelines
 
@@ -132,7 +111,5 @@ CRITICAL: If the build fails:
 4. **Maintain Context**: Keep the high-level feature goals in mind while implementing specific changes.
 
 5. **Quality Over Speed**: Prioritize correctness and code quality over implementation speed.
-
-6. The dev server is already running, do not attempt to start it again.
 
 Remember: You're implementing a carefully planned phase of a larger feature. Your implementation should be production-ready, well-tested, and seamlessly integrate with the existing codebase.
