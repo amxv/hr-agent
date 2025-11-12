@@ -139,12 +139,8 @@
           "name": "absence_employee_id_employee_id_fk",
           "tableFrom": "absence",
           "tableTo": "employee",
-          "columnsFrom": [
-            "employee_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["employee_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -152,12 +148,8 @@
           "name": "absence_approved_by_employee_id_fk",
           "tableFrom": "absence",
           "tableTo": "employee",
-          "columnsFrom": [
-            "approved_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["approved_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -165,12 +157,8 @@
           "name": "absence_created_by_user_id_fk",
           "tableFrom": "absence",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -268,12 +256,8 @@
           "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -511,12 +495,8 @@
           "name": "benefits_enrollment_employee_id_employee_id_fk",
           "tableFrom": "benefits_enrollment",
           "tableTo": "employee",
-          "columnsFrom": [
-            "employee_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["employee_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -524,12 +504,8 @@
           "name": "benefits_enrollment_medical_plan_id_benefits_plan_id_fk",
           "tableFrom": "benefits_enrollment",
           "tableTo": "benefits_plan",
-          "columnsFrom": [
-            "medical_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["medical_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -537,12 +513,8 @@
           "name": "benefits_enrollment_dental_plan_id_benefits_plan_id_fk",
           "tableFrom": "benefits_enrollment",
           "tableTo": "benefits_plan",
-          "columnsFrom": [
-            "dental_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["dental_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -550,12 +522,8 @@
           "name": "benefits_enrollment_vision_plan_id_benefits_plan_id_fk",
           "tableFrom": "benefits_enrollment",
           "tableTo": "benefits_plan",
-          "columnsFrom": [
-            "vision_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["vision_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -563,12 +531,8 @@
           "name": "benefits_enrollment_retirement_plan_id_benefits_plan_id_fk",
           "tableFrom": "benefits_enrollment",
           "tableTo": "benefits_plan",
-          "columnsFrom": [
-            "retirement_plan_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["retirement_plan_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -576,12 +540,8 @@
           "name": "benefits_enrollment_updated_by_user_id_fk",
           "tableFrom": "benefits_enrollment",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -591,9 +551,7 @@
         "benefits_enrollment_employee_id_unique": {
           "name": "benefits_enrollment_employee_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "employee_id"
-          ]
+          "columns": ["employee_id"]
         }
       }
     },
@@ -745,12 +703,8 @@
           "name": "benefits_plan_created_by_user_id_fk",
           "tableFrom": "benefits_plan",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -758,12 +712,8 @@
           "name": "benefits_plan_updated_by_user_id_fk",
           "tableFrom": "benefits_plan",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -773,9 +723,7 @@
         "benefits_plan_plan_id_unique": {
           "name": "benefits_plan_plan_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "plan_id"
-          ]
+          "columns": ["plan_id"]
         }
       }
     },
@@ -880,12 +828,8 @@
           "name": "blackout_date_created_by_user_id_fk",
           "tableFrom": "blackout_date",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -994,12 +938,8 @@
           "name": "case_update_case_id_hr_case_id_fk",
           "tableFrom": "case_update",
           "tableTo": "hr_case",
-          "columnsFrom": [
-            "case_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["case_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1007,12 +947,8 @@
           "name": "case_update_created_by_user_id_fk",
           "tableFrom": "case_update",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1077,12 +1013,8 @@
           "name": "Chat_userId_user_id_fk",
           "tableFrom": "Chat",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1182,12 +1114,8 @@
           "name": "dependent_employee_id_employee_id_fk",
           "tableFrom": "dependent",
           "tableTo": "employee",
-          "columnsFrom": [
-            "employee_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["employee_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1195,12 +1123,8 @@
           "name": "dependent_created_by_user_id_fk",
           "tableFrom": "dependent",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1208,12 +1132,8 @@
           "name": "dependent_updated_by_user_id_fk",
           "tableFrom": "dependent",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1276,12 +1196,8 @@
           "name": "Document_userId_user_id_fk",
           "tableFrom": "Document",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1289,12 +1205,8 @@
           "name": "Document_messageId_Message_id_fk",
           "tableFrom": "Document",
           "tableTo": "Message",
-          "columnsFrom": [
-            "messageId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["messageId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -1302,10 +1214,7 @@
       "compositePrimaryKeys": {
         "Document_id_createdAt_pk": {
           "name": "Document_id_createdAt_pk",
-          "columns": [
-            "id",
-            "createdAt"
-          ]
+          "columns": ["id", "createdAt"]
         }
       },
       "uniqueConstraints": {}
@@ -1588,12 +1497,8 @@
           "name": "employee_user_id_user_id_fk",
           "tableFrom": "employee",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -1601,12 +1506,8 @@
           "name": "employee_manager_id_employee_id_fk",
           "tableFrom": "employee",
           "tableTo": "employee",
-          "columnsFrom": [
-            "manager_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["manager_id"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -1614,12 +1515,8 @@
           "name": "employee_created_by_user_id_fk",
           "tableFrom": "employee",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1627,12 +1524,8 @@
           "name": "employee_updated_by_user_id_fk",
           "tableFrom": "employee",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1642,16 +1535,12 @@
         "employee_user_id_unique": {
           "name": "employee_user_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "user_id"
-          ]
+          "columns": ["user_id"]
         },
         "employee_employee_id_unique": {
           "name": "employee_employee_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "employee_id"
-          ]
+          "columns": ["employee_id"]
         }
       }
     },
@@ -1739,12 +1628,8 @@
           "name": "enrollment_period_created_by_user_id_fk",
           "tableFrom": "enrollment_period",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -1752,12 +1637,8 @@
           "name": "enrollment_period_updated_by_user_id_fk",
           "tableFrom": "enrollment_period",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -1767,9 +1648,7 @@
         "enrollment_period_plan_year_unique": {
           "name": "enrollment_period_plan_year_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "plan_year"
-          ]
+          "columns": ["plan_year"]
         }
       }
     },
@@ -1990,12 +1869,8 @@
           "name": "hr_case_submitted_by_employee_id_fk",
           "tableFrom": "hr_case",
           "tableTo": "employee",
-          "columnsFrom": [
-            "submitted_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["submitted_by"],
+          "columnsTo": ["id"],
           "onDelete": "set null",
           "onUpdate": "no action"
         },
@@ -2003,12 +1878,8 @@
           "name": "hr_case_created_by_user_id_fk",
           "tableFrom": "hr_case",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2016,12 +1887,8 @@
           "name": "hr_case_updated_by_user_id_fk",
           "tableFrom": "hr_case",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2031,9 +1898,7 @@
         "hr_case_case_id_unique": {
           "name": "hr_case_case_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "case_id"
-          ]
+          "columns": ["case_id"]
         }
       }
     },
@@ -2170,12 +2035,8 @@
           "name": "leave_balance_employee_id_employee_id_fk",
           "tableFrom": "leave_balance",
           "tableTo": "employee",
-          "columnsFrom": [
-            "employee_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["employee_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2183,12 +2044,8 @@
           "name": "leave_balance_updated_by_user_id_fk",
           "tableFrom": "leave_balance",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2265,12 +2122,8 @@
           "name": "leave_policy_created_by_user_id_fk",
           "tableFrom": "leave_policy",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2278,12 +2131,8 @@
           "name": "leave_policy_updated_by_user_id_fk",
           "tableFrom": "leave_policy",
           "tableTo": "user",
-          "columnsFrom": [
-            "updated_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["updated_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2293,9 +2142,7 @@
         "leave_policy_department_unique": {
           "name": "leave_policy_department_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "department"
-          ]
+          "columns": ["department"]
         }
       }
     },
@@ -2509,12 +2356,8 @@
           "name": "leave_request_employee_id_employee_id_fk",
           "tableFrom": "leave_request",
           "tableTo": "employee",
-          "columnsFrom": [
-            "employee_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["employee_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -2522,12 +2365,8 @@
           "name": "leave_request_reviewed_by_user_id_fk",
           "tableFrom": "leave_request",
           "tableTo": "user",
-          "columnsFrom": [
-            "reviewed_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["reviewed_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2535,12 +2374,8 @@
           "name": "leave_request_created_by_user_id_fk",
           "tableFrom": "leave_request",
           "tableTo": "user",
-          "columnsFrom": [
-            "created_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["created_by"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2550,9 +2385,7 @@
         "leave_request_request_id_unique": {
           "name": "leave_request_request_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "request_id"
-          ]
+          "columns": ["request_id"]
         }
       }
     },
@@ -2643,12 +2476,8 @@
           "name": "Message_chatId_Chat_id_fk",
           "tableFrom": "Message",
           "tableTo": "Chat",
-          "columnsFrom": [
-            "chatId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["chatId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2722,12 +2551,8 @@
           "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
           "tableTo": "user",
-          "columnsFrom": [
-            "user_id"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["user_id"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -2737,9 +2562,7 @@
         "session_token_unique": {
           "name": "session_token_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "token"
-          ]
+          "columns": ["token"]
         }
       }
     },
@@ -2810,12 +2633,8 @@
           "name": "Suggestion_userId_user_id_fk",
           "tableFrom": "Suggestion",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "no action",
           "onUpdate": "no action"
         },
@@ -2823,14 +2642,8 @@
           "name": "Suggestion_documentId_documentCreatedAt_Document_id_createdAt_fk",
           "tableFrom": "Suggestion",
           "tableTo": "Document",
-          "columnsFrom": [
-            "documentId",
-            "documentCreatedAt"
-          ],
-          "columnsTo": [
-            "id",
-            "createdAt"
-          ],
+          "columnsFrom": ["documentId", "documentCreatedAt"],
+          "columnsTo": ["id", "createdAt"],
           "onDelete": "no action",
           "onUpdate": "no action"
         }
@@ -2838,9 +2651,7 @@
       "compositePrimaryKeys": {
         "Suggestion_id_pk": {
           "name": "Suggestion_id_pk",
-          "columns": [
-            "id"
-          ]
+          "columns": ["id"]
         }
       },
       "uniqueConstraints": {}
@@ -3012,12 +2823,8 @@
           "name": "UploadedDocument_uploaded_by_user_id_fk",
           "tableFrom": "UploadedDocument",
           "tableTo": "user",
-          "columnsFrom": [
-            "uploaded_by"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["uploaded_by"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3027,9 +2834,7 @@
         "UploadedDocument_openai_file_id_unique": {
           "name": "UploadedDocument_openai_file_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "openai_file_id"
-          ]
+          "columns": ["openai_file_id"]
         }
       }
     },
@@ -3115,9 +2920,7 @@
         "user_email_unique": {
           "name": "user_email_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "email"
-          ]
+          "columns": ["email"]
         }
       }
     },
@@ -3152,12 +2955,8 @@
           "name": "UserCredit_userId_user_id_fk",
           "tableFrom": "UserCredit",
           "tableTo": "user",
-          "columnsFrom": [
-            "userId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["userId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3204,9 +3003,7 @@
         "VectorStoreConfig_vector_store_id_unique": {
           "name": "VectorStoreConfig_vector_store_id_unique",
           "nullsNotDistinct": false,
-          "columns": [
-            "vector_store_id"
-          ]
+          "columns": ["vector_store_id"]
         }
       }
     },
@@ -3287,12 +3084,8 @@
           "name": "Vote_chatId_Chat_id_fk",
           "tableFrom": "Vote",
           "tableTo": "Chat",
-          "columnsFrom": [
-            "chatId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["chatId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         },
@@ -3300,12 +3093,8 @@
           "name": "Vote_messageId_Message_id_fk",
           "tableFrom": "Vote",
           "tableTo": "Message",
-          "columnsFrom": [
-            "messageId"
-          ],
-          "columnsTo": [
-            "id"
-          ],
+          "columnsFrom": ["messageId"],
+          "columnsTo": ["id"],
           "onDelete": "cascade",
           "onUpdate": "no action"
         }
@@ -3313,10 +3102,7 @@
       "compositePrimaryKeys": {
         "Vote_chatId_messageId_pk": {
           "name": "Vote_chatId_messageId_pk",
-          "columns": [
-            "chatId",
-            "messageId"
-          ]
+          "columns": ["chatId", "messageId"]
         }
       },
       "uniqueConstraints": {}
@@ -3326,33 +3112,17 @@
     "public.absence_type": {
       "name": "absence_type",
       "schema": "public",
-      "values": [
-        "vacation",
-        "sick",
-        "personal",
-        "other"
-      ]
+      "values": ["vacation", "sick", "personal", "other"]
     },
     "public.accrual_schedule": {
       "name": "accrual_schedule",
       "schema": "public",
-      "values": [
-        "monthly",
-        "bi_weekly",
-        "quarterly",
-        "annually"
-      ]
+      "values": ["monthly", "bi_weekly", "quarterly", "annually"]
     },
     "public.benefits_category": {
       "name": "benefits_category",
       "schema": "public",
-      "values": [
-        "medical",
-        "dental",
-        "vision",
-        "retirement",
-        "hsa_fsa"
-      ]
+      "values": ["medical", "dental", "vision", "retirement", "hsa_fsa"]
     },
     "public.case_category": {
       "name": "case_category",
@@ -3370,33 +3140,17 @@
     "public.case_priority": {
       "name": "case_priority",
       "schema": "public",
-      "values": [
-        "low",
-        "medium",
-        "high",
-        "urgent"
-      ]
+      "values": ["low", "medium", "high", "urgent"]
     },
     "public.case_status": {
       "name": "case_status",
       "schema": "public",
-      "values": [
-        "open",
-        "in_progress",
-        "pending_info",
-        "resolved",
-        "closed"
-      ]
+      "values": ["open", "in_progress", "pending_info", "resolved", "closed"]
     },
     "public.case_update_type": {
       "name": "case_update_type",
       "schema": "public",
-      "values": [
-        "system",
-        "hr_response",
-        "internal_note",
-        "status_change"
-      ]
+      "values": ["system", "hr_response", "internal_note", "status_change"]
     },
     "public.employment_status": {
       "name": "employment_status",
@@ -3412,47 +3166,27 @@
     "public.leave_request_status": {
       "name": "leave_request_status",
       "schema": "public",
-      "values": [
-        "pending",
-        "approved",
-        "denied"
-      ]
+      "values": ["pending", "approved", "denied"]
     },
     "public.leave_type": {
       "name": "leave_type",
       "schema": "public",
-      "values": [
-        "vacation",
-        "sick",
-        "personal"
-      ]
+      "values": ["vacation", "sick", "personal"]
     },
     "public.relationship": {
       "name": "relationship",
       "schema": "public",
-      "values": [
-        "spouse",
-        "domestic_partner",
-        "child",
-        "other"
-      ]
+      "values": ["spouse", "domestic_partner", "child", "other"]
     },
     "public.update_visibility": {
       "name": "update_visibility",
       "schema": "public",
-      "values": [
-        "public",
-        "internal"
-      ]
+      "values": ["public", "internal"]
     },
     "public.work_mode": {
       "name": "work_mode",
       "schema": "public",
-      "values": [
-        "office",
-        "remote",
-        "hybrid"
-      ]
+      "values": ["office", "remote", "hybrid"]
     }
   },
   "schemas": {},

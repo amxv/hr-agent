@@ -18,10 +18,34 @@ import type { Attachment } from "@/lib/ai/types";
 import type { ArtifactKind } from "../artifacts/artifact-kind";
 import { db } from "./client";
 import {
+  absence,
+  benefitsEnrollment,
+  benefitsPlan,
+  blackoutDate,
+  caseUpdate,
   chat,
   type DBMessage,
+  dependent,
   document,
+  employee,
+  enrollmentPeriod,
+  hrCase,
+  type InsertAbsence,
+  type InsertBenefitsEnrollment,
+  type InsertBenefitsPlan,
+  type InsertBlackoutDate,
+  type InsertCaseUpdate,
+  type InsertDependent,
+  type InsertEmployee,
+  type InsertEnrollmentPeriod,
+  type InsertHRCase,
+  type InsertLeaveBalance,
+  type InsertLeavePolicy,
+  type InsertLeaveRequest,
   type InsertUploadedDocument,
+  leaveBalance,
+  leavePolicy,
+  leaveRequest,
   message,
   type Suggestion,
   suggestion,
@@ -1024,4 +1048,1249 @@ export async function getUploadedDocumentByOpenAIFileId(
     console.error("Failed to get uploaded document by OpenAI file ID");
     throw error;
   }
+}
+
+// ============================================================================
+// HR Data Management - Employee Queries
+// ============================================================================
+
+/**
+ * Lists employees with optional search and filters
+ */
+export async function listEmployees(params?: {
+  searchField?: "fullName" | "email" | "employeeId" | "department";
+  searchValue?: string;
+  employmentStatus?: string;
+  department?: string;
+  limit?: number;
+  offset?: number;
+}): Promise<{
+  employees: Array<{
+    id: string;
+    employeeId: string;
+    fullName: string;
+    email: string;
+    jobTitle: string;
+    department: string;
+    employmentStatus: string;
+    location: string;
+    workMode: string;
+    manager: { id: string; fullName: string; jobTitle: string } | null;
+  }>;
+  total: number;
+}> {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  // Apply search filter
+  if (params?.searchValue && params.searchField) {
+    if (params.searchField === "fullName") {
+      whereConditions.push(ilike(employee.fullName, `%${params.searchValue}%`));
+    } else if (params.searchField === "email") {
+      whereConditions.push(ilike(employee.email, `%${params.searchValue}%`));
+    } else if (params.searchField === "employeeId") {
+      whereConditions.push(
+        ilike(employee.employeeId, `%${params.searchValue}%`)
+      );
+    } else if (params.searchField === "department") {
+      whereConditions.push(
+        ilike(employee.department, `%${params.searchValue}%`)
+      );
+    }
+  }
+
+  // Apply employment status filter
+  if (params?.employmentStatus) {
+    whereConditions.push(
+      sql`${employee.employmentStatus} = ${params.employmentStatus}`
+    );
+  } else {
+    // Exclude terminated employees by default
+    whereConditions.push(sql`${employee.employmentStatus} != 'terminated'`);
+  }
+
+  // Apply department filter
+  if (params?.department) {
+    whereConditions.push(eq(employee.department, params.department));
+  }
+
+  // Query employees
+  const employees = await db
+    .select({
+      id: employee.id,
+      employeeId: employee.employeeId,
+      fullName: employee.fullName,
+      email: employee.email,
+      jobTitle: employee.jobTitle,
+      department: employee.department,
+      employmentStatus: employee.employmentStatus,
+      location: employee.location,
+      workMode: employee.workMode,
+      managerId: employee.managerId,
+      managerFullName: sql<string | null>`manager.full_name`,
+      managerJobTitle: sql<string | null>`manager.job_title`,
+    })
+    .from(employee)
+    .leftJoin(
+      sql`${employee} AS manager`,
+      sql`manager.id = ${employee.managerId}`
+    )
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .limit(limit)
+    .offset(offset);
+
+  // Query total count
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(employee)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+
+  return {
+    employees: employees.map((e) => ({
+      id: e.id,
+      employeeId: e.employeeId,
+      fullName: e.fullName,
+      email: e.email,
+      jobTitle: e.jobTitle,
+      department: e.department,
+      employmentStatus: e.employmentStatus,
+      location: e.location,
+      workMode: e.workMode,
+      manager:
+        e.managerId && e.managerFullName && e.managerJobTitle
+          ? {
+              id: e.managerId,
+              fullName: e.managerFullName,
+              jobTitle: e.managerJobTitle,
+            }
+          : null,
+    })),
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets single employee by ID with manager and direct reports details
+ */
+export async function getEmployeeById(id: string) {
+  const [emp] = await db
+    .select()
+    .from(employee)
+    .where(eq(employee.id, id))
+    .limit(1);
+
+  if (!emp) {
+    return null;
+  }
+
+  // Get manager details if exists
+  let manager = null;
+  if (emp.managerId) {
+    const [mgr] = await db
+      .select({
+        id: employee.id,
+        fullName: employee.fullName,
+        jobTitle: employee.jobTitle,
+      })
+      .from(employee)
+      .where(eq(employee.id, emp.managerId))
+      .limit(1);
+    manager = mgr || null;
+  }
+
+  // Get direct reports if exists
+  let directReportsData: Array<{
+    id: string;
+    fullName: string;
+    jobTitle: string;
+  }> = [];
+  if (emp.directReports && Array.isArray(emp.directReports)) {
+    const reportIds = emp.directReports as string[];
+    if (reportIds.length > 0) {
+      directReportsData = await db
+        .select({
+          id: employee.id,
+          fullName: employee.fullName,
+          jobTitle: employee.jobTitle,
+        })
+        .from(employee)
+        .where(inArray(employee.id, reportIds));
+    }
+  }
+
+  return {
+    ...emp,
+    manager,
+    directReportsData,
+  };
+}
+
+/**
+ * Gets employee by employeeId (business identifier like "EMP001")
+ */
+export async function getEmployeeByEmployeeId(employeeId: string) {
+  const [emp] = await db
+    .select()
+    .from(employee)
+    .where(eq(employee.employeeId, employeeId))
+    .limit(1);
+
+  if (!emp) {
+    return null;
+  }
+
+  return getEmployeeById(emp.id);
+}
+
+/**
+ * Creates new employee record
+ */
+export async function createEmployee(data: InsertEmployee) {
+  const [newEmployee] = await db.insert(employee).values(data).returning();
+  return newEmployee;
+}
+
+/**
+ * Updates employee record
+ */
+export async function updateEmployee(
+  id: string,
+  data: Partial<InsertEmployee>,
+  updatedBy: string
+) {
+  const [updated] = await db
+    .update(employee)
+    .set({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(eq(employee.id, id))
+    .returning();
+  return updated;
+}
+
+/**
+ * Soft deletes employee by setting employmentStatus to "terminated"
+ */
+export async function softDeleteEmployee(
+  id: string,
+  updatedBy: string
+): Promise<void> {
+  await db
+    .update(employee)
+    .set({
+      employmentStatus: "terminated",
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(eq(employee.id, id));
+}
+
+// ============================================================================
+// HR Data Management - Leave Balance Queries
+// ============================================================================
+
+/**
+ * Lists leave balances with optional filters
+ */
+export async function listLeaveBalances(params?: {
+  employeeId?: string;
+  leaveType?: string;
+  department?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  if (params?.employeeId) {
+    whereConditions.push(eq(leaveBalance.employeeId, params.employeeId));
+  }
+
+  if (params?.leaveType) {
+    whereConditions.push(sql`${leaveBalance.leaveType} = ${params.leaveType}`);
+  }
+
+  // Join with employee for department filter
+  const balances = await db
+    .select({
+      leaveBalance,
+      employee: {
+        id: employee.id,
+        fullName: employee.fullName,
+        department: employee.department,
+      },
+    })
+    .from(leaveBalance)
+    .innerJoin(employee, eq(leaveBalance.employeeId, employee.id))
+    .where(
+      and(
+        whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        params?.department
+          ? eq(employee.department, params.department)
+          : undefined
+      )
+    )
+    .limit(limit)
+    .offset(offset);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(leaveBalance)
+    .innerJoin(employee, eq(leaveBalance.employeeId, employee.id))
+    .where(
+      and(
+        whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        params?.department
+          ? eq(employee.department, params.department)
+          : undefined
+      )
+    );
+
+  return {
+    balances,
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets all leave balances for a specific employee
+ */
+export async function getLeaveBalancesByEmployeeId(employeeId: string) {
+  return db
+    .select()
+    .from(leaveBalance)
+    .where(eq(leaveBalance.employeeId, employeeId));
+}
+
+/**
+ * Updates a specific leave balance for an employee
+ */
+export async function updateLeaveBalance(
+  employeeId: string,
+  leaveType: string,
+  data: Partial<InsertLeaveBalance>,
+  updatedBy: string
+) {
+  const [updated] = await db
+    .update(leaveBalance)
+    .set({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(leaveBalance.employeeId, employeeId),
+        sql`${leaveBalance.leaveType} = ${leaveType}`
+      )
+    )
+    .returning();
+  return updated;
+}
+
+/**
+ * Lists blackout dates with optional filters
+ */
+export async function listBlackoutDates(params?: {
+  department?: string;
+  startDate?: Date;
+}) {
+  const whereConditions = [];
+
+  if (params?.department) {
+    whereConditions.push(
+      or(
+        eq(blackoutDate.department, params.department),
+        isNull(blackoutDate.department)
+      )
+    );
+  }
+
+  if (params?.startDate) {
+    whereConditions.push(
+      gte(blackoutDate.endDate, params.startDate.toISOString())
+    );
+  }
+
+  return db
+    .select()
+    .from(blackoutDate)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .orderBy(asc(blackoutDate.startDate));
+}
+
+/**
+ * Creates new blackout date
+ */
+export async function createBlackoutDate(data: InsertBlackoutDate) {
+  const [created] = await db.insert(blackoutDate).values(data).returning();
+  return created;
+}
+
+/**
+ * Deletes blackout date
+ */
+export async function deleteBlackoutDate(id: string): Promise<void> {
+  await db.delete(blackoutDate).where(eq(blackoutDate.id, id));
+}
+
+/**
+ * Gets leave policy for department or global
+ */
+export async function getLeavePolicy(department?: string) {
+  const [policy] = await db
+    .select()
+    .from(leavePolicy)
+    .where(
+      department
+        ? eq(leavePolicy.department, department)
+        : isNull(leavePolicy.department)
+    )
+    .limit(1);
+  return policy || null;
+}
+
+// ============================================================================
+// HR Data Management - Benefits Queries
+// ============================================================================
+
+/**
+ * Lists benefits plans with optional filters
+ */
+export async function listBenefitsPlans(params?: {
+  category?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  if (params?.category) {
+    whereConditions.push(sql`${benefitsPlan.category} = ${params.category}`);
+  }
+
+  const plans = await db
+    .select()
+    .from(benefitsPlan)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .limit(limit)
+    .offset(offset);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(benefitsPlan)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+
+  return {
+    plans,
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets single benefits plan by ID
+ */
+export async function getBenefitsPlanById(id: string) {
+  const [plan] = await db
+    .select()
+    .from(benefitsPlan)
+    .where(eq(benefitsPlan.id, id))
+    .limit(1);
+  return plan || null;
+}
+
+/**
+ * Creates new benefits plan
+ */
+export async function createBenefitsPlan(data: InsertBenefitsPlan) {
+  const [created] = await db.insert(benefitsPlan).values(data).returning();
+  return created;
+}
+
+/**
+ * Updates benefits plan
+ */
+export async function updateBenefitsPlan(
+  id: string,
+  data: Partial<InsertBenefitsPlan>,
+  updatedBy: string
+) {
+  const [updated] = await db
+    .update(benefitsPlan)
+    .set({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(eq(benefitsPlan.id, id))
+    .returning();
+  return updated;
+}
+
+/**
+ * Deletes benefits plan
+ */
+export async function deleteBenefitsPlan(id: string): Promise<void> {
+  await db.delete(benefitsPlan).where(eq(benefitsPlan.id, id));
+}
+
+/**
+ * Lists benefits enrollments with optional filters
+ */
+export async function listEnrollments(params?: {
+  employeeId?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  if (params?.employeeId) {
+    whereConditions.push(eq(benefitsEnrollment.employeeId, params.employeeId));
+  }
+
+  // Query enrollments with all plan details
+  const enrollments = await db
+    .select({
+      enrollment: benefitsEnrollment,
+      employee: {
+        id: employee.id,
+        fullName: employee.fullName,
+        email: employee.email,
+      },
+    })
+    .from(benefitsEnrollment)
+    .innerJoin(employee, eq(benefitsEnrollment.employeeId, employee.id))
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .limit(limit)
+    .offset(offset);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(benefitsEnrollment)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+
+  return {
+    enrollments,
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets enrollment for specific employee with all plan details
+ */
+export async function getEnrollmentByEmployeeId(employeeId: string) {
+  const [enrollment] = await db
+    .select()
+    .from(benefitsEnrollment)
+    .where(eq(benefitsEnrollment.employeeId, employeeId))
+    .limit(1);
+
+  return enrollment || null;
+}
+
+/**
+ * Creates or updates enrollment (upsert on employeeId)
+ */
+export async function upsertEnrollment(
+  data: InsertBenefitsEnrollment,
+  updatedBy: string
+) {
+  const [result] = await db
+    .insert(benefitsEnrollment)
+    .values({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .onConflictDoUpdate({
+      target: benefitsEnrollment.employeeId,
+      set: {
+        ...data,
+        updatedBy,
+        updatedAt: new Date(),
+      },
+    })
+    .returning();
+  return result;
+}
+
+/**
+ * Lists all dependents for an employee
+ */
+export async function listDependents(employeeId: string) {
+  return db
+    .select()
+    .from(dependent)
+    .where(eq(dependent.employeeId, employeeId));
+}
+
+/**
+ * Creates new dependent record
+ */
+export async function createDependent(data: InsertDependent) {
+  const [created] = await db.insert(dependent).values(data).returning();
+  return created;
+}
+
+/**
+ * Updates dependent record
+ */
+export async function updateDependent(
+  id: string,
+  data: Partial<InsertDependent>,
+  updatedBy: string
+) {
+  const [updated] = await db
+    .update(dependent)
+    .set({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(eq(dependent.id, id))
+    .returning();
+  return updated;
+}
+
+/**
+ * Deletes dependent
+ */
+export async function deleteDependent(id: string): Promise<void> {
+  await db.delete(dependent).where(eq(dependent.id, id));
+}
+
+/**
+ * Gets current or next enrollment period
+ */
+export async function getCurrentEnrollmentPeriod() {
+  const today = new Date().toISOString();
+  const [period] = await db
+    .select()
+    .from(enrollmentPeriod)
+    .where(sql`${enrollmentPeriod.openEnrollmentEnd} >= ${today}`)
+    .orderBy(asc(enrollmentPeriod.openEnrollmentStart))
+    .limit(1);
+  return period || null;
+}
+
+// ============================================================================
+// HR Data Management - HR Cases Queries
+// ============================================================================
+
+/**
+ * Lists HR cases with optional filters
+ */
+export async function listHRCases(params?: {
+  status?: string;
+  category?: string;
+  assignedTeam?: string;
+  submittedBy?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  if (params?.status) {
+    whereConditions.push(sql`${hrCase.status} = ${params.status}`);
+  }
+
+  if (params?.category) {
+    whereConditions.push(sql`${hrCase.category} = ${params.category}`);
+  }
+
+  if (params?.assignedTeam) {
+    whereConditions.push(eq(hrCase.assignedTeam, params.assignedTeam));
+  }
+
+  if (params?.submittedBy) {
+    whereConditions.push(eq(hrCase.submittedBy, params.submittedBy));
+  }
+
+  const cases = await db
+    .select()
+    .from(hrCase)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
+    .orderBy(desc(hrCase.createdAt))
+    .limit(limit)
+    .offset(offset);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(hrCase)
+    .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
+
+  return {
+    cases,
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets single HR case with full update timeline
+ */
+export async function getHRCaseById(id: string) {
+  const [caseRecord] = await db
+    .select()
+    .from(hrCase)
+    .where(eq(hrCase.id, id))
+    .limit(1);
+
+  if (!caseRecord) {
+    return null;
+  }
+
+  // Get updates
+  const updates = await db
+    .select()
+    .from(caseUpdate)
+    .where(eq(caseUpdate.caseId, id))
+    .orderBy(asc(caseUpdate.timestamp));
+
+  return {
+    ...caseRecord,
+    updates,
+  };
+}
+
+/**
+ * Gets HR case by caseId (business identifier like "HR-2025-001234")
+ */
+export async function getHRCaseByCaseId(caseId: string) {
+  const [caseRecord] = await db
+    .select()
+    .from(hrCase)
+    .where(eq(hrCase.caseId, caseId))
+    .limit(1);
+
+  if (!caseRecord) {
+    return null;
+  }
+
+  return getHRCaseById(caseRecord.id);
+}
+
+/**
+ * Creates new HR case
+ */
+export async function createHRCase(
+  data: Omit<InsertHRCase, "caseId" | "firstResponseDue" | "resolutionDue">,
+  createdBy: string
+) {
+  const { generateCaseId, calculateSLA } = await import("@/lib/hr/helpers");
+
+  // Generate case ID
+  const caseId = await generateCaseId();
+
+  // Calculate SLA
+  const createdAt = new Date();
+  const sla = calculateSLA(createdAt, data.category);
+
+  // Create case
+  const [newCase] = await db
+    .insert(hrCase)
+    .values({
+      ...data,
+      caseId,
+      firstResponseDue: sla.firstResponseDue,
+      resolutionDue: sla.resolutionDue,
+      slaHoursRemaining: sla.slaHoursRemaining.toFixed(2),
+      createdBy,
+      updatedBy: createdBy,
+      createdAt,
+      updatedAt: createdAt,
+    })
+    .returning();
+
+  // Create initial system update
+  await db.insert(caseUpdate).values({
+    caseId: newCase.id,
+    author: "System",
+    type: "system",
+    message: `Case created and assigned to ${data.assignedTeam} team`,
+    visibility: "public",
+    timestamp: createdAt,
+  });
+
+  return newCase;
+}
+
+/**
+ * Updates HR case
+ */
+export async function updateHRCase(
+  id: string,
+  data: Partial<InsertHRCase>,
+  updatedBy: string
+) {
+  // Get current case to check for status changes
+  const [current] = await db
+    .select()
+    .from(hrCase)
+    .where(eq(hrCase.id, id))
+    .limit(1);
+
+  if (!current) {
+    throw new Error("Case not found");
+  }
+
+  // Check if status changed
+  if (data.status && data.status !== current.status) {
+    // Create status change update
+    await db.insert(caseUpdate).values({
+      caseId: id,
+      author: "System",
+      type: "status_change",
+      message: `Status changed from ${current.status} to ${data.status}`,
+      visibility: "public",
+      timestamp: new Date(),
+    });
+  }
+
+  // Update case
+  const [updated] = await db
+    .update(hrCase)
+    .set({
+      ...data,
+      updatedBy,
+      updatedAt: new Date(),
+    })
+    .where(eq(hrCase.id, id))
+    .returning();
+
+  // Recalculate SLA status
+  const { updateSLAStatus } = await import("@/lib/hr/helpers");
+  await updateSLAStatus(id);
+
+  return updated;
+}
+
+/**
+ * Deletes HR case
+ */
+export async function deleteHRCase(id: string): Promise<void> {
+  await db.delete(hrCase).where(eq(hrCase.id, id));
+}
+
+/**
+ * Adds update to case timeline
+ */
+export async function addCaseUpdate(
+  caseId: string,
+  update: InsertCaseUpdate,
+  createdBy: string
+) {
+  const [newUpdate] = await db
+    .insert(caseUpdate)
+    .values({
+      ...update,
+      caseId,
+      createdBy,
+      timestamp: new Date(),
+    })
+    .returning();
+
+  // If this is an hr_response and firstResponseMet is false, update the case
+  if (update.type === "hr_response") {
+    const [caseRecord] = await db
+      .select()
+      .from(hrCase)
+      .where(eq(hrCase.id, caseId))
+      .limit(1);
+
+    if (caseRecord && !caseRecord.firstResponseMet) {
+      await db
+        .update(hrCase)
+        .set({
+          firstResponseMet: true,
+          updatedAt: new Date(),
+        })
+        .where(eq(hrCase.id, caseId));
+    }
+  }
+
+  return newUpdate;
+}
+
+// ============================================================================
+// HR Data Management - Team Availability Queries
+// ============================================================================
+
+/**
+ * Lists absences with optional filters
+ */
+export async function listAbsences(params?: {
+  employeeId?: string;
+  department?: string;
+  startDate?: Date;
+  endDate?: Date;
+  absenceType?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  if (params?.employeeId) {
+    whereConditions.push(eq(absence.employeeId, params.employeeId));
+  }
+
+  if (params?.startDate) {
+    whereConditions.push(gte(absence.endDate, params.startDate.toISOString()));
+  }
+
+  if (params?.endDate) {
+    whereConditions.push(
+      sql`${absence.startDate} <= ${params.endDate.toISOString()}`
+    );
+  }
+
+  if (params?.absenceType) {
+    whereConditions.push(sql`${absence.absenceType} = ${params.absenceType}`);
+  }
+
+  const absences = await db
+    .select({
+      absence,
+      employee: {
+        id: employee.id,
+        fullName: employee.fullName,
+        jobTitle: employee.jobTitle,
+        department: employee.department,
+      },
+    })
+    .from(absence)
+    .innerJoin(employee, eq(absence.employeeId, employee.id))
+    .where(
+      and(
+        whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        params?.department
+          ? eq(employee.department, params.department)
+          : undefined
+      )
+    )
+    .orderBy(desc(absence.startDate))
+    .limit(limit)
+    .offset(offset);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(absence)
+    .innerJoin(employee, eq(absence.employeeId, employee.id))
+    .where(
+      and(
+        whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        params?.department
+          ? eq(employee.department, params.department)
+          : undefined
+      )
+    );
+
+  return {
+    absences,
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets single absence with employee details
+ */
+export async function getAbsenceById(id: string) {
+  const [record] = await db
+    .select({
+      absence,
+      employee: {
+        id: employee.id,
+        fullName: employee.fullName,
+        jobTitle: employee.jobTitle,
+      },
+    })
+    .from(absence)
+    .innerJoin(employee, eq(absence.employeeId, employee.id))
+    .where(eq(absence.id, id))
+    .limit(1);
+
+  return record || null;
+}
+
+/**
+ * Creates new absence record
+ */
+export async function createAbsence(data: InsertAbsence) {
+  const { calculateBusinessDays } = await import("@/lib/hr/helpers");
+
+  // Calculate total days
+  const totalDays = calculateBusinessDays(
+    new Date(data.startDate),
+    new Date(data.endDate)
+  );
+
+  const [created] = await db
+    .insert(absence)
+    .values({
+      ...data,
+      totalDays: totalDays.toString(),
+    })
+    .returning();
+  return created;
+}
+
+/**
+ * Updates absence record
+ */
+export async function updateAbsence(id: string, data: Partial<InsertAbsence>) {
+  // Recalculate totalDays if dates changed
+  if (data.startDate || data.endDate) {
+    const [current] = await db
+      .select()
+      .from(absence)
+      .where(eq(absence.id, id))
+      .limit(1);
+
+    if (current) {
+      const { calculateBusinessDays } = await import("@/lib/hr/helpers");
+      const startDate = data.startDate
+        ? new Date(data.startDate)
+        : new Date(current.startDate);
+      const endDate = data.endDate
+        ? new Date(data.endDate)
+        : new Date(current.endDate);
+
+      const totalDays = calculateBusinessDays(startDate, endDate);
+      data.totalDays = totalDays.toString();
+    }
+  }
+
+  const [updated] = await db
+    .update(absence)
+    .set(data)
+    .where(eq(absence.id, id))
+    .returning();
+  return updated;
+}
+
+/**
+ * Deletes absence
+ */
+export async function deleteAbsence(id: string): Promise<void> {
+  await db.delete(absence).where(eq(absence.id, id));
+}
+
+/**
+ * Lists leave requests with optional filters
+ */
+export async function listLeaveRequests(params?: {
+  employeeId?: string;
+  status?: string;
+  department?: string;
+  limit?: number;
+  offset?: number;
+}) {
+  const limit = params?.limit ?? 50;
+  const offset = params?.offset ?? 0;
+  const whereConditions = [];
+
+  if (params?.employeeId) {
+    whereConditions.push(eq(leaveRequest.employeeId, params.employeeId));
+  }
+
+  if (params?.status) {
+    whereConditions.push(sql`${leaveRequest.status} = ${params.status}`);
+  }
+
+  const requests = await db
+    .select({
+      request: leaveRequest,
+      employee: {
+        id: employee.id,
+        fullName: employee.fullName,
+        department: employee.department,
+      },
+    })
+    .from(leaveRequest)
+    .innerJoin(employee, eq(leaveRequest.employeeId, employee.id))
+    .where(
+      and(
+        whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        params?.department
+          ? eq(employee.department, params.department)
+          : undefined
+      )
+    )
+    .orderBy(desc(leaveRequest.submittedDate))
+    .limit(limit)
+    .offset(offset);
+
+  const [totalResult] = await db
+    .select({ count: count() })
+    .from(leaveRequest)
+    .innerJoin(employee, eq(leaveRequest.employeeId, employee.id))
+    .where(
+      and(
+        whereConditions.length > 0 ? and(...whereConditions) : undefined,
+        params?.department
+          ? eq(employee.department, params.department)
+          : undefined
+      )
+    );
+
+  return {
+    requests,
+    total: totalResult?.count ?? 0,
+  };
+}
+
+/**
+ * Gets single leave request with details
+ */
+export async function getLeaveRequestById(id: string) {
+  const [record] = await db
+    .select()
+    .from(leaveRequest)
+    .where(eq(leaveRequest.id, id))
+    .limit(1);
+
+  return record || null;
+}
+
+/**
+ * Creates new leave request
+ */
+export async function createLeaveRequest(
+  data: Omit<
+    InsertLeaveRequest,
+    "requestId" | "totalDaysRequested" | "createdBy"
+  >,
+  createdBy: string
+) {
+  const { generateRequestId, calculateBusinessDays, detectConflicts } =
+    await import("@/lib/hr/helpers");
+
+  // Generate request ID
+  const requestId = await generateRequestId();
+
+  // Calculate total days
+  const totalDays = calculateBusinessDays(
+    new Date(data.requestedStartDate),
+    new Date(data.requestedEndDate)
+  );
+
+  // Detect conflicts
+  const existingAbsences = await db
+    .select({
+      employeeId: absence.employeeId,
+      startDate: absence.startDate,
+      endDate: absence.endDate,
+    })
+    .from(absence);
+
+  const conflicts = detectConflicts(
+    data.employeeId,
+    new Date(data.requestedStartDate),
+    new Date(data.requestedEndDate),
+    existingAbsences.map((a) => ({
+      employeeId: a.employeeId,
+      startDate: new Date(a.startDate),
+      endDate: new Date(a.endDate),
+    }))
+  );
+
+  const [created] = await db
+    .insert(leaveRequest)
+    .values({
+      ...data,
+      requestId,
+      totalDaysRequested: totalDays.toString(),
+      hasConflict: conflicts.hasConflict,
+      conflictsWith: conflicts.conflictsWith,
+      conflictReason: conflicts.reason || null,
+      status: data.status || "pending",
+      createdBy,
+    })
+    .returning();
+  return created;
+}
+
+/**
+ * Approves leave request and creates corresponding absence
+ */
+export async function approveLeaveRequest(id: string, reviewedBy: string) {
+  const [request] = await db
+    .select()
+    .from(leaveRequest)
+    .where(eq(leaveRequest.id, id))
+    .limit(1);
+
+  if (!request) {
+    throw new Error("Leave request not found");
+  }
+
+  // Update request status
+  const [updatedRequest] = await db
+    .update(leaveRequest)
+    .set({
+      status: "approved",
+      reviewedBy,
+      reviewedAt: new Date(),
+      updatedAt: new Date(),
+    })
+    .where(eq(leaveRequest.id, id))
+    .returning();
+
+  // Create corresponding absence
+  const [newAbsence] = await db
+    .insert(absence)
+    .values({
+      employeeId: request.employeeId,
+      absenceType: request.requestType,
+      startDate: request.requestedStartDate,
+      endDate: request.requestedEndDate,
+      totalDays: request.totalDaysRequested,
+      approvalDate: new Date().toISOString(),
+      approvedBy: request.employeeId, // Self-reference for now
+      createdBy: reviewedBy,
+      createdAt: new Date(),
+    })
+    .returning();
+
+  return {
+    request: updatedRequest,
+    absence: newAbsence,
+  };
+}
+
+/**
+ * Denies leave request
+ */
+export async function denyLeaveRequest(
+  id: string,
+  reviewedBy: string,
+  reason?: string
+) {
+  const updateData: Partial<InsertLeaveRequest> = {
+    status: "denied",
+    reviewedBy,
+    reviewedAt: new Date(),
+    updatedAt: new Date(),
+  };
+
+  if (reason) {
+    updateData.notes = reason;
+  }
+
+  const [updated] = await db
+    .update(leaveRequest)
+    .set(updateData)
+    .where(eq(leaveRequest.id, id))
+    .returning();
+  return updated;
 }
