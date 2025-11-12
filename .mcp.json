@@ -6,12 +6,17 @@
     },
     "chrome-devtools": {
       "command": "npx",
-      "args": ["-y", "chrome-devtools-mcp@latest"]
+      "args": [
+        "-y",
+        "chrome-devtools-mcp@latest"
+      ]
     },
     "next-devtools": {
       "type": "stdio",
       "command": "npx",
-      "args": ["next-devtools-mcp@latest"],
+      "args": [
+        "next-devtools-mcp@latest"
+      ],
       "env": {}
     }
   }
