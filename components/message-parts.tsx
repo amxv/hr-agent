@@ -689,13 +689,15 @@ export function PureMessageParts({
     ]);
 
     // HR tools that should also render as full UI cards after the response
-    const hrToolsForFullDisplay = new Set<ChatMessage["parts"][number]["type"]>([
-      "tool-leaveBalance",
-      "tool-benefitsInfo",
-      "tool-hrCase",
-      "tool-teamAvailability",
-      "tool-peopleSearch",
-    ]);
+    const hrToolsForFullDisplay = new Set<ChatMessage["parts"][number]["type"]>(
+      [
+        "tool-leaveBalance",
+        "tool-benefitsInfo",
+        "tool-hrCase",
+        "tool-teamAvailability",
+        "tool-peopleSearch",
+      ]
+    );
 
     const result: Array<
       | { kind: "chain-of-thought"; startIndex: number; endIndex: number }
