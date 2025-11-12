@@ -11,6 +11,7 @@ import {
   ilike,
   inArray,
   isNull,
+  ne,
   or,
   sql,
 } from "drizzle-orm";
@@ -1247,6 +1248,32 @@ export async function getEmployeeByEmployeeId(employeeId: string) {
  * Creates new employee record
  */
 export async function createEmployee(data: InsertEmployee) {
+  // Validate email uniqueness
+  const [existingEmailEmployee] = await db
+    .select({ id: employee.id })
+    .from(employee)
+    .where(eq(employee.email, data.email))
+    .limit(1);
+
+  if (existingEmailEmployee) {
+    throw new Error(
+      `An employee with email address "${data.email}" already exists. Please use a different email address.`
+    );
+  }
+
+  // Validate employeeId uniqueness
+  const [existingEmployeeId] = await db
+    .select({ id: employee.id })
+    .from(employee)
+    .where(eq(employee.employeeId, data.employeeId))
+    .limit(1);
+
+  if (existingEmployeeId) {
+    throw new Error(
+      `An employee with ID "${data.employeeId}" already exists. Please use a different employee ID.`
+    );
+  }
+
   const [newEmployee] = await db.insert(employee).values(data).returning();
   return newEmployee;
 }
@@ -1259,6 +1286,36 @@ export async function updateEmployee(
   data: Partial<InsertEmployee>,
   updatedBy: string
 ) {
+  // Validate email uniqueness (if email is being updated)
+  if (data.email) {
+    const [existingEmailEmployee] = await db
+      .select({ id: employee.id })
+      .from(employee)
+      .where(and(eq(employee.email, data.email), ne(employee.id, id)))
+      .limit(1);
+
+    if (existingEmailEmployee) {
+      throw new Error(
+        `An employee with email address "${data.email}" already exists. Please use a different email address.`
+      );
+    }
+  }
+
+  // Validate employeeId uniqueness (if employeeId is being updated)
+  if (data.employeeId) {
+    const [existingEmployeeId] = await db
+      .select({ id: employee.id })
+      .from(employee)
+      .where(and(eq(employee.employeeId, data.employeeId), ne(employee.id, id)))
+      .limit(1);
+
+    if (existingEmployeeId) {
+      throw new Error(
+        `An employee with ID "${data.employeeId}" already exists. Please use a different employee ID.`
+      );
+    }
+  }
+
   const [updated] = await db
     .update(employee)
     .set({
@@ -1486,8 +1543,31 @@ export async function listBenefitsPlans(params?: {
     .from(benefitsPlan)
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
+  // Calculate enrollment count for each plan
+  const plansWithEnrollmentCount = await Promise.all(
+    plans.map(async (plan) => {
+      // Count enrollments where this plan is selected for any benefit type
+      const [enrollmentCountResult] = await db
+        .select({ count: count() })
+        .from(benefitsEnrollment)
+        .where(
+          or(
+            eq(benefitsEnrollment.medicalPlanId, plan.id),
+            eq(benefitsEnrollment.dentalPlanId, plan.id),
+            eq(benefitsEnrollment.visionPlanId, plan.id),
+            eq(benefitsEnrollment.retirementPlanId, plan.id)
+          )
+        );
+
+      return {
+        ...plan,
+        enrollmentCount: enrollmentCountResult?.count ?? 0,
+      };
+    })
+  );
+
   return {
-    plans,
+    plans: plansWithEnrollmentCount,
     total: totalResult?.count ?? 0,
   };
 }
@@ -1508,6 +1588,19 @@ export async function getBenefitsPlanById(id: string) {
  * Creates new benefits plan
  */
 export async function createBenefitsPlan(data: InsertBenefitsPlan) {
+  // Validate planId uniqueness
+  const [existingPlanId] = await db
+    .select({ id: benefitsPlan.id })
+    .from(benefitsPlan)
+    .where(eq(benefitsPlan.planId, data.planId))
+    .limit(1);
+
+  if (existingPlanId) {
+    throw new Error(
+      `A benefits plan with ID "${data.planId}" already exists. Please use a different plan ID.`
+    );
+  }
+
   const [created] = await db.insert(benefitsPlan).values(data).returning();
   return created;
 }
@@ -1520,6 +1613,21 @@ export async function updateBenefitsPlan(
   data: Partial<InsertBenefitsPlan>,
   updatedBy: string
 ) {
+  // Validate planId uniqueness (if planId is being updated)
+  if (data.planId) {
+    const [existingPlanId] = await db
+      .select({ id: benefitsPlan.id })
+      .from(benefitsPlan)
+      .where(and(eq(benefitsPlan.planId, data.planId), ne(benefitsPlan.id, id)))
+      .limit(1);
+
+    if (existingPlanId) {
+      throw new Error(
+        `A benefits plan with ID "${data.planId}" already exists. Please use a different plan ID.`
+      );
+    }
+  }
+
   const [updated] = await db
     .update(benefitsPlan)
     .set({
