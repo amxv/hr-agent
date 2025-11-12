@@ -25,7 +25,7 @@ type MarkdownNode = {
   position?: MarkdownPosition;
   properties?: { className?: string };
 };
-type WithNode<T> = Omit<T, 'ref'> & {
+type WithNode<T> = Omit<T, "ref"> & {
   node?: MarkdownNode;
   children?: React.ReactNode;
   className?: string;
@@ -228,7 +228,9 @@ const MemoThead = memo<TheadProps>(
 );
 MemoThead.displayName = "MarkdownThead";
 
-type ThProps = WithNode<React.ComponentPropsWithoutRef<"th">> & { align?: string };
+type ThProps = WithNode<React.ComponentPropsWithoutRef<"th">> & {
+  align?: string;
+};
 const MemoTh = memo<ThProps>(
   ({ node, children, className, align, ...props }: ThProps) => {
     const alignClass = align ? `text-${align}` : "text-left";
@@ -255,7 +257,9 @@ const MemoTh = memo<ThProps>(
 );
 MemoTh.displayName = "MarkdownTh";
 
-type TdProps = WithNode<React.ComponentPropsWithoutRef<"td">> & { align?: string };
+type TdProps = WithNode<React.ComponentPropsWithoutRef<"td">> & {
+  align?: string;
+};
 const MemoTd = memo<TdProps>(
   ({ node, children, className, align, ...props }: TdProps) => {
     const alignClass = align ? `text-${align}` : "text-left";

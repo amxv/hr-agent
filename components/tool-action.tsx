@@ -16,11 +16,7 @@ const ToolActionKind = ({
   className?: string;
   ref?: React.RefObject<HTMLDivElement | null>;
 }) => (
-  <div
-    className={cn("flex shrink-0 gap-1", className)}
-    ref={ref}
-    {...props}
-  >
+  <div className={cn("flex shrink-0 gap-1", className)} ref={ref} {...props}>
     {icon}
     <span className="text-foreground/80 text-xs">{name}</span>
   </div>
