@@ -74,6 +74,26 @@ type CreateBlackoutDateFormValues = z.infer<typeof createBlackoutDateSchema>;
 function CreateBlackoutDateDialog({ onSuccess }: { onSuccess: () => void }) {
   const [open, setOpen] = useState(false);
   const trpcClient = useTRPCClient();
+  const trpc = useTRPC();
+
+  // Fetch all active employees for department list
+  const { data: employeesData } = useQuery({
+    ...trpc.admin.hr.employees.list.queryOptions({
+      employmentStatus: "active",
+      limit: 100,
+      offset: 0,
+    }),
+    enabled: open,
+  });
+
+  // Extract unique departments from employee data
+  const uniqueDepartments = employeesData?.employees
+    ? Array.from(
+        new Set(
+          employeesData.employees.map((emp) => emp.department).filter(Boolean)
+        )
+      ).sort()
+    : [];
 
   const form = useForm<CreateBlackoutDateFormValues>({
     resolver: zodResolver(createBlackoutDateSchema),
@@ -189,11 +209,11 @@ function CreateBlackoutDateDialog({ onSuccess }: { onSuccess: () => void }) {
                     </FormControl>
                     <SelectContent>
                       <SelectItem value="all">All Departments</SelectItem>
-                      <SelectItem value="Engineering">Engineering</SelectItem>
-                      <SelectItem value="Product">Product</SelectItem>
-                      <SelectItem value="Sales">Sales</SelectItem>
-                      <SelectItem value="Marketing">Marketing</SelectItem>
-                      <SelectItem value="Support">Support</SelectItem>
+                      {uniqueDepartments.map((dept) => (
+                        <SelectItem key={dept} value={dept}>
+                          {dept}
+                        </SelectItem>
+                      ))}
                     </SelectContent>
                   </Select>
                   <FormDescription>
@@ -234,6 +254,24 @@ export function BlackoutDatesManager() {
     }),
   });
 
+  // Fetch all active employees for department list
+  const { data: employeesData } = useQuery({
+    ...trpc.admin.hr.employees.list.queryOptions({
+      employmentStatus: "active",
+      limit: 100,
+      offset: 0,
+    }),
+  });
+
+  // Extract unique departments from employee data
+  const uniqueDepartments = employeesData?.employees
+    ? Array.from(
+        new Set(
+          employeesData.employees.map((emp) => emp.department).filter(Boolean)
+        )
+      ).sort()
+    : [];
+
   const invalidate = () => {
     void refetch();
   };
@@ -272,11 +310,11 @@ export function BlackoutDatesManager() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="Engineering">Engineering</SelectItem>
-              <SelectItem value="Product">Product</SelectItem>
-              <SelectItem value="Sales">Sales</SelectItem>
-              <SelectItem value="Marketing">Marketing</SelectItem>
-              <SelectItem value="Support">Support</SelectItem>
+              {uniqueDepartments.map((dept) => (
+                <SelectItem key={dept} value={dept}>
+                  {dept}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

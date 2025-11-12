@@ -82,6 +82,11 @@ type Employee = {
     | "notice_period"
     | "terminated";
   managerId?: string | null;
+  manager?: {
+    id: string;
+    fullName: string;
+    jobTitle: string;
+  } | null;
   createdAt?: Date;
   updatedAt?: Date;
 };
@@ -111,6 +116,32 @@ export function EditEmployeeDialog({
       offset: 0,
     }),
     enabled: open,
+  });
+
+  // Fetch manager information if managerId exists and manager data is not already provided
+  const { data: managerData } = useQuery({
+    ...trpc.admin.hr.employees.get.queryOptions({
+      id: employee.managerId || "",
+    }),
+    enabled: open && !!employee.managerId && !employee.manager,
+  });
+
+  // Use either the fetched manager or the manager from the employee object
+  const currentManager = employee.manager || managerData;
+
+  // Fetch direct reports (employees who have this employee as their manager)
+  const { data: directReportsData } = useQuery({
+    ...trpc.admin.hr.employees.list.queryOptions({
+      limit: 100,
+      offset: 0,
+    }),
+    enabled: open,
+    select: (data) => ({
+      ...data,
+      employees: data.employees.filter(
+        (emp) => emp.manager?.id === employee.id
+      ),
+    }),
   });
 
   const form = useForm<EditEmployeeFormValues>({
@@ -316,6 +347,30 @@ export function EditEmployeeDialog({
                   </FormItem>
                 )}
               />
+
+              {currentManager && (
+                <div className="rounded-md border p-3">
+                  <p className="mb-1 font-medium text-sm">Current Manager</p>
+                  <p className="text-sm">
+                    {currentManager.fullName} - {currentManager.jobTitle}
+                  </p>
+                </div>
+              )}
+
+              {directReportsData && directReportsData.employees.length > 0 && (
+                <div className="rounded-md border p-3">
+                  <p className="mb-2 font-medium text-sm">
+                    Direct Reports ({directReportsData.employees.length})
+                  </p>
+                  <div className="space-y-1">
+                    {directReportsData.employees.map((report) => (
+                      <div className="text-sm" key={report.id}>
+                        {report.fullName} - {report.jobTitle}
+                      </div>
+                    ))}
+                  </div>
+                </div>
+              )}
             </div>
 
             {/* Employment Details */}

@@ -70,6 +70,15 @@ export function LeaveBalanceListTable() {
 
   const totalPages = data?.total ? Math.ceil(data.total / limit) : 0;
 
+  // Extract unique departments from employee data
+  const uniqueDepartments = employeesData?.employees
+    ? Array.from(
+        new Set(
+          employeesData.employees.map((emp) => emp.department).filter(Boolean)
+        )
+      ).sort()
+    : [];
+
   const getBalanceColor = (balance: string) => {
     const numBalance = Number.parseFloat(balance);
     if (numBalance < 5) {
@@ -133,11 +142,11 @@ export function LeaveBalanceListTable() {
             </SelectTrigger>
             <SelectContent>
               <SelectItem value="all">All Departments</SelectItem>
-              <SelectItem value="Engineering">Engineering</SelectItem>
-              <SelectItem value="Product">Product</SelectItem>
-              <SelectItem value="Sales">Sales</SelectItem>
-              <SelectItem value="Marketing">Marketing</SelectItem>
-              <SelectItem value="Support">Support</SelectItem>
+              {uniqueDepartments.map((dept) => (
+                <SelectItem key={dept} value={dept}>
+                  {dept}
+                </SelectItem>
+              ))}
             </SelectContent>
           </Select>
         </div>

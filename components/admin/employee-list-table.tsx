@@ -1,7 +1,7 @@
 "use client";
 
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -59,6 +59,7 @@ const statusLabels: Record<EmployeeStatus, string> = {
 };
 
 export function EmployeeListTable() {
+  const [searchInput, setSearchInput] = useState("");
   const [searchValue, setSearchValue] = useState("");
   const [searchField, setSearchField] = useState<
     "fullName" | "email" | "employeeId" | "department"
@@ -69,6 +70,18 @@ export function EmployeeListTable() {
 
   const limit = 10;
   const offset = currentPage * limit;
+
+  // Debounce search input
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      setSearchValue(searchInput);
+      setCurrentPage(0); // Reset to first page on search
+    }, 300);
+
+    return () => {
+      clearTimeout(timer);
+    };
+  }, [searchInput]);
 
   const { data, isLoading, error, refetch } = useQuery({
     ...trpc.admin.hr.employees.list.queryOptions({
@@ -121,10 +134,10 @@ export function EmployeeListTable() {
             </Select>
             <Input
               className="flex-1"
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={(e) => setSearchInput(e.target.value)}
               placeholder={`Search by ${searchField}...`}
               type="search"
-              value={searchValue}
+              value={searchInput}
             />
           </div>
           <Select

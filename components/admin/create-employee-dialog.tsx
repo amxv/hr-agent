@@ -2,7 +2,7 @@
 
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useQuery } from "@tanstack/react-query";
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
@@ -105,6 +105,25 @@ export function CreateEmployeeDialog({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Calculate years of service from start date
+  const yearsOfService = useMemo(() => {
+    const startDate = form.watch("startDate");
+    if (!startDate) {
+      return 0;
+    }
+    const start = new Date(startDate);
+    const today = new Date();
+    const years = today.getFullYear() - start.getFullYear();
+    const monthDiff = today.getMonth() - start.getMonth();
+    const dayDiff = today.getDate() - start.getDate();
+
+    // Adjust for partial years
+    if (monthDiff < 0 || (monthDiff === 0 && dayDiff < 0)) {
+      return Math.max(0, years - 1);
+    }
+    return Math.max(0, years);
+  }, [form.watch("startDate")]);
 
   const onSubmit = async (values: CreateEmployeeFormValues) => {
     setIsSubmitting(true);
@@ -378,6 +397,23 @@ export function CreateEmployeeDialog({
                     </FormItem>
                   )}
                 />
+              </div>
+
+              <div className="space-y-2">
+                <label
+                  className="font-medium text-sm"
+                  htmlFor="years-of-service"
+                >
+                  Years of Service
+                </label>
+                <Input
+                  disabled
+                  id="years-of-service"
+                  value={`${yearsOfService} ${yearsOfService === 1 ? "year" : "years"}`}
+                />
+                <p className="text-muted-foreground text-xs">
+                  Calculated from start date
+                </p>
               </div>
             </div>
 
