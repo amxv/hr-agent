@@ -72,8 +72,7 @@ Please implement all changes described in the phase plan following the systemati
 1. Read all required documents
 2. Set up the task todo list
 3. Implement all changes incrementally
-4. Run verification checks (type checking, linting, build)
-5. Complete the implementation and provide a summary
+4. Complete the implementation and report back
 
 {optional_notes_if_any}
 ```
@@ -81,30 +80,20 @@ Please implement all changes described in the phase plan following the systemati
 Wait for the phase-implementer to complete.
 
 #### 3.3 Fix TypeScript/Lint Errors:
-After the phase-implementer completes, check if errors were reported.
+After the phase-implementer completes, use the Task tool to spawn a `phase-error-fixer` subagent:
 
-If the phase-implementer reported TypeScript or lint errors:
+```
+The implementation of Phase {phase-number} of feature {feature-id} is complete.
+Please check if there are any TypeScript and lint errors and fix them systematically.
 
-1. Use the Task tool to spawn a `phase-error-fixer` subagent:
+Feature ID: {feature-id}
+Feature Slug: {feature-slug}
+Phase Number: {phase-number}
+```
 
-   ```
-   Fix all TypeScript and lint errors for Phase {phase-number} of feature {feature-id}.
+Wait for the phase-error-fixer to report that all errors have been fixed. Only proceed to the next phase if all errors have been fixed, otherwise spawn a new `phase-error-fixer` subagent to fix the remaining errors.
 
-   Feature ID: {feature-id}
-   Feature Slug: {feature-slug}
-   Phase Number: {phase-number}
-
-   The phase implementation is complete but has TypeScript/lint errors.
-   Please fix all errors following the systematic error-fixing process.
-   ```
-
-2. Wait for the phase-error-fixer to complete
-3. Review the error-fixer's report to ensure all errors were resolved
-
-If errors cannot be fixed automatically:
-- STOP the implementation process
-- Report the issue clearly to the user
-- Ask for guidance before proceeding
+IMPORTANT: You must spawn a `phase-error-fixer` subagent for every phase after the phase-implementer completes its implementation. Do not skip this step.
 
 #### 3.4 Commit and Push Changes:
 After the phase is fully implemented and all errors are fixed:
@@ -129,14 +118,14 @@ After the phase is fully implemented and all errors are fixed:
 1. Mark the phase as `completed` in your master todo list
 2. Provide a brief status update to the user
 
-#### 3.6 Move to Next Phase:
+#### 3.6 Repeat for each remaining phase:
 If there are more phases remaining, follow the steps from 3.1 to 3.5 for each of the remaining phases.
 
-#### CRITICAL: Sequential Execution Rules
-- **NEVER spawn multiple phase-implementer subagents in parallel**
+#### CRITICAL: Sequential Execution Only
+- **NEVER spawn multiple subagents in parallel**
 - **ALWAYS wait for the current phase to fully complete (implement → fix errors → commit) before starting the next phase**
 - Each phase builds on the previous phase, so order matters
-- Each phase must be committed before moving to the next
+- Each phase must be error-free and committed before moving to the next
 
 ### Step 4: Final Summary
 
@@ -180,35 +169,16 @@ After all phases are complete, provide a comprehensive summary:
    - Issues are caught early and don't cascade
    - Each phase is committed and can be rolled back independently
 
-2. **Subagent Communication**: When spawning subagents:
-   - **phase-implementer**: Provide feature ID, feature slug, phase number, and any optional notes
-   - **phase-error-fixer**: Provide feature ID, feature slug, phase number after implementation completes
-   - Review their completion reports carefully before proceeding
-
-3. **Error Handling Workflow**:
-   - If phase-implementer reports errors, use the Task tool to spawn a `phase-error-fixer` subagent to fix the errors
-   - If phase-error-fixer cannot fix errors, STOP and ask for user guidance
-   - DO NOT proceed to the next phase until all errors are resolved
-   - Each phase must be error-free before committing
-
-4. **Commit Management**: After each phase is fully complete and error-free:
-   - Read the phase plan to understand what was implemented
-   - Create a structured commit message following the format
-   - Stage all changes with `git add .`
-   - Commit with detailed message using HEREDOC format
-   - Push to origin
-   - Verify commit was successful before moving to next phase
-
-5. **Progress Tracking**: Use the master todo list to give the user clear visibility into:
+2. **Progress Tracking**: Use the master todo list to give the user clear visibility into:
    - Which phase is currently being implemented
    - Which phases have been completed
    - Which phases are pending
    - Current step within each phase (implement/fix/commit)
 
-6. **Quality Gates**: Each phase must pass all checks before committing and moving to next phase:
+3. **Quality Gates**: Each phase must pass all checks before committing and moving to the next phase:
    - All implementation tasks completed
-   - Type checking passes (via phase-error-fixer if needed)
-   - Linting passes (via phase-error-fixer if needed)
+   - Type checking passes
+   - Linting passes
    - Build succeeds
    - Changes committed and pushed
 
@@ -229,7 +199,6 @@ After all phases are complete, provide a comprehensive summary:
 - ❌ DO NOT modify implementation plans yourself - let the subagents handle that
 - ❌ DO NOT implement code changes directly - delegate to phase-implementer subagents
 - ❌ DO NOT fix errors directly - delegate to phase-error-fixer subagents
-- ❌ DO NOT create commits manually - follow the structured commit format in step 3.4
 
 ## Example Workflow
 
@@ -238,7 +207,7 @@ Step 1: Found feature 003-user-profiles with 3 phases
 Step 2: Created master todo list with 3 phases
 Step 3: Starting Phase 1...
   → Spawning phase-implementer for Phase 1
-  → Phase 1 implementation complete (with TypeScript errors reported)
+  → Phase 1 implementation complete
   → Spawning phase-error-fixer for Phase 1
   → All errors fixed
   → Committing Phase 1 changes (003.1 Add database schema and types)
@@ -246,13 +215,15 @@ Step 3: Starting Phase 1...
   → Phase 1 complete
   → Starting Phase 2...
   → Spawning phase-implementer for Phase 2
-  → Phase 2 implementation complete (no errors)
+  → Phase 2 implementation complete
+  → Spawning phase-error-fixer for Phase 2
+  → All errors fixed
   → Committing Phase 2 changes (003.2 Implement server actions)
   → Commit pushed successfully
   → Phase 2 complete
   → Starting Phase 3...
   → Spawning phase-implementer for Phase 3
-  → Phase 3 implementation complete (with lint errors reported)
+  → Phase 3 implementation complete
   → Spawning phase-error-fixer for Phase 3
   → All errors fixed
   → Committing Phase 3 changes (003.3 Create UI components)
