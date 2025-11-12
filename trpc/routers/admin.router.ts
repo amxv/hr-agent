@@ -504,16 +504,57 @@ export const adminRouter = createTRPCRouter({
               "hsa_fsa",
             ]),
             planName: z.string(),
-            carrier: z.string(),
-            monthlyPremiumEmployeeOnly: z.string().optional(),
-            monthlyPremiumEmployeeSpouse: z.string().optional(),
-            monthlyPremiumFamily: z.string().optional(),
+            carrier: z.string().optional(),
+            planType: z.string().optional(),
+            monthlyPremiums: z
+              .object({
+                employee_only: z.number().optional(),
+                employee_spouse: z.number().optional(),
+                employee_children: z.number().optional(),
+                family: z.number().optional(),
+              })
+              .optional(),
+            deductibles: z
+              .object({
+                individual: z.number().optional(),
+                family: z.number().optional(),
+              })
+              .optional(),
+            outOfPocketMax: z
+              .object({
+                individual: z.number().optional(),
+                family: z.number().optional(),
+              })
+              .optional(),
+            coverageDetails: z.record(z.string(), z.unknown()).optional(),
+            annualMaximum: z.number().optional(),
+            employerMatchPercent: z.number().optional(),
+            vestingSchedule: z.string().optional(),
+            contributionLimits: z
+              .object({
+                employee: z.number().optional(),
+                employer: z.number().optional(),
+              })
+              .optional(),
+            employerContribution: z.number().optional(),
           })
         )
         .mutation(async ({ input, ctx }) => {
           const { createBenefitsPlan } = await import("@/lib/db/queries");
           return await createBenefitsPlan({
-            ...input,
+            planId: input.planId,
+            category: input.category,
+            planName: input.planName,
+            carrier: input.carrier || null,
+            type: input.planType || null,
+            monthlyPremium: input.monthlyPremiums || null,
+            deductible: input.deductibles || null,
+            outOfPocketMax: input.outOfPocketMax || null,
+            coverage: input.coverageDetails || null,
+            annualMaximum: input.annualMaximum || null,
+            employerMatchPercent:
+              input.employerMatchPercent?.toString() || null,
+            vestingSchedule: input.vestingSchedule || null,
             createdBy: ctx.user.id,
             updatedBy: ctx.user.id,
             createdAt: new Date(),

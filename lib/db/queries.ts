@@ -1556,20 +1556,66 @@ export async function listEnrollments(params?: {
   }
 
   // Query enrollments with all plan details
-  const enrollments = await db
+  const enrollmentsRaw = await db
     .select({
       enrollment: benefitsEnrollment,
       employee: {
         id: employee.id,
         fullName: employee.fullName,
         email: employee.email,
+        department: employee.department,
       },
+      medicalPlan: benefitsPlan,
+      dentalPlan: sql`NULL`.as("dental_plan"),
+      visionPlan: sql`NULL`.as("vision_plan"),
     })
     .from(benefitsEnrollment)
     .innerJoin(employee, eq(benefitsEnrollment.employeeId, employee.id))
+    .leftJoin(
+      benefitsPlan,
+      eq(benefitsEnrollment.medicalPlanId, benefitsPlan.id)
+    )
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined)
     .limit(limit)
     .offset(offset);
+
+  // Fetch additional plan details and dependents for each enrollment
+  const enrollments = await Promise.all(
+    enrollmentsRaw.map(async (row) => {
+      const [dentalPlan, visionPlan] = await Promise.all([
+        row.enrollment.dentalPlanId
+          ? db
+              .select()
+              .from(benefitsPlan)
+              .where(eq(benefitsPlan.id, row.enrollment.dentalPlanId))
+              .limit(1)
+              .then((plans) => plans[0] || null)
+          : null,
+        row.enrollment.visionPlanId
+          ? db
+              .select()
+              .from(benefitsPlan)
+              .where(eq(benefitsPlan.id, row.enrollment.visionPlanId))
+              .limit(1)
+              .then((plans) => plans[0] || null)
+          : null,
+      ]);
+
+      const dependents = await db
+        .select()
+        .from(dependent)
+        .where(eq(dependent.employeeId, row.employee.id));
+
+      return {
+        enrollment: row.enrollment,
+        employee: row.employee,
+        medicalPlan: row.medicalPlan,
+        dentalPlan,
+        visionPlan,
+        dependents,
+      };
+    })
+  );
 
   const [totalResult] = await db
     .select({ count: count() })
