@@ -1,6 +1,8 @@
 import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import { sql } from "drizzle-orm";
 import {
   boolean,
+  check,
   date,
   foreignKey,
   index,
@@ -511,6 +513,10 @@ export const leaveBalance = pgTable(
       "leave_balance_employee_leave_type_idx"
     ).on(table.employeeId, table.leaveType),
     leaveTypeIdx: index("leave_balance_leave_type_idx").on(table.leaveType),
+    currentBalanceCheck: check(
+      "leave_balance_current_balance_check",
+      sql`${table.currentBalance} >= 0`
+    ),
   })
 );
 
