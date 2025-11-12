@@ -1,6 +1,6 @@
 "use client";
 
-import { FileText, Home, Users } from "lucide-react";
+import { Briefcase, FileText, Home, Users } from "lucide-react";
 import { motion } from "motion/react";
 import type { Route } from "next";
 import Image from "next/image";
@@ -54,6 +54,13 @@ export function AdminSidebarNav() {
       href: "/admin/documents" as Route,
       icon: (
         <FileText className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
+      ),
+    },
+    {
+      label: "HR Data",
+      href: "/admin/hr-data" as Route,
+      icon: (
+        <Briefcase className="h-5 w-5 flex-shrink-0 text-neutral-700 dark:text-neutral-200" />
       ),
     },
   ];
