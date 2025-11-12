@@ -189,7 +189,9 @@ export const benefitsInfo = ({ dataStream }: BenefitsInfoProps) =>
                   : 0,
                 deductible: deductible?.individual,
                 outOfPocketMax: outOfPocketMax?.individual,
-                effectiveDate: enrollment.updatedAt.toISOString(),
+                effectiveDate:
+                  enrollment.medicalEnrollmentDate ||
+                  enrollment.updatedAt.toISOString(),
                 terminationDate: null,
                 status: "active",
               });
@@ -205,10 +207,6 @@ export const benefitsInfo = ({ dataStream }: BenefitsInfoProps) =>
               enrollment.dentalPlanId
             );
             if (dentalPlan) {
-              const coverage = dentalPlan.coverage as {
-                annualMaxBenefit?: number;
-              } | null;
-
               currentEnrollments.push({
                 planType: "dental",
                 planName: dentalPlan.planName,
@@ -217,7 +215,6 @@ export const benefitsInfo = ({ dataStream }: BenefitsInfoProps) =>
                 monthlyPremium: enrollment.dentalEmployeeContribution
                   ? Number.parseFloat(enrollment.dentalEmployeeContribution)
                   : 0,
-                deductible: coverage?.annualMaxBenefit,
                 effectiveDate: enrollment.updatedAt.toISOString(),
                 terminationDate: null,
                 status: "active",

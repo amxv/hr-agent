@@ -20,7 +20,7 @@ export type LeaveBalance = {
   projected: number; // projected at end of year
   accrualRate: number; // days per month
   carryoverLimit: number; // max days that can carry over
-  carryoverDeadline: string; // ISO date
+  carryoverDeadline: string | null; // ISO date, null if no deadline
 };
 
 export type BlackoutDate = {
@@ -152,7 +152,7 @@ export const leaveBalance = ({ dataStream }: LeaveBalanceProps) =>
           projected: Number.parseFloat(b.projectedYearEnd),
           accrualRate: Number.parseFloat(b.accrualRate),
           carryoverLimit: b.carryoverLimit,
-          carryoverDeadline: b.carryoverDeadline || new Date().toISOString(),
+          carryoverDeadline: b.carryoverDeadline || null,
         }));
 
         // Get blackout dates for the employee's department

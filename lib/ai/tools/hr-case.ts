@@ -8,7 +8,7 @@ const log = createModuleLogger("ai.tools.hr-case");
 // ===== TYPE DEFINITIONS =====
 
 export type HRCaseInput = {
-  action: "create" | "status" | "list";
+  action: "create" | "status" | "list" | "update";
   category?:
     | "payroll"
     | "benefits"
@@ -20,6 +20,9 @@ export type HRCaseInput = {
   description?: string;
   caseId?: string;
   attachChat?: boolean;
+  updateStatus?: CaseStatus;
+  updatePriority?: CasePriority;
+  updateNote?: string;
 };
 
 export type CaseCategory =
@@ -85,6 +88,11 @@ export type HRCaseOutput =
       cases: HRCase[];
       totalOpen: number;
       totalClosed: number;
+    }
+  | {
+      action: "update";
+      case: HRCase;
+      message: string;
     }
   | {
       error: string;
@@ -232,9 +240,9 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
     `,
     inputSchema: z.object({
       action: z
-        .enum(["create", "status", "list"])
+        .enum(["create", "status", "list", "update"])
         .describe(
-          "Action to perform: create new case, check status, or list all cases"
+          "Action to perform: create new case, check status, list all cases, or update existing case"
         ),
       category: z
         .enum([
@@ -268,6 +276,25 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
         .describe(
           "Whether to attach current conversation transcript to the case for context"
         ),
+      updateStatus: z
+        .enum([
+          "new",
+          "assigned",
+          "in_progress",
+          "pending_employee",
+          "resolved",
+          "closed",
+        ])
+        .optional()
+        .describe("New status for update action"),
+      updatePriority: z
+        .enum(["low", "medium", "high", "urgent"])
+        .optional()
+        .describe("New priority for update action"),
+      updateNote: z
+        .string()
+        .optional()
+        .describe("Note to add when updating case"),
     }),
     execute: async ({
       action,
@@ -275,6 +302,9 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
       description,
       caseId,
       attachChat = false,
+      updateStatus,
+      updatePriority,
+      updateNote,
     }: HRCaseInput): Promise<HRCaseOutput> => {
       const startMs = Date.now();
       log.info(
@@ -294,9 +324,13 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
 
       try {
         // Import database queries dynamically
-        const { listHRCases, getHRCaseByCaseId, createHRCase } = await import(
-          "@/lib/db/queries"
-        );
+        const {
+          listHRCases,
+          getHRCaseByCaseId,
+          createHRCase,
+          updateHRCase,
+          addCaseUpdate,
+        } = await import("@/lib/db/queries");
 
         // ===== CREATE ACTION =====
         if (action === "create") {
@@ -514,6 +548,135 @@ export const hrCase = ({ dataStream }: HRCaseProps) =>
             cases,
             totalOpen: openCases.length,
             totalClosed: closedCases.length,
+          };
+        }
+
+        // ===== UPDATE ACTION =====
+        if (action === "update") {
+          if (!caseId) {
+            return { error: "Case ID is required to update a case" };
+          }
+
+          // Get the current case first
+          const existingCase = await getHRCaseByCaseId(caseId);
+          if (!existingCase) {
+            return { error: `Case ${caseId} not found` };
+          }
+
+          // Default updater (in production, get from session)
+          const updatedBy = "EMP001";
+
+          // Prepare update data
+          const updateData: Partial<{
+            status:
+              | "open"
+              | "in_progress"
+              | "resolved"
+              | "closed"
+              | "pending_info";
+            priority: "low" | "medium" | "high" | "urgent";
+            updatedBy: string;
+          }> & { updatedBy: string } = {
+            updatedBy,
+          };
+
+          if (updateStatus) {
+            updateData.status = updateStatus as
+              | "open"
+              | "in_progress"
+              | "resolved"
+              | "closed"
+              | "pending_info";
+          }
+          if (updatePriority) {
+            updateData.priority = updatePriority as
+              | "low"
+              | "medium"
+              | "high"
+              | "urgent";
+          }
+
+          // Update the case
+          await updateHRCase(caseId, updateData, updatedBy);
+
+          // If there's a note, add it as a case update
+          if (updateNote) {
+            await addCaseUpdate(
+              existingCase.id,
+              {
+                caseId: existingCase.id,
+                type: "internal_note",
+                message: updateNote,
+                author: "Demo User",
+                visibility: "public",
+              },
+              updatedBy
+            );
+          }
+
+          // Fetch the updated case with all updates
+          const dbCase = await getHRCaseByCaseId(caseId);
+          if (!dbCase) {
+            return { error: `Failed to retrieve updated case ${caseId}` };
+          }
+
+          // Calculate SLA hours remaining
+          const resolutionDueDate = new Date(dbCase.resolutionDue);
+          const now = new Date();
+          const hoursRemaining = Math.round(
+            (resolutionDueDate.getTime() - now.getTime()) / (1000 * 60 * 60)
+          );
+
+          const updatedCase: HRCase = {
+            caseId: dbCase.caseId,
+            createdDate: dbCase.createdAt.toISOString(),
+            category: dbCase.category as CaseCategory,
+            priority: dbCase.priority as CasePriority,
+            status: dbCase.status as CaseStatus,
+            subject: dbCase.title,
+            description: dbCase.description,
+            assignedTo: undefined,
+            assignedTeam: dbCase.assignedTeam,
+            sla: {
+              firstResponseDue: dbCase.firstResponseDue.toISOString(),
+              firstResponseMet: dbCase.firstResponseMet,
+              resolutionDue: dbCase.resolutionDue.toISOString(),
+              resolutionMet:
+                dbCase.status === "resolved" || dbCase.status === "closed",
+              hoursRemaining,
+            },
+            updates:
+              dbCase.updates?.map((u: any) => ({
+                timestamp: u.timestamp.toISOString(),
+                author: u.author,
+                authorRole: (u.type === "system"
+                  ? "system"
+                  : u.type === "hr_response"
+                    ? "hr_specialist"
+                    : "employee") as "employee" | "hr_specialist" | "system",
+                message: u.message,
+                isInternal: u.visibility === "internal",
+              })) || [],
+          };
+
+          dataStream.write({
+            type: "data-researchUpdate",
+            data: {
+              title: "Case updated successfully",
+              timestamp: Date.now(),
+              type: "completed",
+            },
+          });
+
+          log.info(
+            { ms: Date.now() - startMs, caseId },
+            "hrCase: update success"
+          );
+
+          return {
+            action: "update",
+            case: updatedCase,
+            message: `Case ${caseId} has been updated successfully.`,
           };
         }
 

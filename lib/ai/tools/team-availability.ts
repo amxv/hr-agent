@@ -135,16 +135,14 @@ type TeamAvailabilityProps = {
 export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
   tool({
     description: `
-      MANAGER-ONLY tool for viewing team availability and approving leave requests.
+      View team availability and manage leave requests.
 
-      Use this tool when managers ask about:
+      Use this tool when users ask about:
       - Team member absences and schedules
       - Who is off on specific dates
-      - Pending leave requests to approve
+      - Pending leave requests to review
       - Coverage conflicts
       - Approving or denying leave requests
-
-      ⚠️ IMPORTANT: This tool requires manager permissions. Only use when the user is a manager.
 
       Actions:
       - view_schedule: See team absences for a date range

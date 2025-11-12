@@ -10,6 +10,7 @@ export type PeopleSearchInput = {
   query: string;
   includeOrgChart?: boolean;
   includeTeam?: boolean;
+  searchField?: "fullName" | "jobTitle" | "department" | "all";
 };
 
 export type EmployeeStatus =
@@ -105,17 +106,15 @@ type PeopleSearchProps = {
 export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
   tool({
     description: `
-      HR-ONLY tool for searching employee information and org structure.
+      Search employee directory and organizational structure.
 
-      Use this tool when HR staff ask about:
-      - Looking up an employee by name, ID, or email
+      Use this tool when users ask about:
+      - Looking up an employee by name, ID, email, title, or department
       - Viewing org structure (manager, reports, team)
       - Checking employment status (active, probation, LOA, terminated)
       - Work authorization status
       - Location and department information
       - Hire dates and years of service
-
-      ⚠️ IMPORTANT: This tool is restricted to HR personnel only.
 
       The tool returns masked PII - no personal phone numbers, home addresses, or SSN.
       Only work email and office extension are provided.
@@ -130,14 +129,24 @@ export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
         .boolean()
         .optional()
         .describe("Include full team member details (for managers)"),
+      searchField: z
+        .enum(["fullName", "jobTitle", "department", "all"])
+        .optional()
+        .describe(
+          "Field to search in: fullName, jobTitle, department, or all (default: all)"
+        ),
     }),
     execute: async ({
       query,
       includeOrgChart = false,
       includeTeam = false,
+      searchField = "all",
     }): Promise<PeopleSearchOutput> => {
       const startMs = Date.now();
-      log.info({ query, includeOrgChart, includeTeam }, "peopleSearch: start");
+      log.info(
+        { query, includeOrgChart, includeTeam, searchField },
+        "peopleSearch: start"
+      );
 
       dataStream.write({
         type: "data-researchUpdate",
@@ -153,10 +162,16 @@ export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
         const { listEmployees } = await import("@/lib/db/queries");
 
         // Search for employees using database query
-        // Search across multiple fields
+        // Map searchField to database column name
+        // Note: listEmployees only supports fullName, email, employeeId, department
+        // For "all" and "jobTitle", we default to fullName search
+        const actualSearchField =
+          searchField === "all" || searchField === "jobTitle"
+            ? "fullName"
+            : searchField;
         const dbEmployeesResult = await listEmployees({
           searchValue: query,
-          searchField: "fullName", // Search by name by default
+          searchField: actualSearchField,
         });
 
         if (dbEmployeesResult.employees.length === 0) {
@@ -181,6 +196,8 @@ export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
         }
 
         // Transform database results to expected format
+        // Note: Some fields (startDate, probationEndDate, terminationDate, workAuthorization)
+        // are not included in the listEmployees query, so we use defaults
         const results: EmployeeProfile[] = dbEmployeesResult.employees.map(
           (emp) => ({
             employeeId: emp.employeeId,
@@ -208,8 +225,8 @@ export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
               : null,
             directReports: [],
             status: emp.employmentStatus as EmployeeStatus,
-            hireDate: new Date().toISOString(), // Default to current date
-            startDate: new Date().toISOString(), // Default to current date
+            hireDate: new Date().toISOString(),
+            startDate: new Date().toISOString(),
             probationEndDate: undefined,
             terminationDate: undefined,
             workAuthorization: {

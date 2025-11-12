@@ -95,11 +95,17 @@ export function LeaveBalanceResult({
                       <p>Projected year-end: {balance.projected} days</p>
                       {balance.carryoverLimit > 0 && (
                         <p className="text-amber-600 dark:text-amber-400">
-                          Max carryover: {balance.carryoverLimit} days (by{" "}
-                          {new Date(
-                            balance.carryoverDeadline
-                          ).toLocaleDateString()}
-                          )
+                          Max carryover: {balance.carryoverLimit} days
+                          {balance.carryoverDeadline && (
+                            <>
+                              {" "}
+                              (by{" "}
+                              {new Date(
+                                balance.carryoverDeadline
+                              ).toLocaleDateString()}
+                              )
+                            </>
+                          )}
                         </p>
                       )}
                     </div>
