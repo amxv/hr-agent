@@ -22,6 +22,8 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTRPCClient } from "@/trpc/react";
+import { EditHRCaseDialog } from "./edit-hr-case-dialog";
+import { HRCaseDetailsDialog } from "./hr-case-details-dialog";
 
 type HRCase = {
   id: string;
@@ -31,7 +33,10 @@ type HRCase = {
   category: string;
   priority: string;
   assignedTeam: string;
+  description: string;
   createdAt: Date;
+  updatedAt?: Date;
+  submittedBy?: string | null;
 };
 
 type HRCaseActionsProps = {
@@ -41,6 +46,8 @@ type HRCaseActionsProps = {
 
 export function HRCaseActions({ hrCase, onSuccess }: HRCaseActionsProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
+  const [detailsOpen, setDetailsOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const trpcClient = useTRPCClient();
 
@@ -82,11 +89,11 @@ export function HRCaseActions({ hrCase, onSuccess }: HRCaseActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setDetailsOpen(true)}>
             <Eye className="mr-2 h-4 w-4" />
             View Details
           </DropdownMenuItem>
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Pencil className="mr-2 h-4 w-4" />
             Edit Case
           </DropdownMenuItem>
@@ -124,6 +131,21 @@ export function HRCaseActions({ hrCase, onSuccess }: HRCaseActionsProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {editOpen && (
+        <EditHRCaseDialog hrCase={hrCase} onSuccess={onSuccess}>
+          <div />
+        </EditHRCaseDialog>
+      )}
+
+      {detailsOpen && (
+        <HRCaseDetailsDialog
+          hrCase={hrCase}
+          onClose={() => setDetailsOpen(false)}
+          onSuccess={onSuccess}
+          open={detailsOpen}
+        />
+      )}
     </>
   );
 }

@@ -206,6 +206,7 @@ export function BenefitsPlanListTable() {
                 <TableCell>{formatPremium(plan.monthlyPremium)}</TableCell>
                 <TableCell>
                   <span className="text-muted-foreground text-sm">
+                    {/* TODO: enrollmentCount needs to be added to backend plan type */}
                     0 enrolled
                   </span>
                 </TableCell>

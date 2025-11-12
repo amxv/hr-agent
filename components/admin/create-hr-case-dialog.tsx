@@ -46,11 +46,24 @@ const createHRCaseSchema = z.object({
     "performance",
     "other",
   ]),
+  priority: z.enum(["low", "medium", "high", "urgent"]),
   description: z.string().min(1, "Description is required"),
+  assignedTeam: z.string().min(1, "Assigned team is required"),
   submittedBy: z.string().min(1, "Submitted by is required"),
 });
 
 type CreateHRCaseFormValues = z.infer<typeof createHRCaseSchema>;
+
+// Team assignment configuration based on category
+const TEAM_ASSIGNMENT: Record<string, string> = {
+  payroll: "Payroll",
+  benefits: "Benefits",
+  policy: "HR",
+  equipment: "IT",
+  leave: "HR",
+  performance: "HR",
+  other: "HR",
+};
 
 type CreateHRCaseDialogProps = {
   children: React.ReactNode;
@@ -79,10 +92,15 @@ export function CreateHRCaseDialog({
     defaultValues: {
       title: "",
       category: "other",
+      priority: "medium",
       description: "",
+      assignedTeam: "HR",
       submittedBy: "",
     },
   });
+
+  // Watch category changes to auto-assign team
+  const selectedCategory = form.watch("category");
 
   const [isSubmitting, setIsSubmitting] = useState(false);
 
@@ -143,7 +161,17 @@ export function CreateHRCaseDialog({
                     <FormLabel>
                       Category <span className="text-destructive">*</span>
                     </FormLabel>
-                    <Select onValueChange={field.onChange} value={field.value}>
+                    <Select
+                      onValueChange={(value) => {
+                        field.onChange(value);
+                        // Auto-assign team based on category
+                        form.setValue(
+                          "assignedTeam",
+                          TEAM_ASSIGNMENT[value] || "HR"
+                        );
+                      }}
+                      value={field.value}
+                    >
                       <FormControl>
                         <SelectTrigger>
                           <SelectValue />
@@ -163,7 +191,63 @@ export function CreateHRCaseDialog({
                   </FormItem>
                 )}
               />
+
+              <FormField
+                control={form.control}
+                name="priority"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>
+                      Priority <span className="text-destructive">*</span>
+                    </FormLabel>
+                    <Select onValueChange={field.onChange} value={field.value}>
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        <SelectItem value="low">Low</SelectItem>
+                        <SelectItem value="medium">Medium</SelectItem>
+                        <SelectItem value="high">High</SelectItem>
+                        <SelectItem value="urgent">Urgent</SelectItem>
+                      </SelectContent>
+                    </Select>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
             </div>
+
+            <FormField
+              control={form.control}
+              name="assignedTeam"
+              render={({ field }) => (
+                <FormItem>
+                  <FormLabel>
+                    Assigned Team <span className="text-destructive">*</span>
+                  </FormLabel>
+                  <Select onValueChange={field.onChange} value={field.value}>
+                    <FormControl>
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                    </FormControl>
+                    <SelectContent>
+                      <SelectItem value="HR">HR</SelectItem>
+                      <SelectItem value="IT">IT</SelectItem>
+                      <SelectItem value="Facilities">Facilities</SelectItem>
+                      <SelectItem value="Payroll">Payroll</SelectItem>
+                      <SelectItem value="Benefits">Benefits</SelectItem>
+                    </SelectContent>
+                  </Select>
+                  <p className="text-muted-foreground text-xs">
+                    Auto-assigned based on category (editable)
+                  </p>
+                  <FormMessage />
+                </FormItem>
+              )}
+            />
 
             <FormField
               control={form.control}

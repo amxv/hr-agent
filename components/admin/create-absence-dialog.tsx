@@ -67,6 +67,25 @@ export function CreateAbsenceDialog({
     enabled: open,
   });
 
+  // Helper function to calculate business days between two dates
+  const calculateBusinessDays = (start: string, end: string) => {
+    const startDate = new Date(start);
+    const endDate = new Date(end);
+    let count = 0;
+    const curDate = new Date(startDate.getTime());
+
+    while (curDate <= endDate) {
+      const dayOfWeek = curDate.getDay();
+      if (dayOfWeek !== 0 && dayOfWeek !== 6) {
+        // Not Sunday (0) or Saturday (6)
+        count++;
+      }
+      curDate.setDate(curDate.getDate() + 1);
+    }
+
+    return count.toString();
+  };
+
   const form = useForm<CreateAbsenceFormValues>({
     resolver: zodResolver(createAbsenceSchema),
     defaultValues: {
@@ -80,6 +99,18 @@ export function CreateAbsenceDialog({
   });
 
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // Watch date changes to recalculate total days
+  const startDate = form.watch("startDate");
+  const endDate = form.watch("endDate");
+
+  // Recalculate total days when dates change
+  const handleDateChange = () => {
+    if (startDate && endDate) {
+      const businessDays = calculateBusinessDays(startDate, endDate);
+      form.setValue("totalDays", businessDays);
+    }
+  };
 
   const onSubmit = async (values: CreateAbsenceFormValues) => {
     setIsSubmitting(true);
@@ -173,7 +204,14 @@ export function CreateAbsenceDialog({
                       Start Date <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input
+                        type="date"
+                        {...field}
+                        onBlur={() => {
+                          field.onBlur();
+                          handleDateChange();
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -188,7 +226,14 @@ export function CreateAbsenceDialog({
                       End Date <span className="text-destructive">*</span>
                     </FormLabel>
                     <FormControl>
-                      <Input type="date" {...field} />
+                      <Input
+                        type="date"
+                        {...field}
+                        onBlur={() => {
+                          field.onBlur();
+                          handleDateChange();
+                        }}
+                      />
                     </FormControl>
                     <FormMessage />
                   </FormItem>
@@ -207,6 +252,10 @@ export function CreateAbsenceDialog({
                   <FormControl>
                     <Input placeholder="5" type="number" {...field} />
                   </FormControl>
+                  <p className="text-muted-foreground text-xs">
+                    Auto-calculated based on start and end dates (business days
+                    only)
+                  </p>
                   <FormMessage />
                 </FormItem>
               )}

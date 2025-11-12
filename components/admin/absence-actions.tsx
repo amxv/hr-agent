@@ -22,6 +22,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { useTRPCClient } from "@/trpc/react";
+import { EditAbsenceDialog } from "./edit-absence-dialog";
 
 type Absence = {
   absence: {
@@ -44,6 +45,7 @@ type AbsenceActionsProps = {
 
 export function AbsenceActions({ absence, onSuccess }: AbsenceActionsProps) {
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [editOpen, setEditOpen] = useState(false);
   const [isDeleting, setIsDeleting] = useState(false);
   const trpcClient = useTRPCClient();
 
@@ -73,7 +75,7 @@ export function AbsenceActions({ absence, onSuccess }: AbsenceActionsProps) {
           </Button>
         </DropdownMenuTrigger>
         <DropdownMenuContent align="end">
-          <DropdownMenuItem>
+          <DropdownMenuItem onClick={() => setEditOpen(true)}>
             <Pencil className="mr-2 h-4 w-4" />
             Edit
           </DropdownMenuItem>
@@ -105,6 +107,19 @@ export function AbsenceActions({ absence, onSuccess }: AbsenceActionsProps) {
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
+
+      {editOpen && (
+        <EditAbsenceDialog
+          absence={{
+            ...absence.absence,
+            employee: absence.employee,
+            approvalDate: absence.absence.startDate,
+          }}
+          onSuccess={onSuccess}
+        >
+          <div />
+        </EditAbsenceDialog>
+      )}
     </>
   );
 }

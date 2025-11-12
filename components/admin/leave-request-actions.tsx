@@ -21,6 +21,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { Textarea } from "@/components/ui/textarea";
 import { useTRPCClient } from "@/trpc/react";
 
 type LeaveRequest = {
@@ -51,6 +52,7 @@ export function LeaveRequestActions({
   const [approveOpen, setApproveOpen] = useState(false);
   const [denyOpen, setDenyOpen] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [denialReason, setDenialReason] = useState("");
   const trpcClient = useTRPCClient();
 
   const handleApprove = async () => {
@@ -71,15 +73,21 @@ export function LeaveRequestActions({
   };
 
   const handleDeny = async () => {
+    if (!denialReason.trim()) {
+      toast.error("Please provide a reason for denying this request");
+      return;
+    }
+
     setIsProcessing(true);
     try {
       await trpcClient.admin.hr.leaveRequests.deny.mutate({
         id: request.request.id,
-        reason: "Denied by admin",
+        reason: denialReason,
       });
       toast.success("Leave request denied");
       onSuccess();
       setDenyOpen(false);
+      setDenialReason("");
     } catch (error: unknown) {
       const err = error as { message?: string };
       toast.error(err.message || "Failed to deny request");
@@ -135,10 +143,28 @@ export function LeaveRequestActions({
             <AlertDialogTitle>Deny Leave Request?</AlertDialogTitle>
             <AlertDialogDescription>
               This will deny the leave request for {request.employee.fullName}.
+              Please provide a reason for the denial.
             </AlertDialogDescription>
           </AlertDialogHeader>
+          <div className="py-4">
+            <label
+              className="mb-2 block font-medium text-sm"
+              htmlFor="denial-reason"
+            >
+              Reason for Denial <span className="text-destructive">*</span>
+            </label>
+            <Textarea
+              id="denial-reason"
+              onChange={(e) => setDenialReason(e.target.value)}
+              placeholder="Explain why this request is being denied..."
+              rows={4}
+              value={denialReason}
+            />
+          </div>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogCancel onClick={() => setDenialReason("")}>
+              Cancel
+            </AlertDialogCancel>
             <AlertDialogAction
               className="bg-destructive"
               disabled={isProcessing}
