@@ -32,6 +32,7 @@ type Absence = {
     startDate: Date | string;
     endDate: Date | string;
     totalDays: string;
+    approvalDate: Date | string;
   };
   employee: {
     fullName: string;
@@ -113,7 +114,7 @@ export function AbsenceActions({ absence, onSuccess }: AbsenceActionsProps) {
           absence={{
             ...absence.absence,
             employee: absence.employee,
-            approvalDate: absence.absence.startDate,
+            approvalDate: absence.absence.approvalDate,
           }}
           onSuccess={onSuccess}
         >
