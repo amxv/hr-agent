@@ -168,53 +168,57 @@ export async function seedLeaveBalances(
   employees: Array<{ id: string; employeeId: string }>,
   adminUserId: string
 ): Promise<void> {
-  // Find John Doe (EMP001) for his leave balances
-  const johnDoe = employees.find((e) => e.employeeId === "EMP001");
-  if (!johnDoe) {
-    return;
-  }
+  // Create leave balances for all employees
+  const balanceValues = [];
 
-  await db.insert(leaveBalance).values([
-    {
-      employeeId: johnDoe.id,
-      leaveType: "vacation",
+  for (const emp of employees) {
+    // Vacation balance
+    balanceValues.push({
+      employeeId: emp.id,
+      leaveType: "vacation" as const,
       currentBalance: "18.5",
       accruedYTD: "20",
       usedYTD: "1.5",
       projectedYearEnd: "26.5",
       accrualRate: "1.67",
-      accrualSchedule: "monthly",
+      accrualSchedule: "monthly" as const,
       carryoverLimit: 5,
       carryoverDeadline: "2026-03-31",
       updatedBy: adminUserId,
-    },
-    {
-      employeeId: johnDoe.id,
-      leaveType: "sick",
+    });
+
+    // Sick leave balance
+    balanceValues.push({
+      employeeId: emp.id,
+      leaveType: "sick" as const,
       currentBalance: "12",
       accruedYTD: "12",
       usedYTD: "0",
       projectedYearEnd: "12",
       accrualRate: "1",
-      accrualSchedule: "monthly",
+      accrualSchedule: "monthly" as const,
       carryoverLimit: 0,
       carryoverDeadline: "2025-12-31",
       updatedBy: adminUserId,
-    },
-    {
-      employeeId: johnDoe.id,
-      leaveType: "personal",
+    });
+
+    // Personal leave balance
+    balanceValues.push({
+      employeeId: emp.id,
+      leaveType: "personal" as const,
       currentBalance: "3",
       accruedYTD: "3",
       usedYTD: "0",
       projectedYearEnd: "3",
       accrualRate: "0.25",
-      accrualSchedule: "monthly",
+      accrualSchedule: "monthly" as const,
       carryoverLimit: 0,
       carryoverDeadline: "2025-12-31",
       updatedBy: adminUserId,
-    },
-  ]);
+    });
+  }
+
+  await db.insert(leaveBalance).values(balanceValues);
 }
 
 /**
@@ -499,40 +503,34 @@ export async function seedEnrollments(
   plans: Array<{ id: string; planId: string }>,
   adminUserId: string
 ): Promise<void> {
-  // Find John Doe (EMP001)
+  // Find employees
   const johnDoe = employees.find((e) => e.employeeId === "EMP001");
-  if (!johnDoe) {
-    return;
-  }
+  const noor = employees.find((e) => e.employeeId === "EMP200");
+  const maria = employees.find((e) => e.employeeId === "EMP301");
 
   // Find plans
-  const medicalPlan = plans.find((p) => p.planId === "MED001");
-  const dentalPlan = plans.find((p) => p.planId === "DEN001");
+  const medicalPlan1 = plans.find((p) => p.planId === "MED001");
+  const medicalPlan2 = plans.find((p) => p.planId === "MED002");
+  const dentalPlan1 = plans.find((p) => p.planId === "DEN001");
+  const dentalPlan2 = plans.find((p) => p.planId === "DEN002");
   const visionPlan = plans.find((p) => p.planId === "VIS001");
   const retirementPlan = plans.find((p) => p.planId === "401K001");
 
-  if (!medicalPlan || !dentalPlan || !visionPlan || !retirementPlan) {
-    return;
-  }
-
-  // Create enrollment
-  const [enrollment] = await db
-    .insert(benefitsEnrollment)
-    .values({
+  // Create enrollment for John Doe (with family)
+  if (johnDoe && medicalPlan1 && dentalPlan1 && visionPlan && retirementPlan) {
+    await db.insert(benefitsEnrollment).values({
       employeeId: johnDoe.id,
-      medicalPlanId: medicalPlan.id,
-      dentalPlanId: dentalPlan.id,
+      medicalPlanId: medicalPlan1.id,
+      dentalPlanId: dentalPlan1.id,
       visionPlanId: visionPlan.id,
       retirementPlanId: retirementPlan.id,
       retirementEmployeeContributionPercent: "6.00",
       hsaEmployeeContribution: "0",
       fsaElection: "0",
       updatedBy: adminUserId,
-    })
-    .returning();
+    });
 
-  // Create dependents
-  if (enrollment) {
+    // Create dependents for John Doe
     await db.insert(dependent).values([
       {
         employeeId: johnDoe.id,
@@ -553,6 +551,36 @@ export async function seedEnrollments(
         updatedBy: adminUserId,
       },
     ]);
+  }
+
+  // Create enrollment for Noor (employee only, different plans)
+  if (noor && medicalPlan2 && dentalPlan2 && retirementPlan) {
+    await db.insert(benefitsEnrollment).values({
+      employeeId: noor.id,
+      medicalPlanId: medicalPlan2.id,
+      dentalPlanId: dentalPlan2.id,
+      visionPlanId: null,
+      retirementPlanId: retirementPlan.id,
+      retirementEmployeeContributionPercent: "5.00",
+      hsaEmployeeContribution: "0",
+      fsaElection: "0",
+      updatedBy: adminUserId,
+    });
+  }
+
+  // Create enrollment for Maria (employee only, minimal coverage)
+  if (maria && medicalPlan1 && retirementPlan) {
+    await db.insert(benefitsEnrollment).values({
+      employeeId: maria.id,
+      medicalPlanId: medicalPlan1.id,
+      dentalPlanId: null,
+      visionPlanId: null,
+      retirementPlanId: retirementPlan.id,
+      retirementEmployeeContributionPercent: "4.00",
+      hsaEmployeeContribution: "0",
+      fsaElection: "0",
+      updatedBy: adminUserId,
+    });
   }
 }
 

@@ -311,9 +311,6 @@ export const adminRouter = createTRPCRouter({
             jobTitle: z.string().min(1),
             department: z.string().min(1),
             location: z.string().min(1),
-            city: z.string().min(1),
-            country: z.string().min(1),
-            timezone: z.string().min(1),
             workMode: z.enum(["office", "remote", "hybrid"]),
             employmentStatus: z.enum([
               "active",
@@ -322,13 +319,26 @@ export const adminRouter = createTRPCRouter({
               "notice_period",
               "terminated",
             ]),
-            hireDate: z.string(),
             startDate: z.string(),
             managerId: z.string().optional(),
           })
         )
         .mutation(async ({ input, ctx }) => {
-          const { createEmployee } = await import("@/lib/db/queries");
+          const { createEmployee, getEmployeeById } = await import(
+            "@/lib/db/queries"
+          );
+
+          // Validate manager exists if provided
+          if (input.managerId) {
+            const manager = await getEmployeeById(input.managerId);
+            if (!manager) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Manager not found",
+              });
+            }
+          }
+
           return await createEmployee({
             ...input,
             userId: ctx.user.id, // Link to user account
@@ -338,7 +348,7 @@ export const adminRouter = createTRPCRouter({
               requiresRenewal: false,
               daysUntilExpiry: null,
             }, // Default value
-            yearsOfService: "0", // Will be calculated based on hire date
+            yearsOfService: "0", // Will be calculated based on start date
             createdBy: ctx.user.id,
             updatedBy: ctx.user.id,
           });
@@ -370,7 +380,21 @@ export const adminRouter = createTRPCRouter({
           })
         )
         .mutation(async ({ input, ctx }) => {
-          const { updateEmployee } = await import("@/lib/db/queries");
+          const { updateEmployee, getEmployeeById } = await import(
+            "@/lib/db/queries"
+          );
+
+          // Validate manager exists if provided
+          if (input.data.managerId) {
+            const manager = await getEmployeeById(input.data.managerId);
+            if (!manager) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Manager not found",
+              });
+            }
+          }
+
           return await updateEmployee(input.id, input.data, ctx.user.id);
         }),
 
@@ -413,6 +437,17 @@ export const adminRouter = createTRPCRouter({
           })
         )
         .mutation(async ({ input, ctx }) => {
+          // Validate currentBalance is not negative
+          if (input.data.currentBalance !== undefined) {
+            const balance = Number.parseFloat(input.data.currentBalance);
+            if (balance < 0) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "Leave balance cannot be negative",
+              });
+            }
+          }
+
           const { updateLeaveBalance } = await import("@/lib/db/queries");
           return await updateLeaveBalance(
             input.employeeId,
@@ -735,9 +770,18 @@ export const adminRouter = createTRPCRouter({
           })
         )
         .mutation(async ({ input, ctx }) => {
-          const { createHRCase } = await import("@/lib/db/queries");
+          const { createHRCase, getEmployeeById } = await import(
+            "@/lib/db/queries"
+          );
           const { TEAM_ASSIGNMENT } = await import("@/lib/hr/sla-config");
           const { SLA_CONFIG } = await import("@/lib/hr/sla-config");
+
+          // Get submittedByName from employee record
+          let submittedByName = "Unknown User";
+          const submittedEmployee = await getEmployeeById(input.submittedBy);
+          if (submittedEmployee) {
+            submittedByName = submittedEmployee.fullName;
+          }
 
           return await createHRCase(
             {
@@ -746,7 +790,7 @@ export const adminRouter = createTRPCRouter({
               status: "open",
               assignedTeam: TEAM_ASSIGNMENT[input.category],
               firstResponseMet: false,
-              submittedByName: "Admin User", // TODO: Get from user profile
+              submittedByName,
               createdBy: ctx.user.id,
               updatedBy: ctx.user.id,
             },

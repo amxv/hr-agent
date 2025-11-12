@@ -176,6 +176,11 @@ export function detectConflicts(
  * Used for totalDays calculation in absences and leave requests
  */
 export function calculateBusinessDays(startDate: Date, endDate: Date): number {
+  // Validate date range
+  if (endDate < startDate) {
+    throw new Error("End date must be after or equal to start date");
+  }
+
   let count = 0;
   const currentDate = new Date(startDate);
 

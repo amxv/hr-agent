@@ -2218,8 +2218,12 @@ export async function createLeaveRequest(
   >,
   createdBy: string
 ) {
-  const { generateRequestId, calculateBusinessDays, detectConflicts } =
-    await import("@/lib/hr/helpers");
+  const {
+    generateRequestId,
+    calculateBusinessDays,
+    detectConflicts,
+    calculateCoveragePercent,
+  } = await import("@/lib/hr/helpers");
 
   // Generate request ID
   const requestId = await generateRequestId();
@@ -2229,6 +2233,13 @@ export async function createLeaveRequest(
     new Date(data.requestedStartDate),
     new Date(data.requestedEndDate)
   );
+
+  // Get employee department for coverage calculation
+  const [requestingEmployee] = await db
+    .select({ department: employee.department })
+    .from(employee)
+    .where(eq(employee.id, data.employeeId))
+    .limit(1);
 
   // Detect conflicts
   const existingAbsences = await db
@@ -2250,6 +2261,24 @@ export async function createLeaveRequest(
     }))
   );
 
+  // Calculate coverage impact
+  let coveragePercent: number | null = null;
+  if (requestingEmployee) {
+    const teamMembers = await db
+      .select()
+      .from(employee)
+      .where(eq(employee.department, requestingEmployee.department));
+
+    coveragePercent = calculateCoveragePercent(
+      teamMembers.length,
+      existingAbsences.map((a) => ({
+        startDate: new Date(a.startDate),
+        endDate: new Date(a.endDate),
+      })),
+      new Date(data.requestedStartDate)
+    );
+  }
+
   const [created] = await db
     .insert(leaveRequest)
     .values({
@@ -2259,6 +2288,7 @@ export async function createLeaveRequest(
       hasConflict: conflicts.hasConflict,
       conflictsWith: conflicts.conflictsWith,
       conflictReason: conflicts.reason || null,
+      coveragePercent,
       status: data.status || "pending",
       createdBy,
     })
@@ -2302,7 +2332,7 @@ export async function approveLeaveRequest(id: string, reviewedBy: string) {
       endDate: request.requestedEndDate,
       totalDays: request.totalDaysRequested,
       approvalDate: new Date().toISOString(),
-      approvedBy: request.employeeId, // Self-reference for now
+      approvedBy: reviewedBy, // Use the actual reviewer who approved
       createdBy: reviewedBy,
       createdAt: new Date(),
     })
