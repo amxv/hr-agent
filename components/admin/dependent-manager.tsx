@@ -2,6 +2,7 @@
 
 import { Pencil, Plus, Trash, Users } from "lucide-react";
 import { useState } from "react";
+import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import {
@@ -81,6 +82,17 @@ export function DependentManager({
   };
 
   const handleSave = () => {
+    // Validate date of birth is not in the future
+    const birthDate = new Date(formData.dateOfBirth);
+    const today = new Date();
+    today.setHours(0, 0, 0, 0); // Reset time to start of day for fair comparison
+    birthDate.setHours(0, 0, 0, 0);
+
+    if (birthDate > today) {
+      toast.error("Date of birth cannot be in the future");
+      return;
+    }
+
     if (editingIndex !== null) {
       const updated = [...dependents];
       updated[editingIndex] = formData;

@@ -31,8 +31,8 @@ type BenefitsPlan = {
   category: string;
   planName: string;
   carrier?: string | null;
-  type?: string | null;
-  monthlyPremium?: Record<string, number> | null;
+  planType?: string | null;
+  monthlyPremiums?: Record<string, number> | null;
   deductible?: Record<string, number> | null;
   outOfPocketMax?: Record<string, number> | null;
   annualMaximum?: number | null;
@@ -84,8 +84,8 @@ export function BenefitsPlanActions({
           | "hsa_fsa",
         planName: `${plan.planName} (Copy)`,
         carrier: plan.carrier || "",
-        planType: plan.type || undefined,
-        monthlyPremiums: plan.monthlyPremium || undefined,
+        planType: plan.planType || undefined,
+        monthlyPremiums: plan.monthlyPremiums || undefined,
         deductibles: plan.deductible || undefined,
         outOfPocketMax: plan.outOfPocketMax || undefined,
         annualMaximum: plan.annualMaximum || undefined,

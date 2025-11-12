@@ -148,6 +148,13 @@ export function EditEnrollmentDialog({
       await trpcClient.admin.hr.enrollments.upsert.mutate({
         employeeId: enrollment.enrollment.employeeId,
         ...values,
+        // Filter out "none" sentinel values and convert to undefined
+        medicalPlanId:
+          values.medicalPlanId === "none" ? undefined : values.medicalPlanId,
+        dentalPlanId:
+          values.dentalPlanId === "none" ? undefined : values.dentalPlanId,
+        visionPlanId:
+          values.visionPlanId === "none" ? undefined : values.visionPlanId,
       });
       toast.success("Enrollment updated successfully!");
       onSuccess();
