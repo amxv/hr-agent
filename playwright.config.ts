@@ -56,6 +56,10 @@ export default defineConfig({
       testMatch: /auth.setup.ts/,
     },
     {
+      name: "setup:admin-auth",
+      testMatch: /admin-auth.setup.ts/,
+    },
+    {
       name: "setup:reasoning",
       testMatch: /reasoning.setup.ts/,
       dependencies: ["setup:auth"],
@@ -85,6 +89,24 @@ export default defineConfig({
     {
       name: "artifacts",
       testMatch: /artifacts.test.ts/,
+      dependencies: ["setup:auth"],
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "playwright/.auth/session.json",
+      },
+    },
+    {
+      name: "hr-admin",
+      testMatch: /tests\/e2e\/admin\/.*\.spec\.ts/,
+      dependencies: ["setup:admin-auth"],
+      use: {
+        ...devices["Desktop Chrome"],
+        storageState: "playwright/.auth/admin.json",
+      },
+    },
+    {
+      name: "hr-ai-tools",
+      testMatch: /tests\/e2e\/ai-tools\/.*\.spec\.ts/,
       dependencies: ["setup:auth"],
       use: {
         ...devices["Desktop Chrome"],
