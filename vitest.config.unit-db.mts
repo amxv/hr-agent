@@ -9,15 +9,14 @@ export default defineConfig({
     environment: 'jsdom',
     globals: true,
     setupFiles: './vitest.setup.ts',
-    include: ['**/*.test.{ts,tsx}', '!tests/integration/**', '!tests/e2e/**'],
-    exclude: [
-      'node_modules',
-      'tests/integration',
-      'tests/e2e',
-      'tests/unit/db',
-      '.next',
-      'dist',
-    ],
+    include: ['tests/unit/db/**/*.test.ts'],
+    // Prevent parallel execution across database tests to avoid database conflicts
+    pool: 'forks',
+    poolOptions: {
+      forks: {
+        singleFork: true,
+      },
+    },
     coverage: {
       provider: 'v8',
       reporter: ['text', 'json', 'html'],

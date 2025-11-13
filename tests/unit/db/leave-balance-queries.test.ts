@@ -12,7 +12,7 @@ import {
 import { resetTestDatabase, TEST_ADMIN_ID } from '../../helpers/test-db'
 import type { InsertBlackoutDate } from '@/lib/db/schema'
 
-describe('Leave Balance Queries', () => {
+describe.sequential('Leave Balance Queries', () => {
   beforeEach(async () => {
     await resetTestDatabase()
   })

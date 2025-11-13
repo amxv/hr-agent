@@ -24,6 +24,7 @@
     "models:sync:all": "OVERWRITE_MODELS=1 tsx scripts/models/sync.ts",
     "test": "vitest",
     "test:run": "vitest run",
+    "test:db": "vitest run -c vitest.config.unit-db.mts",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest run --coverage",
     "test:integration": "dotenv -e .env.test -- vitest -c vitest.config.integration.mts",

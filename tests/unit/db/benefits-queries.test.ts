@@ -18,7 +18,7 @@ import {
 import { resetTestDatabase, TEST_ADMIN_ID } from '../../helpers/test-db'
 import type { InsertBenefitsPlan, InsertBenefitsEnrollment, InsertDependent } from '@/lib/db/schema'
 
-describe('Benefits Queries', () => {
+describe.sequential('Benefits Queries', () => {
   beforeEach(async () => {
     await resetTestDatabase()
   })

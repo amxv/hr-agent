@@ -12,7 +12,7 @@ import {
 import { resetTestDatabase, TEST_ADMIN_ID } from '../../helpers/test-db'
 import type { InsertHRCase, InsertCaseUpdate } from '@/lib/db/schema'
 
-describe('HR Case Queries', () => {
+describe.sequential('HR Case Queries', () => {
   beforeEach(async () => {
     await resetTestDatabase()
   })

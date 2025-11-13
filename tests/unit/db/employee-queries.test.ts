@@ -10,7 +10,7 @@ import {
 import { resetTestDatabase, TEST_ADMIN_ID } from '../../helpers/test-db'
 import type { InsertEmployee } from '@/lib/db/schema'
 
-describe('Employee Queries', () => {
+describe.sequential('Employee Queries', () => {
   beforeEach(async () => {
     await resetTestDatabase()
   })
@@ -136,6 +136,12 @@ describe('Employee Queries', () => {
         yearsOfService: '0.0',
         reportsTo: null,
         createdBy: TEST_ADMIN_ID,
+        workAuthorization: {
+          status: 'citizen',
+          expiryDate: null,
+          requiresRenewal: false,
+          daysUntilExpiry: null,
+        },
       }
 
       const created = await createEmployee(newEmployee)
@@ -168,6 +174,12 @@ describe('Employee Queries', () => {
           name: 'Jane Doe',
           relationship: 'Spouse',
           phone: '555-0123',
+        },
+        workAuthorization: {
+          status: 'citizen',
+          expiryDate: null,
+          requiresRenewal: false,
+          daysUntilExpiry: null,
         },
       }
 
