@@ -2,6 +2,11 @@ import '@testing-library/jest-dom'
 import { afterEach, vi } from 'vitest'
 import { cleanup } from '@testing-library/react'
 
+// Set environment variables BEFORE any modules are imported
+process.env.NODE_ENV = 'test'
+process.env.POSTGRES_URL = process.env.TEST_DATABASE_URL || 'postgresql://postgres:postgres@localhost:5433/hr_test'
+process.env.DATABASE_URL = process.env.POSTGRES_URL
+
 // Clean up after each test
 afterEach(() => {
   cleanup()
@@ -40,5 +45,5 @@ vi.mock('next/headers', () => ({
   })),
 }))
 
-// Mock environment variables for tests
-process.env.NODE_ENV = 'test'
+// Mock server-only module (used in server components)
+vi.mock('server-only', () => ({}))
