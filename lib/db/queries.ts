@@ -2408,48 +2408,51 @@ export async function createLeaveRequest(
  * Approves leave request and creates corresponding absence
  */
 export async function approveLeaveRequest(id: string, reviewedBy: string) {
-  const [request] = await db
-    .select()
-    .from(leaveRequest)
-    .where(eq(leaveRequest.id, id))
-    .limit(1);
+  // Use transaction to ensure atomicity
+  return await db.transaction(async (tx) => {
+    const [request] = await tx
+      .select()
+      .from(leaveRequest)
+      .where(eq(leaveRequest.id, id))
+      .limit(1);
 
-  if (!request) {
-    throw new Error("Leave request not found");
-  }
+    if (!request) {
+      throw new Error("Leave request not found");
+    }
 
-  // Update request status
-  const [updatedRequest] = await db
-    .update(leaveRequest)
-    .set({
-      status: "approved",
-      reviewedBy,
-      reviewedAt: new Date(),
-      updatedAt: new Date(),
-    })
-    .where(eq(leaveRequest.id, id))
-    .returning();
+    // Update request status
+    const [updatedRequest] = await tx
+      .update(leaveRequest)
+      .set({
+        status: "approved",
+        reviewedBy,
+        reviewedAt: new Date(),
+        updatedAt: new Date(),
+      })
+      .where(eq(leaveRequest.id, id))
+      .returning();
 
-  // Create corresponding absence
-  const [newAbsence] = await db
-    .insert(absence)
-    .values({
-      employeeId: request.employeeId,
-      absenceType: request.requestType,
-      startDate: request.requestedStartDate,
-      endDate: request.requestedEndDate,
-      totalDays: request.totalDaysRequested,
-      approvalDate: new Date().toISOString(),
-      approvedBy: reviewedBy, // Use the actual reviewer who approved
-      createdBy: reviewedBy,
-      createdAt: new Date(),
-    })
-    .returning();
+    // Create corresponding absence
+    const [newAbsence] = await tx
+      .insert(absence)
+      .values({
+        employeeId: request.employeeId,
+        absenceType: request.requestType,
+        startDate: request.requestedStartDate,
+        endDate: request.requestedEndDate,
+        totalDays: request.totalDaysRequested,
+        approvalDate: new Date().toISOString(),
+        approvedBy: reviewedBy, // Use the actual reviewer who approved
+        createdBy: reviewedBy,
+        createdAt: new Date(),
+      })
+      .returning();
 
-  return {
-    request: updatedRequest,
-    absence: newAbsence,
-  };
+    return {
+      request: updatedRequest,
+      absence: newAbsence,
+    };
+  });
 }
 
 /**

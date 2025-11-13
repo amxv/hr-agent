@@ -302,8 +302,13 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
           });
 
           // Transform to expected format
+          // Also create a map of requestId -> database id for approve/deny operations
+          const requestIdToDbId = new Map<string, string>();
           const pendingRequests: LeaveRequest[] = dbRequestsResult.requests.map(
             (record) => {
+              // Store mapping of requestId to database UUID
+              requestIdToDbId.set(record.request.requestId, record.request.id);
+
               // Calculate team coverage if this request is approved
               const teamSize = teamMembers.length;
               const coveragePercent = Math.round(
@@ -369,7 +374,23 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             return { error: "Request ID is required to approve" };
           }
 
-          const result = await approveLeaveRequest(requestId, manager.id);
+          // Look up the request by requestId to get the database UUID
+          const allRequestsResult = await listLeaveRequests({
+            status: "pending",
+            department,
+          });
+          const requestRecord = allRequestsResult.requests.find(
+            (r) => r.request.requestId === requestId
+          );
+
+          if (!requestRecord) {
+            return { error: `Request ${requestId} not found` };
+          }
+
+          const result = await approveLeaveRequest(
+            requestRecord.request.id,
+            manager.id
+          );
           if (!result) {
             return { error: `Request ${requestId} not found` };
           }
@@ -439,8 +460,21 @@ export const teamAvailability = ({ dataStream }: TeamAvailabilityProps) =>
             return { error: "Reason is required to deny a request" };
           }
 
+          // Look up the request by requestId to get the database UUID
+          const allRequestsResult = await listLeaveRequests({
+            status: "pending",
+            department,
+          });
+          const requestRecord = allRequestsResult.requests.find(
+            (r) => r.request.requestId === requestId
+          );
+
+          if (!requestRecord) {
+            return { error: `Request ${requestId} not found` };
+          }
+
           const updatedRequest = await denyLeaveRequest(
-            requestId,
+            requestRecord.request.id,
             manager.id,
             reason
           );

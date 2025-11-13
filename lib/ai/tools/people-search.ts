@@ -101,9 +101,19 @@ export type HRContext = {
 
 type PeopleSearchProps = {
   dataStream: StreamWriter;
+  session: {
+    user?: {
+      id?: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+      role?: string | null;
+      banned?: boolean | null;
+    };
+  };
 };
 
-export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
+export const peopleSearch = ({ dataStream, session }: PeopleSearchProps) =>
   tool({
     description: `
       Search employee directory and organizational structure.
@@ -147,6 +157,21 @@ export const peopleSearch = ({ dataStream }: PeopleSearchProps) =>
         { query, includeOrgChart, includeTeam, searchField },
         "peopleSearch: start"
       );
+
+      // RBAC check: Only HR users can search employee directory
+      const userRole = session.user?.role || "employee";
+      const isHR = userRole === "admin" || userRole === "hr";
+      if (!isHR) {
+        log.warn(
+          { userId: session.user?.id, role: userRole },
+          "peopleSearch: unauthorized access attempt"
+        );
+        return {
+          results: [],
+          totalResults: 0,
+          error: "Access denied. This tool is only available to HR personnel.",
+        };
+      }
 
       dataStream.write({
         type: "data-researchUpdate",

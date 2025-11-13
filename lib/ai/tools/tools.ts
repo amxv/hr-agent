@@ -103,6 +103,6 @@ export function getTools({
     // Manager-only tool - RBAC check enforced in execute function
     teamAvailability: teamAvailability({ dataStream }),
     // HR-only tool - RBAC check enforced in execute function
-    peopleSearch: peopleSearch({ dataStream }),
+    peopleSearch: peopleSearch({ dataStream, session }),
   };
 }

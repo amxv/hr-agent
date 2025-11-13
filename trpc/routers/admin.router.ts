@@ -448,11 +448,23 @@ export const adminRouter = createTRPCRouter({
             }
           }
 
+          // Map input fields to database column names
+          const dbData: Record<string, string> = {};
+          if (input.data.currentBalance !== undefined) {
+            dbData.currentBalance = input.data.currentBalance;
+          }
+          if (input.data.accrued !== undefined) {
+            dbData.accruedYTD = input.data.accrued;
+          }
+          if (input.data.used !== undefined) {
+            dbData.usedYTD = input.data.used;
+          }
+
           const { updateLeaveBalance } = await import("@/lib/db/queries");
           return await updateLeaveBalance(
             input.employeeId,
             input.leaveType,
-            input.data,
+            dbData,
             ctx.user.id
           );
         }),
@@ -643,18 +655,14 @@ export const adminRouter = createTRPCRouter({
           z.object({
             employeeId: z.string(),
             medicalPlanId: z.string().optional(),
+            medicalCoverageLevel: z.string().optional(),
+            medicalEnrollmentDate: z.string().optional(),
             dentalPlanId: z.string().optional(),
+            dentalCoverageLevel: z.string().optional(),
             visionPlanId: z.string().optional(),
+            visionCoverageLevel: z.string().optional(),
             retirementPlanId: z.string().optional(),
-            coverageTier: z
-              .enum([
-                "employee_only",
-                "employee_spouse",
-                "employee_children",
-                "family",
-              ])
-              .optional(),
-            effectiveDate: z.string().optional(),
+            retirementEmployeeContributionPercent: z.string().optional(),
           })
         )
         .mutation(async ({ input, ctx }) => {
