@@ -197,7 +197,7 @@ export function BenefitsPlanListTable() {
                 <TableCell className="font-medium">
                   <div className="flex items-center gap-2">
                     <CategoryIcon className="h-4 w-4" />
-                    {plan.planId}
+                    {plan.planCode}
                   </div>
                 </TableCell>
                 <TableCell>{plan.planName}</TableCell>

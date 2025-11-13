@@ -70,14 +70,14 @@ describe('admin.hr.leaveBalances tRPC procedures', () => {
         leaveType: balance.leaveType,
         data: {
           currentBalance: '30.0',
-          accruedYTD: '25.0',
-          usedYTD: '5.0',
+          accrued: '25.0',
+          used: '5.0',
         },
       })
 
       expect(result.success).toBe(true)
-      expect(result.data.currentBalance).toBe('30.0')
-      expect(result.data.accruedYTD).toBe('25.0')
+      expect(result.data.currentBalance).toBe('30.00')
+      expect(result.data.accruedYTD).toBe('25.00')
     })
 
     test('validates balance values', async () => {

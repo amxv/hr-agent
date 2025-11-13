@@ -17,7 +17,12 @@ export default defineConfig({
     setupFiles: ['./tests/integration/setup.ts'],
     env: {
       NODE_ENV: 'test',
-      DATABASE_URL: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL,
+      DATABASE_URL: process.env.TEST_DATABASE_URL || process.env.DATABASE_URL || 'postgresql://postgres:postgres@localhost:5432/hr_test',
+      POSTGRES_URL: process.env.TEST_DATABASE_URL || process.env.POSTGRES_URL || 'postgresql://postgres:postgres@localhost:5432/hr_test',
+      AI_GATEWAY_API_KEY: 'test-gateway-key',
+      CRON_SECRET: 'test-cron-secret',
+      AUTH_SECRET: 'test-auth-secret',
+      BLOB_READ_WRITE_TOKEN: 'test-blob-token',
     },
     testTimeout: 30000, // 30 seconds for database operations
   },

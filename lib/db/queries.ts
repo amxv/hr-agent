@@ -1061,12 +1061,12 @@ export async function getUploadedDocumentByOpenAIFileId(
 export async function listEmployees(params?: {
   searchField?: "fullName" | "email" | "employeeId" | "department";
   searchValue?: string;
-  employmentStatus?: string;
+  status?: string;
   department?: string;
   limit?: number;
   offset?: number;
 }): Promise<{
-  employees: Array<{
+  items: Array<{
     id: string;
     employeeId: string;
     fullName: string;
@@ -1102,13 +1102,11 @@ export async function listEmployees(params?: {
   }
 
   // Apply employment status filter
-  if (params?.employmentStatus) {
-    whereConditions.push(
-      sql`${employee.employmentStatus} = ${params.employmentStatus}`
-    );
+  if (params?.status) {
+    whereConditions.push(eq(employee.employmentStatus, params.status));
   } else {
     // Exclude terminated employees by default
-    whereConditions.push(sql`${employee.employmentStatus} != 'terminated'`);
+    whereConditions.push(ne(employee.employmentStatus, "terminated"));
   }
 
   // Apply department filter
@@ -1148,7 +1146,7 @@ export async function listEmployees(params?: {
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
   return {
-    employees: employees.map((e) => ({
+    items: employees.map((e) => ({
       id: e.id,
       employeeId: e.employeeId,
       fullName: e.fullName,
@@ -1274,7 +1272,16 @@ export async function createEmployee(data: InsertEmployee) {
     );
   }
 
-  const [newEmployee] = await db.insert(employee).values(data).returning();
+  // Default updatedBy to createdBy if not provided
+  const insertData = {
+    ...data,
+    updatedBy: data.updatedBy ?? data.createdBy,
+  };
+
+  const [newEmployee] = await db
+    .insert(employee)
+    .values(insertData)
+    .returning();
   return newEmployee;
 }
 
@@ -1286,6 +1293,17 @@ export async function updateEmployee(
   data: Partial<InsertEmployee>,
   updatedBy: string
 ) {
+  // Check if employee exists
+  const [existingEmployee] = await db
+    .select({ id: employee.id })
+    .from(employee)
+    .where(eq(employee.id, id))
+    .limit(1);
+
+  if (!existingEmployee) {
+    throw new Error("NOT_FOUND: Employee not found");
+  }
+
   // Validate email uniqueness (if email is being updated)
   if (data.email) {
     const [existingEmailEmployee] = await db
@@ -1335,10 +1353,23 @@ export async function softDeleteEmployee(
   id: string,
   updatedBy: string
 ): Promise<void> {
+  // Check if employee exists
+  const [existingEmployee] = await db
+    .select({ id: employee.id })
+    .from(employee)
+    .where(eq(employee.id, id))
+    .limit(1);
+
+  if (!existingEmployee) {
+    throw new Error("NOT_FOUND: Employee not found");
+  }
+
   await db
     .update(employee)
     .set({
       employmentStatus: "terminated",
+      deletedAt: new Date(),
+      deletedBy: updatedBy,
       updatedBy,
       updatedAt: new Date(),
     })
@@ -1368,7 +1399,7 @@ export async function listLeaveBalances(params?: {
   }
 
   if (params?.leaveType) {
-    whereConditions.push(sql`${leaveBalance.leaveType} = ${params.leaveType}`);
+    whereConditions.push(eq(leaveBalance.leaveType, params.leaveType));
   }
 
   // Join with employee for department filter
@@ -1432,6 +1463,22 @@ export async function updateLeaveBalance(
   data: Partial<InsertLeaveBalance>,
   updatedBy: string
 ) {
+  // Check if leave balance exists
+  const [existing] = await db
+    .select({ id: leaveBalance.id })
+    .from(leaveBalance)
+    .where(
+      and(
+        eq(leaveBalance.employeeId, employeeId),
+        eq(leaveBalance.leaveType, leaveType)
+      )
+    )
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("NOT_FOUND: Leave balance not found");
+  }
+
   const [updated] = await db
     .update(leaveBalance)
     .set({
@@ -1442,7 +1489,7 @@ export async function updateLeaveBalance(
     .where(
       and(
         eq(leaveBalance.employeeId, employeeId),
-        sql`${leaveBalance.leaveType} = ${leaveType}`
+        eq(leaveBalance.leaveType, leaveType)
       )
     )
     .returning();
@@ -1492,6 +1539,17 @@ export async function createBlackoutDate(data: InsertBlackoutDate) {
  * Deletes blackout date
  */
 export async function deleteBlackoutDate(id: string): Promise<void> {
+  // Check if blackout date exists
+  const [existing] = await db
+    .select({ id: blackoutDate.id })
+    .from(blackoutDate)
+    .where(eq(blackoutDate.id, id))
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("NOT_FOUND: Blackout date not found");
+  }
+
   await db.delete(blackoutDate).where(eq(blackoutDate.id, id));
 }
 
@@ -1520,6 +1578,7 @@ export async function getLeavePolicy(department?: string) {
  */
 export async function listBenefitsPlans(params?: {
   category?: string;
+  tier?: string;
   limit?: number;
   offset?: number;
 }) {
@@ -1528,7 +1587,11 @@ export async function listBenefitsPlans(params?: {
   const whereConditions = [];
 
   if (params?.category) {
-    whereConditions.push(sql`${benefitsPlan.category} = ${params.category}`);
+    whereConditions.push(eq(benefitsPlan.category, params.category));
+  }
+
+  if (params?.tier) {
+    whereConditions.push(eq(benefitsPlan.tier, params.tier));
   }
 
   const plans = await db
@@ -1567,7 +1630,7 @@ export async function listBenefitsPlans(params?: {
   );
 
   return {
-    plans: plansWithEnrollmentCount,
+    items: plansWithEnrollmentCount,
     total: totalResult?.count ?? 0,
   };
 }
@@ -1588,20 +1651,29 @@ export async function getBenefitsPlanById(id: string) {
  * Creates new benefits plan
  */
 export async function createBenefitsPlan(data: InsertBenefitsPlan) {
-  // Validate planId uniqueness
-  const [existingPlanId] = await db
+  // Validate planCode uniqueness
+  const [existingPlanCode] = await db
     .select({ id: benefitsPlan.id })
     .from(benefitsPlan)
-    .where(eq(benefitsPlan.planId, data.planId))
+    .where(eq(benefitsPlan.planCode, data.planCode))
     .limit(1);
 
-  if (existingPlanId) {
+  if (existingPlanCode) {
     throw new Error(
-      `A benefits plan with ID "${data.planId}" already exists. Please use a different plan ID.`
+      `A benefits plan with code "${data.planCode}" already exists. Please use a different plan code.`
     );
   }
 
-  const [created] = await db.insert(benefitsPlan).values(data).returning();
+  // Default updatedBy to createdBy if not provided
+  const insertData = {
+    ...data,
+    updatedBy: data.updatedBy ?? data.createdBy,
+  };
+
+  const [created] = await db
+    .insert(benefitsPlan)
+    .values(insertData)
+    .returning();
   return created;
 }
 
@@ -1613,17 +1685,30 @@ export async function updateBenefitsPlan(
   data: Partial<InsertBenefitsPlan>,
   updatedBy: string
 ) {
-  // Validate planId uniqueness (if planId is being updated)
-  if (data.planId) {
-    const [existingPlanId] = await db
+  // Check if benefits plan exists
+  const [existingPlan] = await db
+    .select({ id: benefitsPlan.id })
+    .from(benefitsPlan)
+    .where(eq(benefitsPlan.id, id))
+    .limit(1);
+
+  if (!existingPlan) {
+    throw new Error("NOT_FOUND: Benefits plan not found");
+  }
+
+  // Validate planCode uniqueness (if planCode is being updated)
+  if (data.planCode) {
+    const [existingPlanCode] = await db
       .select({ id: benefitsPlan.id })
       .from(benefitsPlan)
-      .where(and(eq(benefitsPlan.planId, data.planId), ne(benefitsPlan.id, id)))
+      .where(
+        and(eq(benefitsPlan.planCode, data.planCode), ne(benefitsPlan.id, id))
+      )
       .limit(1);
 
-    if (existingPlanId) {
+    if (existingPlanCode) {
       throw new Error(
-        `A benefits plan with ID "${data.planId}" already exists. Please use a different plan ID.`
+        `A benefits plan with code "${data.planCode}" already exists. Please use a different plan code.`
       );
     }
   }
@@ -1644,6 +1729,17 @@ export async function updateBenefitsPlan(
  * Deletes benefits plan
  */
 export async function deleteBenefitsPlan(id: string): Promise<void> {
+  // Check if benefits plan exists
+  const [existingPlan] = await db
+    .select({ id: benefitsPlan.id })
+    .from(benefitsPlan)
+    .where(eq(benefitsPlan.id, id))
+    .limit(1);
+
+  if (!existingPlan) {
+    throw new Error("NOT_FOUND: Benefits plan not found");
+  }
+
   await db.delete(benefitsPlan).where(eq(benefitsPlan.id, id));
 }
 
@@ -1690,37 +1786,35 @@ export async function listEnrollments(params?: {
   // Fetch additional plan details and dependents for each enrollment
   const enrollments = await Promise.all(
     enrollmentsRaw.map(async (row) => {
-      const [dentalPlan, visionPlan] = await Promise.all([
-        row.enrollment.dentalPlanId
-          ? db
-              .select()
-              .from(benefitsPlan)
-              .where(eq(benefitsPlan.id, row.enrollment.dentalPlanId))
-              .limit(1)
-              .then((plans) => plans[0] || null)
-          : null,
-        row.enrollment.visionPlanId
-          ? db
-              .select()
-              .from(benefitsPlan)
-              .where(eq(benefitsPlan.id, row.enrollment.visionPlanId))
-              .limit(1)
-              .then((plans) => plans[0] || null)
-          : null,
-      ]);
-
-      const dependents = await db
-        .select()
-        .from(dependent)
-        .where(eq(dependent.employeeId, row.employee.id));
+      // Get primary plan (medical if available, otherwise first available plan)
+      let plan = row.medicalPlan;
+      if (!plan && row.enrollment.dentalPlanId) {
+        [plan] = await db
+          .select()
+          .from(benefitsPlan)
+          .where(eq(benefitsPlan.id, row.enrollment.dentalPlanId))
+          .limit(1);
+      }
+      if (!plan && row.enrollment.visionPlanId) {
+        [plan] = await db
+          .select()
+          .from(benefitsPlan)
+          .where(eq(benefitsPlan.id, row.enrollment.visionPlanId))
+          .limit(1);
+      }
+      if (!plan && row.enrollment.retirementPlanId) {
+        [plan] = await db
+          .select()
+          .from(benefitsPlan)
+          .where(eq(benefitsPlan.id, row.enrollment.retirementPlanId))
+          .limit(1);
+      }
 
       return {
-        enrollment: row.enrollment,
+        ...row.enrollment,
+        employeeId: row.employee.id,
         employee: row.employee,
-        medicalPlan: row.medicalPlan,
-        dentalPlan,
-        visionPlan,
-        dependents,
+        plan: plan || null,
       };
     })
   );
@@ -1731,7 +1825,7 @@ export async function listEnrollments(params?: {
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
   return {
-    enrollments,
+    items: enrollments,
     total: totalResult?.count ?? 0,
   };
 }
@@ -1740,13 +1834,12 @@ export async function listEnrollments(params?: {
  * Gets enrollment for specific employee with all plan details
  */
 export async function getEnrollmentByEmployeeId(employeeId: string) {
-  const [enrollment] = await db
+  const enrollments = await db
     .select()
     .from(benefitsEnrollment)
-    .where(eq(benefitsEnrollment.employeeId, employeeId))
-    .limit(1);
+    .where(eq(benefitsEnrollment.employeeId, employeeId));
 
-  return enrollment || null;
+  return enrollments;
 }
 
 /**
@@ -1789,7 +1882,13 @@ export async function listDependents(employeeId: string) {
  * Creates new dependent record
  */
 export async function createDependent(data: InsertDependent) {
-  const [created] = await db.insert(dependent).values(data).returning();
+  // Default updatedBy to createdBy if not provided
+  const insertData = {
+    ...data,
+    updatedBy: data.updatedBy ?? data.createdBy,
+  };
+
+  const [created] = await db.insert(dependent).values(insertData).returning();
   return created;
 }
 
@@ -1801,6 +1900,17 @@ export async function updateDependent(
   data: Partial<InsertDependent>,
   updatedBy: string
 ) {
+  // Check if dependent exists
+  const [existing] = await db
+    .select({ id: dependent.id })
+    .from(dependent)
+    .where(eq(dependent.id, id))
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("NOT_FOUND: Dependent not found");
+  }
+
   const [updated] = await db
     .update(dependent)
     .set({
@@ -1817,6 +1927,17 @@ export async function updateDependent(
  * Deletes dependent
  */
 export async function deleteDependent(id: string): Promise<void> {
+  // Check if dependent exists
+  const [existing] = await db
+    .select({ id: dependent.id })
+    .from(dependent)
+    .where(eq(dependent.id, id))
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("NOT_FOUND: Dependent not found");
+  }
+
   await db.delete(dependent).where(eq(dependent.id, id));
 }
 
@@ -1844,6 +1965,7 @@ export async function getCurrentEnrollmentPeriod() {
 export async function listHRCases(params?: {
   status?: string;
   category?: string;
+  priority?: string;
   assignedTeam?: string;
   submittedBy?: string;
   limit?: number;
@@ -1854,11 +1976,15 @@ export async function listHRCases(params?: {
   const whereConditions = [];
 
   if (params?.status) {
-    whereConditions.push(sql`${hrCase.status} = ${params.status}`);
+    whereConditions.push(eq(hrCase.status, params.status));
   }
 
   if (params?.category) {
-    whereConditions.push(sql`${hrCase.category} = ${params.category}`);
+    whereConditions.push(eq(hrCase.category, params.category));
+  }
+
+  if (params?.priority) {
+    whereConditions.push(eq(hrCase.priority, params.priority));
   }
 
   if (params?.assignedTeam) {
@@ -1883,7 +2009,7 @@ export async function listHRCases(params?: {
     .where(whereConditions.length > 0 ? and(...whereConditions) : undefined);
 
   return {
-    cases,
+    items: cases,
     total: totalResult?.count ?? 0,
   };
 }
@@ -1948,11 +2074,23 @@ export async function createHRCase(
   const createdAt = new Date();
   const sla = calculateSLA(createdAt, data.category);
 
+  // Auto-derive submittedByName from employee if not provided
+  let submittedByName = data.submittedByName;
+  if (!submittedByName && data.submittedBy) {
+    const [submitter] = await db
+      .select({ fullName: employee.fullName })
+      .from(employee)
+      .where(eq(employee.id, data.submittedBy))
+      .limit(1);
+    submittedByName = submitter?.fullName;
+  }
+
   // Create case
   const [newCase] = await db
     .insert(hrCase)
     .values({
       ...data,
+      submittedByName,
       caseId,
       firstResponseDue: sla.firstResponseDue,
       resolutionDue: sla.resolutionDue,
@@ -2031,23 +2169,28 @@ export async function updateHRCase(
  * Deletes HR case
  */
 export async function deleteHRCase(id: string): Promise<void> {
+  // Check if HR case exists
+  const [existing] = await db
+    .select({ id: hrCase.id })
+    .from(hrCase)
+    .where(eq(hrCase.id, id))
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("NOT_FOUND: HR case not found");
+  }
+
   await db.delete(hrCase).where(eq(hrCase.id, id));
 }
 
 /**
  * Adds update to case timeline
  */
-export async function addCaseUpdate(
-  caseId: string,
-  update: InsertCaseUpdate,
-  createdBy: string
-) {
+export async function addCaseUpdate(update: InsertCaseUpdate) {
   const [newUpdate] = await db
     .insert(caseUpdate)
     .values({
       ...update,
-      caseId,
-      createdBy,
       timestamp: new Date(),
     })
     .returning();
@@ -2057,7 +2200,7 @@ export async function addCaseUpdate(
     const [caseRecord] = await db
       .select()
       .from(hrCase)
-      .where(eq(hrCase.id, caseId))
+      .where(eq(hrCase.id, update.caseId))
       .limit(1);
 
     if (caseRecord && !caseRecord.firstResponseMet) {
@@ -2067,7 +2210,7 @@ export async function addCaseUpdate(
           firstResponseMet: true,
           updatedAt: new Date(),
         })
-        .where(eq(hrCase.id, caseId));
+        .where(eq(hrCase.id, update.caseId));
     }
   }
 
@@ -2109,7 +2252,7 @@ export async function listAbsences(params?: {
   }
 
   if (params?.absenceType) {
-    whereConditions.push(sql`${absence.absenceType} = ${params.absenceType}`);
+    whereConditions.push(eq(absence.absenceType, params.absenceType));
   }
 
   const absences = await db
@@ -2150,7 +2293,7 @@ export async function listAbsences(params?: {
     );
 
   return {
-    absences,
+    items: absences,
     total: totalResult?.count ?? 0,
   };
 }
@@ -2202,26 +2345,29 @@ export async function createAbsence(data: InsertAbsence) {
  * Updates absence record
  */
 export async function updateAbsence(id: string, data: Partial<InsertAbsence>) {
+  // Check if absence exists
+  const [current] = await db
+    .select()
+    .from(absence)
+    .where(eq(absence.id, id))
+    .limit(1);
+
+  if (!current) {
+    throw new Error("NOT_FOUND: Absence not found");
+  }
+
   // Recalculate totalDays if dates changed
   if (data.startDate || data.endDate) {
-    const [current] = await db
-      .select()
-      .from(absence)
-      .where(eq(absence.id, id))
-      .limit(1);
+    const { calculateBusinessDays } = await import("@/lib/hr/helpers");
+    const startDate = data.startDate
+      ? new Date(data.startDate)
+      : new Date(current.startDate);
+    const endDate = data.endDate
+      ? new Date(data.endDate)
+      : new Date(current.endDate);
 
-    if (current) {
-      const { calculateBusinessDays } = await import("@/lib/hr/helpers");
-      const startDate = data.startDate
-        ? new Date(data.startDate)
-        : new Date(current.startDate);
-      const endDate = data.endDate
-        ? new Date(data.endDate)
-        : new Date(current.endDate);
-
-      const totalDays = calculateBusinessDays(startDate, endDate);
-      data.totalDays = totalDays.toString();
-    }
+    const totalDays = calculateBusinessDays(startDate, endDate);
+    data.totalDays = totalDays.toString();
   }
 
   const [updated] = await db
@@ -2236,6 +2382,17 @@ export async function updateAbsence(id: string, data: Partial<InsertAbsence>) {
  * Deletes absence
  */
 export async function deleteAbsence(id: string): Promise<void> {
+  // Check if absence exists
+  const [existing] = await db
+    .select({ id: absence.id })
+    .from(absence)
+    .where(eq(absence.id, id))
+    .limit(1);
+
+  if (!existing) {
+    throw new Error("NOT_FOUND: Absence not found");
+  }
+
   await db.delete(absence).where(eq(absence.id, id));
 }
 
@@ -2258,7 +2415,7 @@ export async function listLeaveRequests(params?: {
   }
 
   if (params?.status) {
-    whereConditions.push(sql`${leaveRequest.status} = ${params.status}`);
+    whereConditions.push(eq(leaveRequest.status, params.status));
   }
 
   const requests = await db
@@ -2298,7 +2455,7 @@ export async function listLeaveRequests(params?: {
     );
 
   return {
-    requests,
+    items: requests,
     total: totalResult?.count ?? 0,
   };
 }

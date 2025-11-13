@@ -27,7 +27,7 @@ import { EditBenefitsPlanDialog } from "./edit-benefits-plan-dialog";
 
 type BenefitsPlan = {
   id: string;
-  planId: string;
+  planCode: string;
   category: string;
   planName: string;
   carrier?: string | null;
@@ -75,7 +75,7 @@ export function BenefitsPlanActions({
   const handleDuplicate = async () => {
     try {
       await trpcClient.admin.hr.benefitsPlans.create.mutate({
-        planId: `${plan.planId}-COPY`,
+        planCode: `${plan.planCode}-COPY`,
         category: plan.category as
           | "medical"
           | "dental"

@@ -1,7 +1,7 @@
 import { db } from '@/lib/db/client'
 import { seedAllHRData, clearAllHRData } from '@/lib/db/seeds/hr-data'
 
-const TEST_ADMIN_USER_ID = 'test-admin-user-id'
+const TEST_ADMIN_USER_ID = 'test-admin-id'
 
 /**
  * Set up test database with seed data

@@ -110,7 +110,7 @@ function CreateBlackoutDateDialog({ onSuccess }: { onSuccess: () => void }) {
   const onSubmit = async (values: CreateBlackoutDateFormValues) => {
     setIsSubmitting(true);
     try {
-      await trpcClient.admin.hr.blackoutDates.create.mutate({
+      await trpcClient.admin.hr.leaveBalances.blackoutDates.create.mutate({
         ...values,
         department: values.department || undefined,
       });
@@ -249,7 +249,7 @@ export function BlackoutDatesManager() {
   const trpcClient = useTRPCClient();
 
   const { data, isLoading, error, refetch } = useQuery({
-    ...trpc.admin.hr.blackoutDates.list.queryOptions({
+    ...trpc.admin.hr.leaveBalances.blackoutDates.list.queryOptions({
       department: departmentFilter === "all" ? undefined : departmentFilter,
     }),
   });
@@ -278,7 +278,7 @@ export function BlackoutDatesManager() {
 
   const handleDelete = async (id: string) => {
     try {
-      await trpcClient.admin.hr.blackoutDates.delete.mutate({ id });
+      await trpcClient.admin.hr.leaveBalances.blackoutDates.delete.mutate({ id });
       toast.success("Blackout date deleted successfully!");
       invalidate();
     } catch (error: unknown) {
@@ -293,7 +293,7 @@ export function BlackoutDatesManager() {
         <div>
           <CardTitle>Blackout Dates</CardTitle>
           <CardDescription>
-            {data?.length ?? 0} blackout periods configured
+            {data?.total ?? 0} blackout periods configured
           </CardDescription>
         </div>
         <CreateBlackoutDateDialog onSuccess={invalidate} />
@@ -368,14 +368,14 @@ export function BlackoutDatesManager() {
               </TableRow>
             </TableHeader>
             <TableBody>
-              {data.length === 0 ? (
+              {!data?.items || data.items.length === 0 ? (
                 <TableRow>
                   <TableCell className="text-center" colSpan={5}>
                     No blackout dates found
                   </TableCell>
                 </TableRow>
               ) : (
-                data.map((blackout) => (
+                data.items.map((blackout) => (
                   <TableRow key={blackout.id}>
                     <TableCell>
                       {new Date(blackout.startDate).toLocaleDateString()}

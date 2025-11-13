@@ -35,7 +35,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { useTRPCClient } from "@/trpc/react";
 
 const createBenefitsPlanSchema = z.object({
-  planId: z.string().min(1, "Plan ID is required"),
+  planCode: z.string().min(1, "Plan code is required"),
   category: z.enum(["medical", "dental", "vision", "retirement", "hsa_fsa"]),
   planName: z.string().min(1, "Plan name is required"),
   carrier: z.string().optional(),
@@ -92,7 +92,7 @@ export function CreateBenefitsPlanDialog({
   const form = useForm<CreateBenefitsPlanFormValues>({
     resolver: zodResolver(createBenefitsPlanSchema),
     defaultValues: {
-      planId: "",
+      planCode: "",
       category:
         (defaultCategory as CreateBenefitsPlanFormValues["category"]) ||
         "medical",
@@ -169,7 +169,7 @@ export function CreateBenefitsPlanDialog({
               <div className="grid grid-cols-2 gap-4">
                 <FormField
                   control={form.control}
-                  name="planId"
+                  name="planCode"
                   render={({ field }) => (
                     <FormItem>
                       <FormLabel>

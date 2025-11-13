@@ -63,6 +63,7 @@ export const leaveRequestStatusEnum = pgEnum("leave_request_status", [
 
 // Benefits
 export const benefitsCategoryEnum = pgEnum("benefits_category", [
+  "health",
   "medical",
   "dental",
   "vision",
@@ -384,7 +385,6 @@ export const employee = pgTable(
     // Identity
     id: uuid("id").primaryKey().notNull().defaultRandom(),
     userId: text("user_id")
-      .notNull()
       .unique()
       .references(() => user.id, { onDelete: "cascade" }),
     employeeId: text("employee_id").notNull().unique(),
@@ -394,6 +394,11 @@ export const employee = pgTable(
     preferredName: text("preferred_name"),
     email: text("email").notNull(),
     phoneExtension: text("phone_extension"),
+    emergencyContact: json("emergency_contact").$type<{
+      name: string;
+      relationship: string;
+      phone: string;
+    }>(),
 
     // Job Information
     jobTitle: text("job_title").notNull(),
@@ -449,10 +454,11 @@ export const employee = pgTable(
       .notNull()
       .references(() => user.id),
     updatedBy: text("updated_by")
-      .notNull()
       .references(() => user.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
+    deletedAt: timestamp("deleted_at"),
+    deletedBy: text("deleted_by").references(() => user.id),
   },
   (table) => ({
     employeeIdIdx: index("employee_employee_id_idx").on(table.employeeId),
@@ -463,6 +469,7 @@ export const employee = pgTable(
     departmentIdx: index("employee_department_idx").on(table.department),
     managerIdIdx: index("employee_manager_id_idx").on(table.managerId),
     emailIdx: index("employee_email_idx").on(table.email),
+    deletedAtIdx: index("employee_deleted_at_idx").on(table.deletedAt),
   })
 );
 
@@ -487,6 +494,9 @@ export const leaveBalance = pgTable(
     usedYTD: numeric("used_ytd", { precision: 5, scale: 2 })
       .notNull()
       .default("0"),
+    plannedYTD: numeric("planned_ytd", { precision: 5, scale: 2 })
+      .notNull()
+      .default("0"),
 
     // Accrual Configuration
     accrualRate: numeric("accrual_rate", { precision: 5, scale: 2 }).notNull(),
@@ -503,9 +513,7 @@ export const leaveBalance = pgTable(
     }).notNull(),
 
     // Audit Fields
-    updatedBy: text("updated_by")
-      .notNull()
-      .references(() => user.id),
+    updatedBy: text("updated_by").references(() => user.id),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
@@ -555,9 +563,7 @@ export const leavePolicy = pgTable("leave_policy", {
   createdBy: text("created_by")
     .notNull()
     .references(() => user.id),
-  updatedBy: text("updated_by")
-    .notNull()
-    .references(() => user.id),
+  updatedBy: text("updated_by").references(() => user.id),
   createdAt: timestamp("created_at").notNull().defaultNow(),
   updatedAt: timestamp("updated_at").notNull().defaultNow(),
 });
@@ -567,26 +573,23 @@ export const benefitsPlan = pgTable(
   "benefits_plan",
   {
     id: uuid("id").primaryKey().notNull().defaultRandom(),
-    planId: text("plan_id").notNull().unique(),
+    planCode: text("plan_code").notNull().unique(),
     category: benefitsCategoryEnum("category").notNull(),
+    tier: text("tier"),
     planName: text("plan_name").notNull(),
     carrier: text("carrier"),
     type: text("type"),
 
     // Cost Fields
-    monthlyPremium: json("monthly_premium").$type<{
-      employeeOnly?: number;
-      employeeSpouse?: number;
-      family?: number;
-    }>(),
-    deductible: json("deductible").$type<{
-      individual?: number;
-      family?: number;
-    }>(),
-    outOfPocketMax: json("out_of_pocket_max").$type<{
-      individual?: number;
-      family?: number;
-    }>(),
+    monthlyPremium: numeric("monthly_premium", { precision: 10, scale: 2 }),
+    annualDeductible: numeric("annual_deductible", {
+      precision: 10,
+      scale: 2,
+    }),
+    outOfPocketMax: numeric("out_of_pocket_max", {
+      precision: 10,
+      scale: 2,
+    }),
 
     // Plan-Specific Fields
     coverage: json("coverage").$type<Record<string, any>>(),
@@ -596,19 +599,18 @@ export const benefitsPlan = pgTable(
       scale: 2,
     }),
     vestingSchedule: text("vesting_schedule"),
+    isActive: boolean("is_active").notNull().default(true),
 
     // Audit Fields
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
-    updatedBy: text("updated_by")
-      .notNull()
-      .references(() => user.id),
+    updatedBy: text("updated_by").references(() => user.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
-    planIdIdx: index("benefits_plan_plan_id_idx").on(table.planId),
+    planCodeIdx: index("benefits_plan_plan_code_idx").on(table.planCode),
     categoryIdx: index("benefits_plan_category_idx").on(table.category),
   })
 );
@@ -709,9 +711,7 @@ export const benefitsEnrollment = pgTable(
     fsaElection: numeric("fsa_election", { precision: 8, scale: 2 }),
 
     // Audit Fields
-    updatedBy: text("updated_by")
-      .notNull()
-      .references(() => user.id),
+    updatedBy: text("updated_by").references(() => user.id),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
   (table) => ({
@@ -738,18 +738,18 @@ export const dependent = pgTable(
     employeeId: uuid("employee_id")
       .notNull()
       .references(() => employee.id, { onDelete: "cascade" }),
-    name: text("name").notNull(),
+    fullName: text("full_name").notNull(),
     relationship: relationshipEnum("relationship").notNull(),
     dateOfBirth: date("date_of_birth").notNull(),
+    ssn: text("ssn"),
+    isStudent: boolean("is_student").notNull().default(false),
     coveredUnder: json("covered_under").$type<string[]>().notNull().default([]),
 
     // Audit Fields
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
-    updatedBy: text("updated_by")
-      .notNull()
-      .references(() => user.id),
+    updatedBy: text("updated_by").references(() => user.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
@@ -763,7 +763,10 @@ export const enrollmentPeriod = pgTable(
   "enrollment_period",
   {
     id: uuid("id").primaryKey().notNull().defaultRandom(),
+    periodName: text("period_name").notNull(),
     planYear: integer("plan_year").notNull().unique(),
+    startDate: date("start_date").notNull(),
+    endDate: date("end_date").notNull(),
     openEnrollmentStart: date("open_enrollment_start").notNull(),
     openEnrollmentEnd: date("open_enrollment_end").notNull(),
     effectiveDate: date("effective_date").notNull(),
@@ -772,9 +775,7 @@ export const enrollmentPeriod = pgTable(
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
-    updatedBy: text("updated_by")
-      .notNull()
-      .references(() => user.id),
+    updatedBy: text("updated_by").references(() => user.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },
@@ -799,7 +800,7 @@ export const hrCase = pgTable(
     submittedBy: uuid("submitted_by").references(() => employee.id, {
       onDelete: "set null",
     }),
-    submittedByName: text("submitted_by_name").notNull(),
+    submittedByName: text("submitted_by_name"),
     assignedTeam: text("assigned_team").notNull(),
 
     // SLA Fields
@@ -815,9 +816,7 @@ export const hrCase = pgTable(
     createdBy: text("created_by")
       .notNull()
       .references(() => user.id),
-    updatedBy: text("updated_by")
-      .notNull()
-      .references(() => user.id),
+    updatedBy: text("updated_by").references(() => user.id),
     createdAt: timestamp("created_at").notNull().defaultNow(),
     updatedAt: timestamp("updated_at").notNull().defaultNow(),
   },

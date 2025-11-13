@@ -53,10 +53,8 @@ describe('HR Case Queries', () => {
       const result = await listHRCases({})
 
       if (result.items.length > 0) {
-        expect(result.items[0]).toHaveProperty('submittedByEmployee')
-        if (result.items[0].submittedByEmployee) {
-          expect(result.items[0].submittedByEmployee).toHaveProperty('fullName')
-        }
+        expect(result.items[0]).toHaveProperty('submittedBy')
+        expect(result.items[0]).toHaveProperty('submittedByName')
       }
     })
 
@@ -130,25 +128,20 @@ describe('HR Case Queries', () => {
       const employee = await getEmployeeByEmployeeId('EMP001')
       expect(employee).toBeDefined()
 
-      const newCase: InsertHRCase = {
-        caseId: `HR-2025-${Date.now().toString().slice(-6)}`,
+      const newCase = {
         title: 'Test HR Case',
         description: 'This is a test case',
-        category: 'payroll',
-        priority: 'high',
-        status: 'open',
+        category: 'payroll' as const,
+        priority: 'high' as const,
+        status: 'open' as const,
         submittedBy: employee!.id,
         assignedTeam: 'Payroll Services',
-        assignedTo: null,
-        firstResponseDue: new Date(Date.now() + 4 * 60 * 60 * 1000), // +4 hours
-        resolutionDue: new Date(Date.now() + 2 * 24 * 60 * 60 * 1000), // +2 days
-        createdBy: TEST_ADMIN_ID,
       }
 
-      const created = await createHRCase(newCase)
+      const created = await createHRCase(newCase, TEST_ADMIN_ID)
 
       expect(created.id).toBeDefined()
-      expect(created.caseId).toBe(newCase.caseId)
+      expect(created.caseId).toBeDefined()
       expect(created.title).toBe('Test HR Case')
       expect(created.status).toBe('open')
     })
@@ -157,22 +150,17 @@ describe('HR Case Queries', () => {
       const employee = await getEmployeeByEmployeeId('EMP001')
       expect(employee).toBeDefined()
 
-      const equipmentCase: InsertHRCase = {
-        caseId: `HR-2025-${Date.now().toString().slice(-6)}`,
+      const equipmentCase = {
         title: 'Equipment Request',
         description: 'Need new laptop',
-        category: 'equipment',
-        priority: 'medium',
-        status: 'open',
+        category: 'equipment' as const,
+        priority: 'medium' as const,
+        status: 'open' as const,
         submittedBy: employee!.id,
         assignedTeam: 'IT & Facilities',
-        assignedTo: null,
-        firstResponseDue: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        resolutionDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        createdBy: TEST_ADMIN_ID,
       }
 
-      const created = await createHRCase(equipmentCase)
+      const created = await createHRCase(equipmentCase, TEST_ADMIN_ID)
 
       expect(created.assignedTeam).toBe('IT & Facilities')
     })
@@ -182,22 +170,17 @@ describe('HR Case Queries', () => {
       expect(employee).toBeDefined()
 
       const now = new Date()
-      const newCase: InsertHRCase = {
-        caseId: `HR-2025-${Date.now().toString().slice(-6)}`,
+      const newCase = {
         title: 'Test SLA',
         description: 'Testing SLA dates',
-        category: 'payroll',
-        priority: 'high',
-        status: 'open',
+        category: 'payroll' as const,
+        priority: 'high' as const,
+        status: 'open' as const,
         submittedBy: employee!.id,
         assignedTeam: 'Payroll Services',
-        assignedTo: null,
-        firstResponseDue: new Date(now.getTime() + 4 * 60 * 60 * 1000),
-        resolutionDue: new Date(now.getTime() + 48 * 60 * 60 * 1000),
-        createdBy: TEST_ADMIN_ID,
       }
 
-      const created = await createHRCase(newCase)
+      const created = await createHRCase(newCase, TEST_ADMIN_ID)
 
       expect(created.firstResponseDue).toBeDefined()
       expect(created.resolutionDue).toBeDefined()
@@ -215,8 +198,7 @@ describe('HR Case Queries', () => {
 
       const updated = await updateHRCase(cases.items[0].id, {
         status: 'in_progress',
-        updatedBy: TEST_ADMIN_ID,
-      })
+      }, TEST_ADMIN_ID)
 
       expect(updated.status).toBe('in_progress')
       expect(updated.updatedBy).toBe(TEST_ADMIN_ID)
@@ -228,14 +210,11 @@ describe('HR Case Queries', () => {
         return
       }
 
-      const employee = await getEmployeeByEmployeeId('EMP001')
-
       const updated = await updateHRCase(cases.items[0].id, {
-        assignedTo: employee!.id,
-        updatedBy: TEST_ADMIN_ID,
-      })
+        assignedTeam: 'Benefits Administration',
+      }, TEST_ADMIN_ID)
 
-      expect(updated.assignedTo).toBe(employee!.id)
+      expect(updated.assignedTeam).toBe('Benefits Administration')
     })
 
     test('preserves non-updated fields', async () => {
@@ -248,8 +227,7 @@ describe('HR Case Queries', () => {
 
       const updated = await updateHRCase(cases.items[0].id, {
         status: 'in_progress',
-        updatedBy: TEST_ADMIN_ID,
-      })
+      }, TEST_ADMIN_ID)
 
       expect(updated.title).toBe(originalTitle)
       expect(updated.status).toBe('in_progress')
@@ -258,57 +236,71 @@ describe('HR Case Queries', () => {
 
   describe('addCaseUpdate', () => {
     test('adds update to case timeline', async () => {
-      const cases = await listHRCases({})
-      if (cases.items.length === 0) {
-        return
-      }
-
       const employee = await getEmployeeByEmployeeId('EMP001')
+      expect(employee).toBeDefined()
+
+      // Create a test case first
+      const testCase = await createHRCase({
+        title: 'Test Case for Updates',
+        description: 'Test case to verify updates work',
+        category: 'payroll' as const,
+        priority: 'medium' as const,
+        status: 'open' as const,
+        submittedBy: employee!.id,
+        assignedTeam: 'Payroll Services',
+      }, TEST_ADMIN_ID)
 
       const update: InsertCaseUpdate = {
-        caseId: cases.items[0].id,
+        caseId: testCase.id,
         message: 'Test update message',
-        updateType: 'hr_response',
+        type: 'hr_response',
         visibility: 'public',
-        addedBy: employee!.id,
+        author: employee!.fullName,
       }
 
       const created = await addCaseUpdate(update)
 
       expect(created.id).toBeDefined()
       expect(created.message).toBe('Test update message')
-      expect(created.updateType).toBe('hr_response')
+      expect(created.type).toBe('hr_response')
 
       // Verify update is in case timeline
-      const hrCase = await getHRCaseById(cases.items[0].id)
+      const hrCase = await getHRCaseById(testCase.id)
       expect(hrCase?.updates.some(u => u.id === created.id)).toBe(true)
     })
 
     test('creates different types of updates', async () => {
-      const cases = await listHRCases({})
-      if (cases.items.length === 0) {
-        return
-      }
-
       const employee = await getEmployeeByEmployeeId('EMP001')
+      expect(employee).toBeDefined()
 
-      const types: Array<'employee_comment' | 'hr_response' | 'status_change'> = [
-        'employee_comment',
+      // Create a test case first
+      const testCase = await createHRCase({
+        title: 'Test Case for Multiple Updates',
+        description: 'Test case to verify different update types',
+        category: 'payroll' as const,
+        priority: 'medium' as const,
+        status: 'open' as const,
+        submittedBy: employee!.id,
+        assignedTeam: 'Payroll Services',
+      }, TEST_ADMIN_ID)
+
+      const types: Array<'system' | 'hr_response' | 'status_change'> = [
+        'system',
         'hr_response',
         'status_change',
       ]
 
       for (const type of types) {
         const update: InsertCaseUpdate = {
-          caseId: cases.items[0].id,
+          caseId: testCase.id,
           message: `Test ${type}`,
-          updateType: type,
+          type: type,
           visibility: 'public',
-          addedBy: employee!.id,
+          author: employee!.fullName,
         }
 
         const created = await addCaseUpdate(update)
-        expect(created.updateType).toBe(type)
+        expect(created.type).toBe(type)
       }
     })
 
@@ -323,9 +315,9 @@ describe('HR Case Queries', () => {
       const update: InsertCaseUpdate = {
         caseId: cases.items[0].id,
         message: 'Internal note for HR team',
-        updateType: 'hr_response',
+        type: 'hr_response',
         visibility: 'internal',
-        addedBy: employee!.id,
+        author: employee!.fullName,
       }
 
       const created = await addCaseUpdate(update)
@@ -339,22 +331,17 @@ describe('HR Case Queries', () => {
       const employee = await getEmployeeByEmployeeId('EMP001')
       expect(employee).toBeDefined()
 
-      const newCase: InsertHRCase = {
-        caseId: `HR-2025-${Date.now().toString().slice(-6)}`,
+      const newCase = {
         title: 'To Be Deleted',
         description: 'This case will be deleted',
-        category: 'general',
-        priority: 'low',
-        status: 'open',
+        category: 'payroll' as const,
+        priority: 'low' as const,
+        status: 'open' as const,
         submittedBy: employee!.id,
         assignedTeam: 'HR Operations',
-        assignedTo: null,
-        firstResponseDue: new Date(Date.now() + 24 * 60 * 60 * 1000),
-        resolutionDue: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
-        createdBy: TEST_ADMIN_ID,
       }
 
-      const created = await createHRCase(newCase)
+      const created = await createHRCase(newCase, TEST_ADMIN_ID)
       await deleteHRCase(created.id)
 
       const retrieved = await getHRCaseById(created.id)

@@ -22,8 +22,8 @@ describe('Leave Balance Queries', () => {
       const result = await listLeaveBalances({})
 
       expect(result.total).toBeGreaterThan(0)
-      expect(result.items).toBeDefined()
-      expect(result.items.length).toBeGreaterThan(0)
+      expect(result.balances).toBeDefined()
+      expect(result.balances.length).toBeGreaterThan(0)
     })
 
     test('filters by employee', async () => {
@@ -34,7 +34,7 @@ describe('Leave Balance Queries', () => {
         employeeId: employee!.id,
       })
 
-      expect(result.items.every(b => b.employeeId === employee!.id)).toBe(true)
+      expect(result.balances.every(b => b.leaveBalance.employeeId === employee!.id)).toBe(true)
     })
 
     test('filters by leave type', async () => {
@@ -42,24 +42,24 @@ describe('Leave Balance Queries', () => {
         leaveType: 'vacation',
       })
 
-      expect(result.items.every(b => b.leaveType === 'vacation')).toBe(true)
+      expect(result.balances.every(b => b.leaveBalance.leaveType === 'vacation')).toBe(true)
     })
 
     test('includes employee details in results', async () => {
       const result = await listLeaveBalances({})
 
-      expect(result.items[0].employee).toBeDefined()
-      expect(result.items[0].employee.fullName).toBeDefined()
-      expect(result.items[0].employee.employeeId).toBeDefined()
+      expect(result.balances[0].employee).toBeDefined()
+      expect(result.balances[0].employee.fullName).toBeDefined()
+      expect(result.balances[0].employee.id).toBeDefined()
     })
 
     test('supports pagination', async () => {
       const page1 = await listLeaveBalances({ limit: 2, offset: 0 })
       const page2 = await listLeaveBalances({ limit: 2, offset: 2 })
 
-      expect(page1.items.length).toBeLessThanOrEqual(2)
+      expect(page1.balances.length).toBeLessThanOrEqual(2)
       if (page1.total > 2) {
-        expect(page2.items.length).toBeGreaterThan(0)
+        expect(page2.balances.length).toBeGreaterThan(0)
       }
     })
   })
@@ -110,13 +110,13 @@ describe('Leave Balance Queries', () => {
           currentBalance: '25.0',
           accruedYTD: '20.0',
           usedYTD: '5.0',
-          updatedBy: TEST_ADMIN_ID,
-        }
+        },
+        TEST_ADMIN_ID
       )
 
-      expect(updated.currentBalance).toBe('25.0')
-      expect(updated.accruedYTD).toBe('20.0')
-      expect(updated.usedYTD).toBe('5.0')
+      expect(updated.currentBalance).toBe('25.00')
+      expect(updated.accruedYTD).toBe('20.00')
+      expect(updated.usedYTD).toBe('5.00')
     })
 
     test('preserves non-updated fields', async () => {
@@ -131,11 +131,11 @@ describe('Leave Balance Queries', () => {
         'vacation',
         {
           currentBalance: '25.0',
-          updatedBy: TEST_ADMIN_ID,
-        }
+        },
+        TEST_ADMIN_ID
       )
 
-      expect(updated.currentBalance).toBe('25.0')
+      expect(updated.currentBalance).toBe('25.00')
       // Other fields should remain unchanged
       expect(updated.leaveType).toBe('vacation')
     })
@@ -149,8 +149,8 @@ describe('Leave Balance Queries', () => {
         'vacation',
         {
           currentBalance: '25.0',
-          updatedBy: TEST_ADMIN_ID,
-        }
+        },
+        TEST_ADMIN_ID
       )
 
       expect(updated.updatedBy).toBe(TEST_ADMIN_ID)
@@ -162,8 +162,8 @@ describe('Leave Balance Queries', () => {
     test('returns all blackout dates', async () => {
       const result = await listBlackoutDates({})
 
-      expect(result.items).toBeDefined()
-      expect(Array.isArray(result.items)).toBe(true)
+      expect(result).toBeDefined()
+      expect(Array.isArray(result)).toBe(true)
     })
 
     test('filters by department', async () => {
@@ -171,7 +171,7 @@ describe('Leave Balance Queries', () => {
         department: 'Engineering',
       })
 
-      expect(result.items.every(
+      expect(result.every(
         bd => bd.department === 'Engineering' || bd.department === null
       )).toBe(true)
     })
@@ -179,10 +179,10 @@ describe('Leave Balance Queries', () => {
     test('includes date range information', async () => {
       const result = await listBlackoutDates({})
 
-      if (result.items.length > 0) {
-        expect(result.items[0]).toHaveProperty('startDate')
-        expect(result.items[0]).toHaveProperty('endDate')
-        expect(result.items[0]).toHaveProperty('reason')
+      if (result.length > 0) {
+        expect(result[0]).toHaveProperty('startDate')
+        expect(result[0]).toHaveProperty('endDate')
+        expect(result[0]).toHaveProperty('reason')
       }
     })
   })
@@ -240,7 +240,7 @@ describe('Leave Balance Queries', () => {
       await deleteBlackoutDate(created.id)
 
       const remaining = await listBlackoutDates({})
-      expect(remaining.items.find(bd => bd.id === created.id)).toBeUndefined()
+      expect(remaining.find(bd => bd.id === created.id)).toBeUndefined()
     })
   })
 
@@ -249,7 +249,7 @@ describe('Leave Balance Queries', () => {
       const policy = await getLeavePolicy()
 
       expect(policy).toBeDefined()
-      expect(policy).toHaveProperty('minNoticeDays')
+      expect(policy).toHaveProperty('minimumNotice')
       expect(policy).toHaveProperty('maxConsecutiveDays')
     })
 

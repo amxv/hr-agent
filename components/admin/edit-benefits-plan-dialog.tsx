@@ -79,7 +79,7 @@ type EditBenefitsPlanFormValues = z.infer<typeof editBenefitsPlanSchema>;
 
 type BenefitsPlan = {
   id: string;
-  planId: string;
+  planCode: string;
   category: string;
   planName: string;
   carrier?: string | null;
@@ -226,7 +226,7 @@ export function EditBenefitsPlanDialog({
               <label className="font-medium text-sm" htmlFor="plan-id">
                 Plan ID
               </label>
-              <Input disabled id="plan-id" value={plan.planId} />
+              <Input disabled id="plan-id" value={plan.planCode} />
               <p className="text-muted-foreground text-xs">
                 Plan ID cannot be changed
               </p>

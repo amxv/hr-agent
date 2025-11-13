@@ -284,7 +284,10 @@ export const adminRouter = createTRPCRouter({
         )
         .query(async ({ input }) => {
           const { listEmployees } = await import("@/lib/db/queries");
-          return await listEmployees(input);
+          return await listEmployees({
+            ...input,
+            status: input.employmentStatus,
+          });
         }),
 
       get: adminProcedure
@@ -295,7 +298,7 @@ export const adminRouter = createTRPCRouter({
           if (!employee) {
             throw new TRPCError({
               code: "NOT_FOUND",
-              message: "Employee not found",
+              message: "NOT_FOUND: Employee not found",
             });
           }
           return employee;
@@ -339,7 +342,7 @@ export const adminRouter = createTRPCRouter({
             }
           }
 
-          return await createEmployee({
+          const employee = await createEmployee({
             ...input,
             userId: ctx.user.id, // Link to user account
             workAuthorization: {
@@ -352,6 +355,7 @@ export const adminRouter = createTRPCRouter({
             createdBy: ctx.user.id,
             updatedBy: ctx.user.id,
           });
+          return { success: true, data: employee };
         }),
 
       update: adminProcedure
@@ -395,15 +399,36 @@ export const adminRouter = createTRPCRouter({
             }
           }
 
-          return await updateEmployee(input.id, input.data, ctx.user.id);
+          try {
+            const updated = await updateEmployee(input.id, input.data, ctx.user.id);
+            return { success: true, data: updated };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       delete: adminProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input, ctx }) => {
           const { softDeleteEmployee } = await import("@/lib/db/queries");
-          await softDeleteEmployee(input.id, ctx.user.id);
-          return { success: true };
+          try {
+            await softDeleteEmployee(input.id, ctx.user.id);
+            return { success: true };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
     },
 
@@ -421,7 +446,19 @@ export const adminRouter = createTRPCRouter({
         )
         .query(async ({ input }) => {
           const { listLeaveBalances } = await import("@/lib/db/queries");
-          return await listLeaveBalances(input);
+          const result = await listLeaveBalances(input);
+
+          // Transform balances to flatten the structure
+          const items = result.balances.map((b) => ({
+            ...b.leaveBalance,
+            employeeId: b.leaveBalance.employeeId,
+            employee: b.employee,
+          }));
+
+          return {
+            items,
+            total: result.total,
+          };
         }),
 
       update: adminProcedure
@@ -461,53 +498,99 @@ export const adminRouter = createTRPCRouter({
           }
 
           const { updateLeaveBalance } = await import("@/lib/db/queries");
-          return await updateLeaveBalance(
-            input.employeeId,
-            input.leaveType,
-            dbData,
-            ctx.user.id
-          );
-        }),
-    },
-
-    blackoutDates: {
-      list: adminProcedure
-        .input(
-          z.object({
-            department: z.string().optional(),
-            startDate: z.date().optional(),
-          })
-        )
-        .query(async ({ input }) => {
-          const { listBlackoutDates } = await import("@/lib/db/queries");
-          return await listBlackoutDates(input);
-        }),
-
-      create: adminProcedure
-        .input(
-          z.object({
-            startDate: z.string(),
-            endDate: z.string(),
-            reason: z.string(),
-            department: z.string().optional(),
-          })
-        )
-        .mutation(async ({ input, ctx }) => {
-          const { createBlackoutDate } = await import("@/lib/db/queries");
-          return await createBlackoutDate({
-            ...input,
-            createdBy: ctx.user.id,
-            createdAt: new Date(),
-          });
+          try {
+            const updated = await updateLeaveBalance(
+              input.employeeId,
+              input.leaveType,
+              dbData,
+              ctx.user.id
+            );
+            return {
+              success: true,
+              data: updated,
+            };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
-      delete: adminProcedure
-        .input(z.object({ id: z.string() }))
-        .mutation(async ({ input }) => {
-          const { deleteBlackoutDate } = await import("@/lib/db/queries");
-          await deleteBlackoutDate(input.id);
-          return { success: true };
-        }),
+      // Nested blackoutDates procedures
+      blackoutDates: {
+        list: adminProcedure
+          .input(
+            z.object({
+              department: z.string().optional(),
+              startDate: z.date().optional(),
+            })
+          )
+          .query(async ({ input }) => {
+            const { listBlackoutDates } = await import("@/lib/db/queries");
+            const blackoutDates = await listBlackoutDates(input);
+            return {
+              items: blackoutDates,
+              total: blackoutDates.length,
+            };
+          }),
+
+        create: adminProcedure
+          .input(
+            z.object({
+              startDate: z.string(),
+              endDate: z.string(),
+              reason: z.string(),
+              department: z.string().optional().nullable(),
+            })
+          )
+          .mutation(async ({ input, ctx }) => {
+            // Validate date range
+            const startDate = new Date(input.startDate);
+            const endDate = new Date(input.endDate);
+
+            if (endDate < startDate) {
+              throw new TRPCError({
+                code: "BAD_REQUEST",
+                message: "End date must be after or equal to start date",
+              });
+            }
+
+            const { createBlackoutDate } = await import("@/lib/db/queries");
+            const created = await createBlackoutDate({
+              ...input,
+              department: input.department || null,
+              createdBy: ctx.user.id,
+              createdAt: new Date(),
+            });
+
+            return {
+              success: true,
+              data: created,
+            };
+          }),
+
+        delete: adminProcedure
+          .input(z.object({ id: z.string() }))
+          .mutation(async ({ input }) => {
+            const { deleteBlackoutDate } = await import("@/lib/db/queries");
+            try {
+              await deleteBlackoutDate(input.id);
+              return { success: true };
+            } catch (error) {
+              if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+                throw new TRPCError({
+                  code: "NOT_FOUND",
+                  message: error.message,
+                });
+              }
+              throw error;
+            }
+          }),
+      },
     },
 
     // Benefits Procedures
@@ -533,7 +616,7 @@ export const adminRouter = createTRPCRouter({
           if (!plan) {
             throw new TRPCError({
               code: "NOT_FOUND",
-              message: "Benefits plan not found",
+              message: "NOT_FOUND: Benefits plan not found",
             });
           }
           return plan;
@@ -542,63 +625,44 @@ export const adminRouter = createTRPCRouter({
       create: adminProcedure
         .input(
           z.object({
-            planId: z.string(),
+            planCode: z.string(),
             category: z.enum([
+              "health",
               "medical",
               "dental",
               "vision",
               "retirement",
               "hsa_fsa",
             ]),
+            tier: z.string().optional(),
             planName: z.string(),
             carrier: z.string().optional(),
             planType: z.string().optional(),
-            monthlyPremiums: z
-              .object({
-                employee_only: z.number().optional(),
-                employee_spouse: z.number().optional(),
-                employee_children: z.number().optional(),
-                family: z.number().optional(),
-              })
-              .optional(),
-            deductibles: z
-              .object({
-                individual: z.number().optional(),
-                family: z.number().optional(),
-              })
-              .optional(),
-            outOfPocketMax: z
-              .object({
-                individual: z.number().optional(),
-                family: z.number().optional(),
-              })
-              .optional(),
+            monthlyPremium: z.number().optional(),
+            annualDeductible: z.number().optional(),
+            outOfPocketMax: z.number().optional(),
             coverageDetails: z.record(z.string(), z.unknown()).optional(),
             annualMaximum: z.number().optional(),
             employerMatchPercent: z.number().optional(),
             vestingSchedule: z.string().optional(),
-            contributionLimits: z
-              .object({
-                employee: z.number().optional(),
-                employer: z.number().optional(),
-              })
-              .optional(),
-            employerContribution: z.number().optional(),
+            isActive: z.boolean().optional(),
           })
         )
         .mutation(async ({ input, ctx }) => {
           const { createBenefitsPlan } = await import("@/lib/db/queries");
-          return await createBenefitsPlan({
-            planId: input.planId,
+          const plan = await createBenefitsPlan({
+            planCode: input.planCode,
             category: input.category,
+            tier: input.tier || null,
             planName: input.planName,
             carrier: input.carrier || null,
             type: input.planType || null,
-            monthlyPremium: input.monthlyPremiums || null,
-            deductible: input.deductibles || null,
-            outOfPocketMax: input.outOfPocketMax || null,
+            monthlyPremium: input.monthlyPremium?.toString() || null,
+            annualDeductible: input.annualDeductible?.toString() || null,
+            outOfPocketMax: input.outOfPocketMax?.toString() || null,
             coverage: input.coverageDetails || null,
             annualMaximum: input.annualMaximum || null,
+            isActive: input.isActive ?? true,
             employerMatchPercent:
               input.employerMatchPercent?.toString() || null,
             vestingSchedule: input.vestingSchedule || null,
@@ -607,6 +671,7 @@ export const adminRouter = createTRPCRouter({
             createdAt: new Date(),
             updatedAt: new Date(),
           });
+          return { success: true, data: plan };
         }),
 
       update: adminProcedure
@@ -624,15 +689,36 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
           const { updateBenefitsPlan } = await import("@/lib/db/queries");
-          return await updateBenefitsPlan(input.id, input.data, ctx.user.id);
+          try {
+            const updated = await updateBenefitsPlan(input.id, input.data, ctx.user.id);
+            return { success: true, data: updated };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       delete: adminProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input }) => {
           const { deleteBenefitsPlan } = await import("@/lib/db/queries");
-          await deleteBenefitsPlan(input.id);
-          return { success: true };
+          try {
+            await deleteBenefitsPlan(input.id);
+            return { success: true };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
     },
 
@@ -667,7 +753,7 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
           const { upsertEnrollment } = await import("@/lib/db/queries");
-          return await upsertEnrollment(
+          const enrollment = await upsertEnrollment(
             {
               ...input,
               updatedBy: ctx.user.id,
@@ -675,6 +761,7 @@ export const adminRouter = createTRPCRouter({
             },
             ctx.user.id
           );
+          return { success: true, data: enrollment };
         }),
     },
 
@@ -691,13 +778,14 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
           const { createDependent } = await import("@/lib/db/queries");
-          return await createDependent({
+          const dependent = await createDependent({
             ...input,
             createdBy: ctx.user.id,
             updatedBy: ctx.user.id,
             createdAt: new Date(),
             updatedAt: new Date(),
           });
+          return { success: true, data: dependent };
         }),
 
       update: adminProcedure
@@ -716,15 +804,36 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
           const { updateDependent } = await import("@/lib/db/queries");
-          return await updateDependent(input.id, input.data, ctx.user.id);
+          try {
+            const updated = await updateDependent(input.id, input.data, ctx.user.id);
+            return { success: true, data: updated };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       delete: adminProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input }) => {
           const { deleteDependent } = await import("@/lib/db/queries");
-          await deleteDependent(input.id);
-          return { success: true };
+          try {
+            await deleteDependent(input.id);
+            return { success: true };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
     },
 
@@ -791,7 +900,7 @@ export const adminRouter = createTRPCRouter({
             submittedByName = submittedEmployee.fullName;
           }
 
-          return await createHRCase(
+          const hrCase = await createHRCase(
             {
               ...input,
               priority: SLA_CONFIG[input.category].priority,
@@ -804,6 +913,7 @@ export const adminRouter = createTRPCRouter({
             },
             ctx.user.id
           );
+          return { success: true, data: hrCase };
         }),
 
       update: adminProcedure
@@ -827,15 +937,36 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
           const { updateHRCase } = await import("@/lib/db/queries");
-          return await updateHRCase(input.id, input.data, ctx.user.id);
+          try {
+            const updated = await updateHRCase(input.id, input.data, ctx.user.id);
+            return { success: true, data: updated };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       delete: adminProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input }) => {
           const { deleteHRCase } = await import("@/lib/db/queries");
-          await deleteHRCase(input.id);
-          return { success: true };
+          try {
+            await deleteHRCase(input.id);
+            return { success: true };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       addUpdate: adminProcedure
@@ -843,7 +974,7 @@ export const adminRouter = createTRPCRouter({
           z.object({
             caseId: z.string(),
             author: z.string(),
-            type: z.enum([
+            updateType: z.enum([
               "system",
               "hr_response",
               "internal_note",
@@ -853,9 +984,27 @@ export const adminRouter = createTRPCRouter({
             visibility: z.enum(["public", "internal"]).default("public"),
           })
         )
-        .mutation(async ({ input, ctx }) => {
+        .mutation(async ({ input }) => {
           const { addCaseUpdate } = await import("@/lib/db/queries");
-          return await addCaseUpdate(input.caseId, input, ctx.user.id);
+          try {
+            const update = await addCaseUpdate({
+              caseId: input.caseId,
+              author: input.author,
+              updateType: input.updateType,
+              message: input.message,
+              visibility: input.visibility,
+              timestamp: new Date(),
+            });
+            return { success: true, data: update };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
     },
 
@@ -892,12 +1041,13 @@ export const adminRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
           const { createAbsence } = await import("@/lib/db/queries");
           // createAbsence calculates totalDays automatically
-          return await createAbsence({
+          const absence = await createAbsence({
             ...input,
             totalDays: "0", // Will be recalculated in createAbsence
             createdBy: ctx.user.id,
             createdAt: new Date(),
           });
+          return { success: true, data: absence };
         }),
 
       update: adminProcedure
@@ -915,15 +1065,36 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input }) => {
           const { updateAbsence } = await import("@/lib/db/queries");
-          return await updateAbsence(input.id, input.data);
+          try {
+            const updated = await updateAbsence(input.id, input.data);
+            return { success: true, data: updated };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       delete: adminProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input }) => {
           const { deleteAbsence } = await import("@/lib/db/queries");
-          await deleteAbsence(input.id);
-          return { success: true };
+          try {
+            await deleteAbsence(input.id);
+            return { success: true };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
     },
 
@@ -956,14 +1127,26 @@ export const adminRouter = createTRPCRouter({
         .mutation(async ({ input, ctx }) => {
           const { createLeaveRequest } = await import("@/lib/db/queries");
           // createLeaveRequest handles all required fields internally
-          return await createLeaveRequest(input, ctx.user.id);
+          const request = await createLeaveRequest(input, ctx.user.id);
+          return { success: true, data: request };
         }),
 
       approve: adminProcedure
         .input(z.object({ id: z.string() }))
         .mutation(async ({ input, ctx }) => {
           const { approveLeaveRequest } = await import("@/lib/db/queries");
-          return await approveLeaveRequest(input.id, ctx.user.id);
+          try {
+            const result = await approveLeaveRequest(input.id, ctx.user.id);
+            return { success: true, data: result };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
 
       deny: adminProcedure
@@ -975,7 +1158,18 @@ export const adminRouter = createTRPCRouter({
         )
         .mutation(async ({ input, ctx }) => {
           const { denyLeaveRequest } = await import("@/lib/db/queries");
-          return await denyLeaveRequest(input.id, ctx.user.id, input.reason);
+          try {
+            const updated = await denyLeaveRequest(input.id, ctx.user.id, input.reason);
+            return { success: true, data: updated };
+          } catch (error) {
+            if (error instanceof Error && error.message.includes("NOT_FOUND")) {
+              throw new TRPCError({
+                code: "NOT_FOUND",
+                message: error.message,
+              });
+            }
+            throw error;
+          }
         }),
     },
 

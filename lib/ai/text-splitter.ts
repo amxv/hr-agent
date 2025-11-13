@@ -45,9 +45,13 @@ abstract class TextSplitter implements TextSplitterParams {
     const docs: string[] = [];
     const currentDoc: string[] = [];
     let total = 0;
+    const separatorLen = separator.length;
     for (const d of splits) {
       const _len = d.length;
-      if (total + _len >= this.chunkSize) {
+      // Account for separator length when joining (except for first item)
+      const lengthWithSeparator =
+        currentDoc.length > 0 ? _len + separatorLen : _len;
+      if (total + lengthWithSeparator > this.chunkSize) {
         if (total > this.chunkSize) {
           console.warn(
             `Created a chunk of size ${total}, +
@@ -63,16 +67,23 @@ which is longer than the specified ${this.chunkSize}`
           // - we have a larger chunk than in the chunk overlap
           // - or if we still have any chunks and the length is long
           while (
-            total > this.chunkOverlap ||
-            (total + _len > this.chunkSize && total > 0)
+            currentDoc.length > 0 &&
+            (total > this.chunkOverlap ||
+              (total + lengthWithSeparator > this.chunkSize && total > 0))
           ) {
-            total -= currentDoc[0]?.length;
+            const removedLength = currentDoc[0]?.length ?? 0;
+            total -= removedLength;
+            if (currentDoc.length > 1) {
+              total -= separatorLen; // Also subtract separator length
+            }
             currentDoc.shift();
           }
         }
       }
       currentDoc.push(d);
-      total += _len;
+      // Recalculate the actual length to add to total (no separator if this is the first item)
+      const actualLength = currentDoc.length === 1 ? _len : lengthWithSeparator;
+      total += actualLength;
     }
     const doc = this.joinDocs(currentDoc, separator);
     if (doc !== null) {
@@ -99,6 +110,9 @@ export class RecursiveCharacterTextSplitter
   }
 
   splitText(text: string): string[] {
+    if (this.chunkOverlap >= this.chunkSize) {
+      throw new Error("Cannot have chunkOverlap >= chunkSize");
+    }
     const finalChunks: string[] = [];
 
     // Get appropriate separator to use
