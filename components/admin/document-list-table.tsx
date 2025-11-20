@@ -2,7 +2,7 @@
 
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { RefreshCw } from "lucide-react";
-import { useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -31,6 +31,7 @@ import { UploadDocumentDialog } from "./upload-document-dialog";
 export function DocumentListTable() {
   const [searchValue, setSearchValue] = useState("");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const hasAutoRefreshed = useRef(false);
   const trpc = useTRPC();
   const trpcClient = useTRPCClient();
   const queryClient = useQueryClient();
@@ -43,7 +44,7 @@ export function DocumentListTable() {
     }),
   });
 
-  const invalidate = async () => {
+  const invalidate = useCallback(async () => {
     // Invalidate all document queries (list and tags) to ensure UI updates
     await queryClient.invalidateQueries({
       predicate: (query) => {
@@ -60,21 +61,45 @@ export function DocumentListTable() {
         return false;
       },
     });
-  };
+  }, [queryClient]);
 
-  const handleRefreshStatus = async () => {
+  const handleRefreshStatus = useCallback(async () => {
     setIsRefreshing(true);
     try {
-      await trpcClient.admin.documents.refreshStatus.mutate();
-      toast.success("Status refreshed");
-      invalidate();
+      const result = await trpcClient.admin.documents.refreshStatus.mutate();
+      if (result.updated > 0) {
+        toast.success(
+          `Status refreshed: ${result.completed} completed, ${result.failed} failed`
+        );
+      } else {
+        toast.success("All documents are up to date");
+      }
+      await invalidate();
     } catch (error: unknown) {
       const err = error as { message?: string };
       toast.error(err.message || "Failed to refresh status");
     } finally {
       setIsRefreshing(false);
     }
-  };
+  }, [trpcClient.admin.documents.refreshStatus, invalidate]);
+
+  // Auto-refresh status on mount if there are any processing documents
+  useEffect(() => {
+    // Only run once when data is first loaded
+    if (!data || hasAutoRefreshed.current || isLoading) {
+      return;
+    }
+
+    const hasProcessingDocs = data.documents.some(
+      (doc) => doc.status === "processing"
+    );
+
+    if (hasProcessingDocs) {
+      hasAutoRefreshed.current = true;
+      // Run refresh in background without blocking UI
+      handleRefreshStatus();
+    }
+  }, [data, isLoading, handleRefreshStatus]);
 
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) {
