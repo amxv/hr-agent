@@ -39,6 +39,8 @@ function getProviderIconSlug(provider: ProviderId): string | null {
     case "morph":
     case "meituan":
       return null;
+    default:
+      return null;
   }
 }
 export function getProviderIconUrl(

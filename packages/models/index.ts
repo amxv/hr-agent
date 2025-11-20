@@ -14,4 +14,4 @@ export { modelDefinitionMap, getModelDefinition };
 export {
   type ImageModelData,
   imageModelsData,
-} from "../../lib/models/image-models";
+} from "./image-models";

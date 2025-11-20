@@ -6,6 +6,7 @@
     "incremental": false,
     "emitDeclarationOnly": false,
     "outDir": "./dist",
+    "rootDir": ".",
     "baseUrl": "../../",
     "paths": {
       "@/*": ["*"]

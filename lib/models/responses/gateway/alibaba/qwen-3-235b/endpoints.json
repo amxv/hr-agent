@@ -3,13 +3,17 @@
     "id": "alibaba/qwen-3-235b",
     "name": "Qwen3 235B A22B Instruct 2507",
     "created": 1755815280,
-    "description": "Mixture-of-experts LLM with math and reasoning capabilities",
+    "description": "Qwen3-235B-A22B-Instruct-2507 is the updated version of the Qwen3-235B-A22B non-thinking mode, featuring significant improvements in general capabilities, including instruction following, logical reasoning, text comprehension, mathematics, science, coding and tool usage.",
     "architecture": {
       "tokenizer": null,
       "instruct_type": null,
       "modality": "text→text",
-      "input_modalities": ["text"],
-      "output_modalities": ["text"]
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ]
     },
     "endpoints": [
       {
@@ -108,7 +112,7 @@
         "context_length": 131072,
         "pricing": {
           "prompt": "0.0000003",
-          "completion": "0.000003",
+          "completion": "0.0000015",
           "request": "0",
           "image": "0",
           "image_output": "0",
@@ -119,14 +123,16 @@
         "provider_name": "novita",
         "tag": "novita",
         "quantization": null,
-        "max_completion_tokens": 131072,
+        "max_completion_tokens": 32768,
         "max_prompt_tokens": null,
         "supported_parameters": [
           "max_tokens",
           "temperature",
           "stop",
           "tools",
-          "tool_choice"
+          "tool_choice",
+          "reasoning",
+          "include_reasoning"
         ],
         "status": 0,
         "uptime_last_30m": null,

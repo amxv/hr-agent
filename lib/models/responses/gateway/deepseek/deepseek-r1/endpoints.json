@@ -8,8 +8,12 @@
       "tokenizer": null,
       "instruct_type": null,
       "modality": "text→text",
-      "input_modalities": ["text"],
-      "output_modalities": ["text"]
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ]
     },
     "endpoints": [
       {
@@ -45,30 +49,29 @@
         "supports_implicit_caching": false
       },
       {
-        "name": "fireworks | deepseek/deepseek-r1",
+        "name": "deepinfra | deepseek/deepseek-r1",
         "model_name": "DeepSeek-R1",
         "context_length": 160000,
         "pricing": {
-          "prompt": "0.000003",
-          "completion": "0.000008",
+          "prompt": "0.0000005",
+          "completion": "0.00000215",
           "request": "0",
           "image": "0",
           "image_output": "0",
           "web_search": "0",
           "internal_reasoning": "0",
+          "input_cache_read": "0.0000004",
           "discount": 0
         },
-        "provider_name": "fireworks",
-        "tag": "fireworks",
+        "provider_name": "deepinfra",
+        "tag": "deepinfra",
         "quantization": null,
-        "max_completion_tokens": 8192,
+        "max_completion_tokens": 16384,
         "max_prompt_tokens": null,
         "supported_parameters": [
           "max_tokens",
           "temperature",
           "stop",
-          "tools",
-          "tool_choice",
           "reasoning",
           "include_reasoning"
         ],
@@ -99,8 +102,6 @@
           "max_tokens",
           "temperature",
           "stop",
-          "tools",
-          "tool_choice",
           "reasoning",
           "include_reasoning"
         ],

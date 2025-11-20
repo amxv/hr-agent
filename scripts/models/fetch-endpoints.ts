@@ -169,16 +169,22 @@ async function main() {
         video: inMods.has("video"),
         audio: inMods.has("audio"),
       };
-      output = {
-        image: outMods.has("image"),
-        text: outMods.has("text"),
-        audio: outMods.has("audio"),
-      };
       const params = new Set(
         (data?.endpoints ?? []).flatMap((e) => e.supported_parameters ?? [])
       );
       toolCall = params.has("tools") || params.has("tool_choice");
       reasoning = params.has("reasoning") || params.has("include_reasoning");
+
+      // Fix incorrect image output metadata for reasoning models
+      // Reasoning models (like gpt-5.1-thinking) are text-only but AI Gateway incorrectly reports image output
+      const isReasoningModel = reasoning || (m.tags ?? []).includes("reasoning");
+      const hasImageOutput = outMods.has("image") && !isReasoningModel;
+
+      output = {
+        image: hasImageOutput,
+        text: outMods.has("text"),
+        audio: outMods.has("audio"),
+      };
     } catch {}
 
     lines.push("  {");

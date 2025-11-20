@@ -1,6 +1,7 @@
 #!/usr/bin/env tsx
 
 import { execSync } from "node:child_process";
+import { cpSync } from "node:fs";
 import { join } from "node:path";
 
 async function main() {
@@ -17,7 +18,27 @@ async function main() {
   // 3) Fetch endpoints and build models.generated.ts
   run("tsx scripts/models/fetch-endpoints.ts");
 
-  // 4) Typecheck
+  // 4) Copy generated files to packages/models
+  console.log("Copying generated files to packages/models...");
+  cpSync(
+    join(ROOT, "lib/models/models.generated.ts"),
+    join(ROOT, "packages/models/models.generated.ts")
+  );
+  cpSync(
+    join(ROOT, "lib/models/model-extra.generated.ts"),
+    join(ROOT, "packages/models/model-extra.generated.ts")
+  );
+  cpSync(
+    join(ROOT, "lib/models/image-models.ts"),
+    join(ROOT, "packages/models/image-models.ts")
+  );
+  cpSync(
+    join(ROOT, "lib/models/image-model-id.ts"),
+    join(ROOT, "packages/models/image-model-id.ts")
+  );
+  console.log("Files copied successfully");
+
+  // 5) Typecheck
   run("bun run test:types");
 }
 

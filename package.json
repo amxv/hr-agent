@@ -4,7 +4,7 @@
   "private": true,
   "license": "Apache-2.0",
   "scripts": {
-    "prebuild": "",
+    "prebuild": "SKIP_EXISTING=1 tsx scripts/models/sync.ts",
     "dev": "next dev",
     "build": "(cd packages/models && bun run build) && tsx lib/db/migrate && next build",
     "start": "next start",

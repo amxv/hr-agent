@@ -1,0 +1,52 @@
+{
+  "data": {
+    "id": "xai/grok-4.1-fast-reasoning",
+    "name": "Grok 4.1 Fast Reasoning",
+    "created": 1755815280,
+    "description": "Grok 4.1 Fast is xAI's best tool-calling model with a 2M context window. It reasons and completes agentic tasks accurately and rapidly, excelling at complex real-world use cases such as customer support and finance. To optimize for maximal intelligence use this variant. Otherwise, use the non-reasoning version.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "xai | xai/grok-4.1-fast-reasoning",
+        "model_name": "Grok 4.1 Fast Reasoning",
+        "context_length": 2000000,
+        "pricing": {
+          "prompt": "0.0000002",
+          "completion": "0.0000005",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "input_cache_read": "0.00000005",
+          "discount": 0
+        },
+        "provider_name": "xai",
+        "tag": "xai",
+        "quantization": null,
+        "max_completion_tokens": 2000000,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop",
+          "reasoning",
+          "include_reasoning"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

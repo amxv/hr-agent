@@ -8,7 +8,7 @@ export type ModelExtra = {
   fixedTemperature?: number;
 };
 
-export const allModelsExtra: Record<ModelId, ModelExtra> = {
+export const allModelsExtra: Partial<Record<ModelId, ModelExtra>> = {
   ...generatedModelExtra,
   ...manualModelExtra,
 };
