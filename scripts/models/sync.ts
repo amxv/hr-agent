@@ -38,7 +38,11 @@ async function main() {
   );
   console.log("Files copied successfully");
 
-  // 5) Typecheck
+  // 5) Build the @ai-models/vercel-gateway package
+  console.log("Building @ai-models/vercel-gateway package...");
+  run("cd packages/models && bun run build");
+
+  // 6) Typecheck
   run("bun run test:types");
 }
 
