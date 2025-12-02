@@ -153,7 +153,7 @@ function PureModelCard({ model }: { model: ModelDefinition }) {
           <span>
             Input{" "}
             <span className="font-medium text-foreground">
-              ${(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(2)}
+              ${(Number.parseFloat(model.pricing.input ?? "0") * 1_000_000).toFixed(2)}
               /M
             </span>
           </span>
@@ -162,7 +162,7 @@ function PureModelCard({ model }: { model: ModelDefinition }) {
             Output{" "}
             <span className="font-medium text-foreground">
               $
-              {(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(2)}
+              {(Number.parseFloat(model.pricing.output ?? "0") * 1_000_000).toFixed(2)}
               /M
             </span>
           </span>

@@ -122,16 +122,16 @@
       "owned_by": "alibaba",
       "name": "Qwen 3 Coder 30B A3B Instruct",
       "description": "Efficient coding specialist balancing performance with cost-effectiveness for daily development tasks while maintaining strong tool integration capabilities.",
-      "context_window": 262144,
-      "max_tokens": 8192,
+      "context_window": 160000,
+      "max_tokens": 32768,
       "type": "language",
       "tags": [
         "reasoning",
         "tool-use"
       ],
       "pricing": {
-        "input": "0.00000015",
-        "output": "0.0000006"
+        "input": "0.00000007",
+        "output": "0.00000027"
       }
     },
     {
@@ -164,8 +164,7 @@
       "type": "embedding",
       "tags": [],
       "pricing": {
-        "input": "0.00000001",
-        "output": "0"
+        "input": "0.00000001"
       }
     },
     {
@@ -180,8 +179,7 @@
       "type": "embedding",
       "tags": [],
       "pricing": {
-        "input": "0.00000002",
-        "output": "0"
+        "input": "0.00000002"
       }
     },
     {
@@ -196,8 +194,7 @@
       "type": "embedding",
       "tags": [],
       "pricing": {
-        "input": "0.00000005",
-        "output": "0"
+        "input": "0.00000005"
       }
     },
     {
@@ -360,8 +357,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000002",
-        "output": "0"
+        "input": "0.00000002"
       }
     },
     {
@@ -563,6 +559,29 @@
       }
     },
     {
+      "id": "anthropic/claude-opus-4.5",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "anthropic",
+      "name": "Claude Opus 4.5",
+      "description": "Claude Opus 4.5 is Anthropic’s latest model in the Opus series, meant for demanding reasoning tasks and complex problem solving. This model has improvements in general intelligence and vision compared to previous iterations. In addition, it is suited for difficult coding tasks and agentic workflows, especially those with computer use and tool use, and can effectively handle context usage and external memory files.",
+      "context_window": 200000,
+      "max_tokens": 64000,
+      "type": "language",
+      "tags": [
+        "tool-use",
+        "reasoning",
+        "vision",
+        "file-input"
+      ],
+      "pricing": {
+        "input": "0.000005",
+        "output": "0.000025",
+        "input_cache_read": "0.0000005",
+        "input_cache_write": "0.00000625"
+      }
+    },
+    {
       "id": "anthropic/claude-sonnet-4",
       "object": "model",
       "created": 1755815280,
@@ -609,6 +628,97 @@
       }
     },
     {
+      "id": "arcee-ai/trinity-mini",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "arcee-ai",
+      "name": "Trinity Mini",
+      "description": "Trinity Mini is a 26B-parameter (3B active) sparse mixture-of-experts language model, engineered for efficient inference over long contexts with robust function calling and multi-step agent workflows.",
+      "context_window": 131072,
+      "max_tokens": 131072,
+      "type": "language",
+      "tags": [],
+      "pricing": {
+        "input": "0.000000045",
+        "output": "0.00000015"
+      }
+    },
+    {
+      "id": "bfl/flux-kontext-max",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "bfl",
+      "name": "FLUX.1 Kontext Max",
+      "description": "FLUX.1 Kontext creates images from text prompts with unique capabilities for character consistency and advanced editing. It also edits images using simple text prompts. No complex workflows or fine-tuning needed.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+      "context_window": 512,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
+      "id": "bfl/flux-kontext-pro",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "bfl",
+      "name": "FLUX.1 Kontext Pro",
+      "description": "FLUX.1 Kontext creates images from text prompts with unique capabilities for character consistency and advanced editing. It also edits images using simple text prompts. No complex workflows or fine-tuning needed.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+      "context_window": 512,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
+      "id": "bfl/flux-pro-1.0-fill",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "bfl",
+      "name": "FLUX.1 Fill [pro]",
+      "description": "A state-of-the-art inpainting model, enabling editing and expansion of real and generated images given a text description and a binary mask.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+      "context_window": 0,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
+      "id": "bfl/flux-pro-1.1",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "bfl",
+      "name": "FLUX1.1 [pro]",
+      "description": "FLUX1.1 [pro] is the standard for text-to-image generation with fast, reliable and consistently stunning results.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+      "context_window": 0,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
+      "id": "bfl/flux-pro-1.1-ultra",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "bfl",
+      "name": "FLUX1.1 [pro] Ultra",
+      "description": "FLUX1.1 [pro] Ultra delivers ultra-fast, ultra high-resolution image creation - with more pixels in every picture. Generate varying aspect ratios from text, at 4MP resolution fast.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+      "context_window": 0,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
       "id": "cohere/command-a",
       "object": "model",
       "created": 1755815280,
@@ -637,8 +747,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000012",
-        "output": "0"
+        "input": "0.00000012"
       }
     },
     {
@@ -717,6 +826,26 @@
       }
     },
     {
+      "id": "deepseek/deepseek-v3.2",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "deepseek",
+      "name": "DeepSeek V3.2",
+      "description": "DeepSeek-V3.2: Official successor to V3.2-Exp.",
+      "context_window": 128000,
+      "max_tokens": 8000,
+      "type": "language",
+      "tags": [
+        "tool-use",
+        "implicit-caching"
+      ],
+      "pricing": {
+        "input": "0.00000028",
+        "output": "0.00000042",
+        "input_cache_read": "0.000000028"
+      }
+    },
+    {
       "id": "deepseek/deepseek-v3.2-exp",
       "object": "model",
       "created": 1755815280,
@@ -737,17 +866,35 @@
       }
     },
     {
-      "id": "deepseek/deepseek-v3.2-exp-thinking",
+      "id": "deepseek/deepseek-v3.2-speciale",
       "object": "model",
       "created": 1755815280,
       "owned_by": "deepseek",
-      "name": "DeepSeek V3.2 Exp Thinking",
-      "description": "DeepSeek-V3.2-Exp is an experimental model introducing the groundbreaking DeepSeek Sparse Attention (DSA) mechanism for enhanced long-context processing efficiency. Built on V3.1-Terminus, DSA achieves fine-grained sparse attention while maintaining identical output quality.",
-      "context_window": 163840,
-      "max_tokens": 8192,
+      "name": "DeepSeek V3.2 Speciale",
+      "description": "DeepSeek-V3.2-Speciale: Pushing the boundaries of reasoning capabilities (thinking mode only)",
+      "context_window": 128000,
+      "max_tokens": 128000,
       "type": "language",
       "tags": [
-        "implicit-caching",
+        "reasoning"
+      ],
+      "pricing": {
+        "input": "0.00000028",
+        "output": "0.00000042",
+        "input_cache_read": "0.000000028"
+      }
+    },
+    {
+      "id": "deepseek/deepseek-v3.2-thinking",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "deepseek",
+      "name": "DeepSeek V3.2 Thinking",
+      "description": "Thinking mode of DeepSeek V3.2",
+      "context_window": 128000,
+      "max_tokens": 64000,
+      "type": "language",
+      "tags": [
         "reasoning",
         "tool-use"
       ],
@@ -825,8 +972,8 @@
       "object": "model",
       "created": 1755815280,
       "owned_by": "google",
-      "name": "Gemini 2.5 Flash Image (Code name: Nano Banana)",
-      "description": "Gemini 2.5 Flash Image is our first fully hybrid reasoning model, letting developers turn thinking on or off and set thinking budgets to balance quality, cost, and latency. Upgraded for rapid creative workflows, it can generate interleaved text and images and supports conversational, multi‑turn image editing in natural language. It’s also locale‑aware, enabling culturally and linguistically appropriate image generation for audiences worldwide.",
+      "name": "Nano Banana (Gemini 2.5 Flash Image)",
+      "description": "Nano Banana (Gemini 2.5 Flash Image) is Google's first fully hybrid reasoning model, letting developers turn thinking on or off and set thinking budgets to balance quality, cost, and latency. Upgraded for rapid creative workflows, it can generate interleaved text and images and supports conversational, multi‑turn image editing in natural language. It’s also locale‑aware, enabling culturally and linguistically appropriate image generation for audiences worldwide.",
       "context_window": 32768,
       "max_tokens": 32768,
       "type": "language",
@@ -843,8 +990,8 @@
       "object": "model",
       "created": 1755815280,
       "owned_by": "google",
-      "name": "Gemini 2.5 Flash Image Preview (Code name: Nano Banana)",
-      "description": "Gemini 2.5 Flash Image Preview is our first fully hybrid reasoning model, letting developers turn thinking on or off and set thinking budgets to balance quality, cost, and latency. Upgraded for rapid creative workflows, it can generate interleaved text and images and supports conversational, multi‑turn image editing in natural language. It’s also locale‑aware, enabling culturally and linguistically appropriate image generation for audiences worldwide.",
+      "name": "Nano Banana Preview (Gemini 2.5 Flash Image Preview)",
+      "description": "Nano Banana (Gemini 2.5 Flash Image) is Google's first fully hybrid reasoning model, letting developers turn thinking on or off and set thinking budgets to balance quality, cost, and latency. Upgraded for rapid creative workflows, it can generate interleaved text and images and supports conversational, multi‑turn image editing in natural language. It’s also locale‑aware, enabling culturally and linguistically appropriate image generation for audiences worldwide.",
       "context_window": 32768,
       "max_tokens": 32768,
       "type": "language",
@@ -945,6 +1092,24 @@
       }
     },
     {
+      "id": "google/gemini-3-pro-image",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "google",
+      "name": "Nano Banana Pro (Gemini 3 Pro Image)",
+      "description": "Nano Banana Pro (Gemini 3 Pro Image) builds on Nano Banana's generation capabilities into a new era of studio-quality, functional design to help you create and edit high-fidelity, production-ready visuals with unparalleled precision and control. Improvements include enhanced world knowledge and reasoning, dynamic text and translation, and studio level controls.",
+      "context_window": 65536,
+      "max_tokens": 32768,
+      "type": "language",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {
+        "input": "0.000002",
+        "output": "0.00012"
+      }
+    },
+    {
       "id": "google/gemini-3-pro-preview",
       "object": "model",
       "created": 1755815280,
@@ -962,7 +1127,8 @@
       ],
       "pricing": {
         "input": "0.000002",
-        "output": "0.000012"
+        "output": "0.000012",
+        "input_cache_read": "0.0000002"
       }
     },
     {
@@ -976,9 +1142,53 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000015",
-        "output": "0"
+        "input": "0.00000015"
       }
+    },
+    {
+      "id": "google/imagen-4.0-fast-generate-001",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "google",
+      "name": "Imagen 4 Fast",
+      "description": "Imagen 4 Fast is Google’s speed-optimized variant of the Imagen 4 text-to-image model, designed for rapid, high-volume image generation. It’s ideal for workflows like quick drafts, mockups, and iterative creative exploration. Despite emphasizing speed, it still benefits from the broader Imagen 4 family’s improvements in clarity, text rendering, and stylistic flexibility, and supports high-resolution outputs up to 2K.",
+      "context_window": 480,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
+      "id": "google/imagen-4.0-generate-001",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "google",
+      "name": "Imagen 4",
+      "description": "Imagen 4: Google's flagship text-to-image model that serves as the go-to choice for a wide variety of high-quality image generation tasks, featuring significant improvements in text rendering over previous models. It now supports up to 2K resolution generation for creating detailed and crisp visuals, making it suitable for everything from marketing assets to artistic compositions.",
+      "context_window": 480,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
+    },
+    {
+      "id": "google/imagen-4.0-ultra-generate-001",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "google",
+      "name": "Imagen 4 Ultra",
+      "description": "Imagen 4 Ultra: Highest quality image generation model for detailed and photorealistic outputs.",
+      "context_window": 480,
+      "max_tokens": 0,
+      "type": "image",
+      "tags": [
+        "image-generation"
+      ],
+      "pricing": {}
     },
     {
       "id": "google/text-embedding-005",
@@ -991,8 +1201,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.000000025",
-        "output": "0"
+        "input": "0.000000025"
       }
     },
     {
@@ -1006,8 +1215,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.000000025",
-        "output": "0"
+        "input": "0.000000025"
       }
     },
     {
@@ -1041,10 +1249,7 @@
       "tags": [
         "tool-use"
       ],
-      "pricing": {
-        "input": "0",
-        "output": "0"
-      }
+      "pricing": {}
     },
     {
       "id": "meituan/longcat-flash-thinking",
@@ -1249,9 +1454,9 @@
       "object": "model",
       "created": 1755815280,
       "owned_by": "mistral",
-      "name": "Mistral Codestral 25.01",
-      "description": "Mistral Codestral 25.01 is a state-of-the-art coding model optimized for low-latency, high-frequency use cases. Proficient in over 80 programming languages, it excels at tasks like fill-in-the-middle (FIM), code correction, and test generation.",
-      "context_window": 256000,
+      "name": "Mistral Codestral",
+      "description": "Mistral's cutting-edge language model for coding released end of July 2025, Codestral specializes in low-latency, high-frequency tasks such as fill-in-the-middle (FIM), code correction and test generation.",
+      "context_window": 128000,
       "max_tokens": 4000,
       "type": "language",
       "tags": [
@@ -1273,8 +1478,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000015",
-        "output": "0"
+        "input": "0.00000015"
       }
     },
     {
@@ -1315,24 +1519,6 @@
       }
     },
     {
-      "id": "mistral/magistral-medium-2506",
-      "object": "model",
-      "created": 1755815280,
-      "owned_by": "mistral",
-      "name": "Magistral Medium 2506",
-      "description": "Complex thinking, backed by deep understanding, with transparent reasoning you can follow and verify. The model excels in maintaining high-fidelity reasoning across numerous languages, even when switching between languages mid-task.",
-      "context_window": 128000,
-      "max_tokens": 64000,
-      "type": "language",
-      "tags": [
-        "reasoning"
-      ],
-      "pricing": {
-        "input": "0.000002",
-        "output": "0.000005"
-      }
-    },
-    {
       "id": "mistral/magistral-small",
       "object": "model",
       "created": 1755815280,
@@ -1345,24 +1531,6 @@
       "tags": [
         "reasoning",
         "vision"
-      ],
-      "pricing": {
-        "input": "0.0000005",
-        "output": "0.0000015"
-      }
-    },
-    {
-      "id": "mistral/magistral-small-2506",
-      "object": "model",
-      "created": 1755815280,
-      "owned_by": "mistral",
-      "name": "Magistral Small 2506",
-      "description": "Complex thinking, backed by deep understanding, with transparent reasoning you can follow and verify. The model excels in maintaining high-fidelity reasoning across numerous languages, even when switching between languages mid-task.",
-      "context_window": 128000,
-      "max_tokens": 64000,
-      "type": "language",
-      "tags": [
-        "reasoning"
       ],
       "pricing": {
         "input": "0.0000005",
@@ -1416,8 +1584,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.0000001",
-        "output": "0"
+        "input": "0.0000001"
       }
     },
     {
@@ -1718,8 +1885,7 @@
       "pricing": {
         "input": "0.000002",
         "output": "0.000008",
-        "input_cache_read": "0.0000005",
-        "input_cache_write": "0"
+        "input_cache_read": "0.0000005"
       }
     },
     {
@@ -1740,8 +1906,7 @@
       "pricing": {
         "input": "0.0000004",
         "output": "0.0000016",
-        "input_cache_read": "0.0000001",
-        "input_cache_write": "0"
+        "input_cache_read": "0.0000001"
       }
     },
     {
@@ -1762,8 +1927,7 @@
       "pricing": {
         "input": "0.0000001",
         "output": "0.0000004",
-        "input_cache_read": "0.000000025",
-        "input_cache_write": "0"
+        "input_cache_read": "0.000000025"
       }
     },
     {
@@ -1784,8 +1948,7 @@
       "pricing": {
         "input": "0.0000025",
         "output": "0.00001",
-        "input_cache_read": "0.00000125",
-        "input_cache_write": "0"
+        "input_cache_read": "0.00000125"
       }
     },
     {
@@ -1806,8 +1969,7 @@
       "pricing": {
         "input": "0.00000015",
         "output": "0.0000006",
-        "input_cache_read": "0.000000075",
-        "input_cache_write": "0"
+        "input_cache_read": "0.000000075"
       }
     },
     {
@@ -1830,8 +1992,7 @@
       "pricing": {
         "input": "0.00000125",
         "output": "0.00001",
-        "input_cache_read": "0.00000013",
-        "input_cache_write": "0"
+        "input_cache_read": "0.00000013"
       }
     },
     {
@@ -1877,8 +2038,7 @@
       "pricing": {
         "input": "0.00000125",
         "output": "0.00001",
-        "input_cache_read": "0.00000013",
-        "input_cache_write": "0"
+        "input_cache_read": "0.00000013"
       }
     },
     {
@@ -1900,8 +2060,7 @@
       "pricing": {
         "input": "0.00000025",
         "output": "0.000002",
-        "input_cache_read": "0.00000003",
-        "input_cache_write": "0"
+        "input_cache_read": "0.00000003"
       }
     },
     {
@@ -1924,8 +2083,7 @@
       "pricing": {
         "input": "0.00000005",
         "output": "0.0000004",
-        "input_cache_read": "0.00000001",
-        "input_cache_write": "0"
+        "input_cache_read": "0.00000001"
       }
     },
     {
@@ -2120,8 +2278,7 @@
       "pricing": {
         "input": "0.000015",
         "output": "0.00006",
-        "input_cache_read": "0.0000075",
-        "input_cache_write": "0"
+        "input_cache_read": "0.0000075"
       }
     },
     {
@@ -2143,8 +2300,7 @@
       "pricing": {
         "input": "0.000002",
         "output": "0.000008",
-        "input_cache_read": "0.0000005",
-        "input_cache_write": "0"
+        "input_cache_read": "0.0000005"
       }
     },
     {
@@ -2187,8 +2343,7 @@
       "pricing": {
         "input": "0.0000011",
         "output": "0.0000044",
-        "input_cache_read": "0.00000055",
-        "input_cache_write": "0"
+        "input_cache_read": "0.00000055"
       }
     },
     {
@@ -2210,8 +2365,7 @@
       "pricing": {
         "input": "0.0000011",
         "output": "0.0000044",
-        "input_cache_read": "0.000000275",
-        "input_cache_write": "0"
+        "input_cache_read": "0.000000275"
       }
     },
     {
@@ -2225,8 +2379,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000013",
-        "output": "0"
+        "input": "0.00000013"
       }
     },
     {
@@ -2240,8 +2393,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000002",
-        "output": "0"
+        "input": "0.00000002"
       }
     },
     {
@@ -2255,8 +2407,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.0000001",
-        "output": "0"
+        "input": "0.0000001"
       }
     },
     {
@@ -2331,6 +2482,25 @@
       "pricing": {
         "input": "0.000002",
         "output": "0.000008"
+      }
+    },
+    {
+      "id": "prime-intellect/intellect-3",
+      "object": "model",
+      "created": 1755815280,
+      "owned_by": "prime-intellect",
+      "name": "INTELLECT 3",
+      "description": "Introducing INTELLECT-3: Scaling RL to a 100B+ MoE model on our end-to-end stack.\n\nAchieving state-of-the-art performance for its size across math, code and reasoning.",
+      "context_window": 131072,
+      "max_tokens": 131072,
+      "type": "language",
+      "tags": [
+        "reasoning",
+        "tool-use"
+      ],
+      "pricing": {
+        "input": "0.0000002",
+        "output": "0.0000011"
       }
     },
     {
@@ -2422,8 +2592,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000018",
-        "output": "0"
+        "input": "0.00000018"
       }
     },
     {
@@ -2437,8 +2606,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000006",
-        "output": "0"
+        "input": "0.00000006"
       }
     },
     {
@@ -2452,8 +2620,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000002",
-        "output": "0"
+        "input": "0.00000002"
       }
     },
     {
@@ -2467,8 +2634,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000012",
-        "output": "0"
+        "input": "0.00000012"
       }
     },
     {
@@ -2482,8 +2648,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000018",
-        "output": "0"
+        "input": "0.00000018"
       }
     },
     {
@@ -2497,8 +2662,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000012",
-        "output": "0"
+        "input": "0.00000012"
       }
     },
     {
@@ -2512,8 +2676,7 @@
       "max_tokens": 0,
       "type": "embedding",
       "pricing": {
-        "input": "0.00000012",
-        "output": "0"
+        "input": "0.00000012"
       }
     },
     {
@@ -2736,7 +2899,8 @@
       ],
       "pricing": {
         "input": "0.0000002",
-        "output": "0.0000015"
+        "output": "0.0000015",
+        "input_cache_read": "0.00000002"
       }
     },
     {

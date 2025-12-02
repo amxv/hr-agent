@@ -14,10 +14,10 @@ const maxTokensValues = allModels
   .map((m) => m.max_tokens)
   .filter((n): n is number => typeof n === "number" && Number.isFinite(n));
 const inputPrices = allModels
-  .map((m) => Number.parseFloat(m.pricing.input) * 1_000_000)
+  .map((m) => Number.parseFloat(m.pricing.input ?? "0") * 1_000_000)
   .filter((n) => Number.isFinite(n));
 const outputPrices = allModels
-  .map((m) => Number.parseFloat(m.pricing.output) * 1_000_000)
+  .map((m) => Number.parseFloat(m.pricing.output ?? "0") * 1_000_000)
   .filter((n) => Number.isFinite(n));
 
 const minContext = contextWindows.length > 0 ? Math.min(...contextWindows) : 0;
@@ -154,8 +154,8 @@ export const createModelsStore = (
       if (!maxTokensOk) {
         return false;
       }
-      const inputPrice = Number.parseFloat(m.pricing.input) * 1_000_000;
-      const outputPrice = Number.parseFloat(m.pricing.output) * 1_000_000;
+      const inputPrice = Number.parseFloat(m.pricing.input ?? "0") * 1_000_000;
+      const outputPrice = Number.parseFloat(m.pricing.output ?? "0") * 1_000_000;
       if (inputPrice < f.inputPricing[0] || inputPrice > f.inputPricing[1]) {
         return false;
       }
@@ -184,20 +184,20 @@ export const createModelsStore = (
             return b.releaseDate.getTime() - a.releaseDate.getTime();
           case "pricing-low":
             return (
-              (Number.parseFloat(a.pricing.input) +
-                Number.parseFloat(a.pricing.output)) *
+              (Number.parseFloat(a.pricing.input ?? "0") +
+                Number.parseFloat(a.pricing.output ?? "0")) *
                 1_000_000 -
-              (Number.parseFloat(b.pricing.input) +
-                Number.parseFloat(b.pricing.output)) *
+              (Number.parseFloat(b.pricing.input ?? "0") +
+                Number.parseFloat(b.pricing.output ?? "0")) *
                 1_000_000
             );
           case "pricing-high":
             return (
-              (Number.parseFloat(b.pricing.input) +
-                Number.parseFloat(b.pricing.output)) *
+              (Number.parseFloat(b.pricing.input ?? "0") +
+                Number.parseFloat(b.pricing.output ?? "0")) *
                 1_000_000 -
-              (Number.parseFloat(a.pricing.input) +
-                Number.parseFloat(a.pricing.output)) *
+              (Number.parseFloat(a.pricing.input ?? "0") +
+                Number.parseFloat(a.pricing.output ?? "0")) *
                 1_000_000
             );
           case "context-high":

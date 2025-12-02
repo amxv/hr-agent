@@ -1,0 +1,50 @@
+{
+  "data": {
+    "id": "google/imagen-4.0-generate-001",
+    "name": "Imagen 4",
+    "created": 1755815280,
+    "description": "Imagen 4: Google's flagship text-to-image model that serves as the go-to choice for a wide variety of high-quality image generation tasks, featuring significant improvements in text rendering over previous models. It now supports up to 2K resolution generation for creating detailed and crisp visuals, making it suitable for everything from marketing assets to artistic compositions.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text+image",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "vertex | google/imagen-4.0-generate-001",
+        "model_name": "Imagen 4",
+        "context_length": 480,
+        "pricing": {
+          "prompt": "0",
+          "completion": "0",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "vertex",
+        "tag": "vertex",
+        "quantization": null,
+        "max_completion_tokens": 0,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

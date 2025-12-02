@@ -1,0 +1,50 @@
+{
+  "data": {
+    "id": "google/imagen-4.0-ultra-generate-001",
+    "name": "Imagen 4 Ultra",
+    "created": 1755815280,
+    "description": "Imagen 4 Ultra: Highest quality image generation model for detailed and photorealistic outputs.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text+image",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "vertex | google/imagen-4.0-ultra-generate-001",
+        "model_name": "Imagen 4 Ultra",
+        "context_length": 480,
+        "pricing": {
+          "prompt": "0",
+          "completion": "0",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "vertex",
+        "tag": "vertex",
+        "quantization": null,
+        "max_completion_tokens": 0,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

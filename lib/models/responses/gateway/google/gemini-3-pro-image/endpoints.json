@@ -1,0 +1,78 @@
+{
+  "data": {
+    "id": "google/gemini-3-pro-image",
+    "name": "Nano Banana Pro (Gemini 3 Pro Image)",
+    "created": 1755815280,
+    "description": "Nano Banana Pro (Gemini 3 Pro Image) builds on Nano Banana's generation capabilities into a new era of studio-quality, functional design to help you create and edit high-fidelity, production-ready visuals with unparalleled precision and control. Improvements include enhanced world knowledge and reasoning, dynamic text and translation, and studio level controls.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text+image",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "google | google/gemini-3-pro-image",
+        "model_name": "Nano Banana Pro (Gemini 3 Pro Image)",
+        "context_length": 65536,
+        "pricing": {
+          "prompt": "0.000002",
+          "completion": "0.00012",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "google",
+        "tag": "google",
+        "quantization": null,
+        "max_completion_tokens": 32768,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      },
+      {
+        "name": "vertex | google/gemini-3-pro-image",
+        "model_name": "Nano Banana Pro (Gemini 3 Pro Image)",
+        "context_length": 65536,
+        "pricing": {
+          "prompt": "0.000002",
+          "completion": "0.00012",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "vertex",
+        "tag": "vertex",
+        "quantization": null,
+        "max_completion_tokens": 32768,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

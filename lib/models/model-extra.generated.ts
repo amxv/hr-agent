@@ -51,16 +51,19 @@ export const generatedModelExtra = {
     releaseDate: new Date("2025-10-15"),
   },
   "anthropic/claude-opus-4": {
-    releaseDate: new Date("2025-05-22"),
+    releaseDate: new Date("2025-05-21"),
   },
   "anthropic/claude-opus-4.1": {
     releaseDate: new Date("2025-08-05"),
   },
+  "anthropic/claude-opus-4.5": {
+    releaseDate: new Date("2025-11-24"),
+  },
   "anthropic/claude-sonnet-4": {
-    releaseDate: new Date("2025-05-22"),
+    releaseDate: new Date("2025-05-21"),
   },
   "anthropic/claude-sonnet-4.5": {
-    releaseDate: new Date("2025-09-29"),
+    releaseDate: new Date("2025-09-26"),
   },
   "deepseek/deepseek-r1": {
     releaseDate: new Date("2025-01-20"),
@@ -71,20 +74,17 @@ export const generatedModelExtra = {
   "deepseek/deepseek-v3.2-exp": {
     releaseDate: new Date("2025-09-29"),
   },
-  "deepseek/deepseek-v3.2-exp-thinking": {
-    releaseDate: new Date("2025-09-29"),
-  },
   "google/gemini-2.0-flash": {
     releaseDate: new Date("2024-12-11"),
   },
   "google/gemini-2.0-flash-lite": {
-    releaseDate: new Date("2024-12-11"),
+    releaseDate: new Date("2025-02-05"),
   },
   "google/gemini-2.5-flash": {
-    releaseDate: new Date("2025-06-17"),
+    releaseDate: new Date("2025-04-26"),
   },
   "google/gemini-2.5-flash-lite": {
-    releaseDate: new Date("2025-06-17"),
+    releaseDate: new Date("2025-06-19"),
   },
   "google/gemini-2.5-flash-lite-preview-09-2025": {
     releaseDate: new Date("2025-09-25"),
@@ -93,7 +93,7 @@ export const generatedModelExtra = {
     releaseDate: new Date("2025-09-25"),
   },
   "google/gemini-2.5-pro": {
-    releaseDate: new Date("2025-06-17"),
+    releaseDate: new Date("2025-02-05"),
   },
   "google/gemini-3-pro-preview": {
     releaseDate: new Date("2025-11-18"),
@@ -195,16 +195,22 @@ export const generatedModelExtra = {
     releaseDate: new Date("2025-10-06"),
   },
   "openai/gpt-5.1-codex": {
-    releaseDate: new Date("2025-11-13"),
+    releaseDate: new Date("2025-11-12"),
   },
   "openai/gpt-5.1-codex-mini": {
-    releaseDate: new Date("2025-11-13"),
+    releaseDate: new Date("2025-11-12"),
+  },
+  "openai/gpt-5.1-instant": {
+    releaseDate: new Date("2025-11-12"),
   },
   "openai/gpt-oss-120b": {
-    releaseDate: new Date("2025-08-23"),
+    releaseDate: new Date("2024-12-01"),
   },
   "openai/gpt-oss-20b": {
-    releaseDate: new Date("2025-08-05"),
+    releaseDate: new Date("2024-12-01"),
+  },
+  "openai/gpt-oss-safeguard-20b": {
+    releaseDate: new Date("2025-10-29"),
   },
   "openai/o1": {
     releaseDate: new Date("2024-09-12"),
@@ -237,31 +243,34 @@ export const generatedModelExtra = {
     releaseDate: new Date("2025-06-09"),
   },
   "xai/grok-2": {
-    releaseDate: new Date("2024-08-20"),
+    releaseDate: new Date("2025-01-14"),
   },
   "xai/grok-2-vision": {
     releaseDate: new Date("2024-08-20"),
   },
   "xai/grok-3": {
-    releaseDate: new Date("2024-12-09"),
+    releaseDate: new Date("2025-04-11"),
   },
   "xai/grok-3-fast": {
     releaseDate: new Date("2025-02-17"),
   },
   "xai/grok-3-mini": {
-    releaseDate: new Date("2024-12-09"),
+    releaseDate: new Date("2025-04-11"),
   },
   "xai/grok-3-mini-fast": {
     releaseDate: new Date("2025-02-17"),
   },
   "xai/grok-4": {
-    releaseDate: new Date("2025-09-09"),
+    releaseDate: new Date("2025-07-10"),
   },
   "xai/grok-4-fast-non-reasoning": {
-    releaseDate: new Date("2025-09-19"),
+    releaseDate: new Date("2025-09-16"),
+  },
+  "xai/grok-4-fast-reasoning": {
+    releaseDate: new Date("2025-09-16"),
   },
   "xai/grok-code-fast-1": {
-    releaseDate: new Date("2025-08-28"),
+    releaseDate: new Date("2025-08-22"),
   },
   "zai/glm-4.5": {
     releaseDate: new Date("2025-07-28"),

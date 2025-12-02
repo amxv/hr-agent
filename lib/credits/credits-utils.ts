@@ -67,8 +67,8 @@ export function getBaseModelCost(model: AppModelDefinition) {
   const { input, output } = model.pricing;
 
   // Convert from string to number and scale to per million tokens
-  const inputCostPerMTok = Number.parseFloat(input) * 1_000_000;
-  const outputCostPerMTok = Number.parseFloat(output) * 1_000_000;
+  const inputCostPerMTok = Number.parseFloat(input ?? "0") * 1_000_000;
+  const outputCostPerMTok = Number.parseFloat(output ?? "0") * 1_000_000;
 
   // Formula: Weighted average assuming typical 1:3 input:output ratio
   // This gives more weight to output since models typically generate more output

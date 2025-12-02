@@ -101,13 +101,13 @@ async function main() {
   lines.push("  owned_by: ProviderId;");
   lines.push("  name: string;");
   lines.push("  description: string;");
-  lines.push("  type: 'language' | 'embedding';");
+  lines.push("  type: string;");
   lines.push("  tags?: ModelTag[];");
   lines.push("  context_window: number; // Max input tokens");
   lines.push("  max_tokens: number; // Max output tokens");
   lines.push("  pricing: {");
-  lines.push("    input: string; // Input price per token");
-  lines.push("    output: string; // Output price per token");
+  lines.push("    input?: string; // Input price per token");
+  lines.push("    output?: string; // Output price per token");
   lines.push(
     "    input_cache_read?: string; // Input cache read price per token"
   );

@@ -1,0 +1,52 @@
+{
+  "data": {
+    "id": "deepseek/deepseek-v3.2-speciale",
+    "name": "DeepSeek V3.2 Speciale",
+    "created": 1755815280,
+    "description": "DeepSeek-V3.2-Speciale: Pushing the boundaries of reasoning capabilities (thinking mode only)",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "deepseek | deepseek/deepseek-v3.2-speciale",
+        "model_name": "DeepSeek V3.2 Speciale",
+        "context_length": 128000,
+        "pricing": {
+          "prompt": "0.00000028",
+          "completion": "0.00000042",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "input_cache_read": "0.000000028",
+          "discount": 0
+        },
+        "provider_name": "deepseek",
+        "tag": "deepseek",
+        "quantization": null,
+        "max_completion_tokens": 128000,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop",
+          "reasoning",
+          "include_reasoning"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

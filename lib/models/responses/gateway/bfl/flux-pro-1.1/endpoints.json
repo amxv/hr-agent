@@ -1,0 +1,50 @@
+{
+  "data": {
+    "id": "bfl/flux-pro-1.1",
+    "name": "FLUX1.1 [pro]",
+    "created": 1755815280,
+    "description": "FLUX1.1 [pro] is the standard for text-to-image generation with fast, reliable and consistently stunning results.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text+image",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "bfl | bfl/flux-pro-1.1",
+        "model_name": "FLUX1.1 [pro]",
+        "context_length": 0,
+        "pricing": {
+          "prompt": "0",
+          "completion": "0",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "bfl",
+        "tag": "bfl",
+        "quantization": null,
+        "max_completion_tokens": 0,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

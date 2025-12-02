@@ -1,0 +1,50 @@
+{
+  "data": {
+    "id": "google/imagen-4.0-fast-generate-001",
+    "name": "Imagen 4 Fast",
+    "created": 1755815280,
+    "description": "Imagen 4 Fast is Google’s speed-optimized variant of the Imagen 4 text-to-image model, designed for rapid, high-volume image generation. It’s ideal for workflows like quick drafts, mockups, and iterative creative exploration. Despite emphasizing speed, it still benefits from the broader Imagen 4 family’s improvements in clarity, text rendering, and stylistic flexibility, and supports high-resolution outputs up to 2K.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text+image",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "vertex | google/imagen-4.0-fast-generate-001",
+        "model_name": "Imagen 4 Fast",
+        "context_length": 480,
+        "pricing": {
+          "prompt": "0",
+          "completion": "0",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "vertex",
+        "tag": "vertex",
+        "quantization": null,
+        "max_completion_tokens": 0,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

@@ -240,7 +240,7 @@ export function ModelDetailsCard({
               </span>
               <span className="font-medium text-sm">
                 $
-                {(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(
+                {(Number.parseFloat(model.pricing.input ?? "0") * 1_000_000).toFixed(
                   2
                 )}
                 /M tokens
@@ -252,7 +252,7 @@ export function ModelDetailsCard({
               </span>
               <span className="font-medium text-sm">
                 $
-                {(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(
+                {(Number.parseFloat(model.pricing.output ?? "0") * 1_000_000).toFixed(
                   2
                 )}
                 /M tokens

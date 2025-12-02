@@ -1,0 +1,53 @@
+{
+  "data": {
+    "id": "prime-intellect/intellect-3",
+    "name": "INTELLECT 3",
+    "created": 1755815280,
+    "description": "Introducing INTELLECT-3: Scaling RL to a 100B+ MoE model on our end-to-end stack.\n\nAchieving state-of-the-art performance for its size across math, code and reasoning.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "parasail | prime-intellect/intellect-3",
+        "model_name": "INTELLECT 3",
+        "context_length": 131072,
+        "pricing": {
+          "prompt": "0.0000002",
+          "completion": "0.0000011",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "parasail",
+        "tag": "parasail",
+        "quantization": null,
+        "max_completion_tokens": 131072,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop",
+          "tools",
+          "tool_choice",
+          "reasoning",
+          "include_reasoning"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

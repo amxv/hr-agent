@@ -1,0 +1,50 @@
+{
+  "data": {
+    "id": "bfl/flux-kontext-max",
+    "name": "FLUX.1 Kontext Max",
+    "created": 1755815280,
+    "description": "FLUX.1 Kontext creates images from text prompts with unique capabilities for character consistency and advanced editing. It also edits images using simple text prompts. No complex workflows or fine-tuning needed.\nThis provider gives the option to change the moderation level for inputs and outputs. The control is under safety tolerance and is by default 2 on a range from 0 (more strict) through 6 (more permissive).",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text+image",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text",
+        "image"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "bfl | bfl/flux-kontext-max",
+        "model_name": "FLUX.1 Kontext Max",
+        "context_length": 512,
+        "pricing": {
+          "prompt": "0",
+          "completion": "0",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "bfl",
+        "tag": "bfl",
+        "quantization": null,
+        "max_completion_tokens": 0,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

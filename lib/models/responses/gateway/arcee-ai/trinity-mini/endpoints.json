@@ -1,0 +1,49 @@
+{
+  "data": {
+    "id": "arcee-ai/trinity-mini",
+    "name": "Trinity Mini",
+    "created": 1755815280,
+    "description": "Trinity Mini is a 26B-parameter (3B active) sparse mixture-of-experts language model, engineered for efficient inference over long contexts with robust function calling and multi-step agent workflows.",
+    "architecture": {
+      "tokenizer": null,
+      "instruct_type": null,
+      "modality": "text→text",
+      "input_modalities": [
+        "text"
+      ],
+      "output_modalities": [
+        "text"
+      ]
+    },
+    "endpoints": [
+      {
+        "name": "arcee-ai | arcee-ai/trinity-mini",
+        "model_name": "Trinity Mini",
+        "context_length": 131072,
+        "pricing": {
+          "prompt": "0.000000045",
+          "completion": "0.00000015",
+          "request": "0",
+          "image": "0",
+          "image_output": "0",
+          "web_search": "0",
+          "internal_reasoning": "0",
+          "discount": 0
+        },
+        "provider_name": "arcee-ai",
+        "tag": "arcee-ai",
+        "quantization": null,
+        "max_completion_tokens": 131072,
+        "max_prompt_tokens": null,
+        "supported_parameters": [
+          "max_tokens",
+          "temperature",
+          "stop"
+        ],
+        "status": 0,
+        "uptime_last_30m": null,
+        "supports_implicit_caching": false
+      }
+    ]
+  }
+}

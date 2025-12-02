@@ -100,7 +100,7 @@ export function WideModelDetails({
             label="Pricing (Input)"
             value={
               model
-                ? `$${(Number.parseFloat(model.pricing.input) * 1_000_000).toFixed(2)}/M tokens`
+                ? `$${(Number.parseFloat(model.pricing.input ?? "0") * 1_000_000).toFixed(2)}/M tokens`
                 : "--"
             }
           />
@@ -108,7 +108,7 @@ export function WideModelDetails({
             label="Pricing (Output)"
             value={
               model
-                ? `$${(Number.parseFloat(model.pricing.output) * 1_000_000).toFixed(2)}/M tokens`
+                ? `$${(Number.parseFloat(model.pricing.output ?? "0") * 1_000_000).toFixed(2)}/M tokens`
                 : "--"
             }
           />
