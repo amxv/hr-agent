@@ -49,7 +49,7 @@ export function DeleteDialog({
 
     if (deleteId === chatId && type === "chat") {
       refreshChatID();
-      router.push("/");
+      router.push("/chat");
     }
   }, [
     type,

@@ -41,7 +41,7 @@ export function ChatIdProvider({ children }: { children: ReactNode }) {
       }
     }
 
-    if (pathname === "/") {
+    if (pathname === "/chat") {
       return {
         id: provisionalChatIdRef.current,
         type: "provisional",

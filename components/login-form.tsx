@@ -71,7 +71,7 @@ export function LoginForm({
         }
       } else {
         // Success - redirect to home
-        router.push("/");
+        router.push("/chat");
         router.refresh();
       }
     } catch (error) {

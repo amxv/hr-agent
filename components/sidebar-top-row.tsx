@@ -16,7 +16,7 @@ export function SidebarTopRow() {
   return (
     <Link
       className="flex flex-row items-center gap-2 group-data-[collapsible=icon]:w-fit"
-      href="/"
+      href="/chat"
       onClick={() => {
         setOpenMobile(false);
         refreshChatID();

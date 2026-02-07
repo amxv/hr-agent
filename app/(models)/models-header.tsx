@@ -25,8 +25,8 @@ function PureModelsHeader({ className }: { className?: string }) {
   const _isAuthenticated = !!user;
 
   const isActive = (path: string) => {
-    if (path === "/") {
-      return pathname === "/";
+    if (path === "/chat") {
+      return pathname === "/chat";
     }
     return pathname.startsWith(path);
   };
@@ -38,7 +38,7 @@ function PureModelsHeader({ className }: { className?: string }) {
         className
       )}
     >
-      <Link aria-label="AgentDune Chat home" className="py-2" href="/">
+      <Link aria-label="AgentDune Chat home" className="py-2" href="/chat">
         <span className="flex h-9 cursor-pointer items-center gap-2 rounded-md px-2 font-semibold text-lg hover:bg-muted">
           <Image
             alt="AgentDune Chat"
@@ -55,9 +55,9 @@ function PureModelsHeader({ className }: { className?: string }) {
         <Link
           className={cn(
             "font-medium text-sm transition-colors hover:text-foreground",
-            isActive("/") ? "text-foreground" : "text-muted-foreground"
+            isActive("/chat") ? "text-foreground" : "text-muted-foreground"
           )}
-          href="/"
+          href="/chat"
         >
           Chat
         </Link>
@@ -111,7 +111,7 @@ function PureModelsHeader({ className }: { className?: string }) {
               sideOffset={8}
             >
               <DropdownMenuItem asChild>
-                <Link className={cn(isActive("/") && "font-semibold")} href="/">
+                <Link className={cn(isActive("/chat") && "font-semibold")} href="/chat">
                   Chat
                 </Link>
               </DropdownMenuItem>

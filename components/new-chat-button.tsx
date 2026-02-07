@@ -20,7 +20,7 @@ export function NewChatButton() {
     <SidebarMenuButton asChild className="mt-4">
       <Link
         className="flex w-full items-center gap-2"
-        href="/"
+        href="/chat"
         onClick={() => {
           setOpenMobile(false);
           refreshChatID();

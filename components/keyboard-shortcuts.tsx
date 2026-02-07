@@ -17,7 +17,7 @@ export function KeyboardShortcuts() {
         e.preventDefault();
         setOpenMobile(false);
         refreshChatID();
-        router.push("/");
+        router.push("/chat");
       }
     };
 

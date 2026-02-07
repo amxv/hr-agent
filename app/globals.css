@@ -10,6 +10,7 @@
   --font-mono:
     ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
     "Courier New", monospace;
+  --font-display: var(--font-instrument), ui-serif, Georgia, serif;
 
   --breakpoint-toast-mobile: 600px;
 
