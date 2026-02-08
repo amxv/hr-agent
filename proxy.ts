@@ -64,7 +64,8 @@ export default async function proxy(req: NextRequest) {
     return;
   }
 
-  const isOnChat = url.pathname.startsWith("/");
+  const isOnLandingPage = url.pathname === "/";
+  const isOnChat = url.pathname === "/chat" || url.pathname.startsWith("/chat/");
   const isOnModels = url.pathname.startsWith("/models");
   const isOnCompare = url.pathname.startsWith("/compare");
   const isOnLoginPage = url.pathname.startsWith("/login");
@@ -85,6 +86,9 @@ export default async function proxy(req: NextRequest) {
   if (isOnPrivacyPage || isOnTermsPage) {
     return;
   }
+  if (isOnLandingPage) {
+    return;
+  }
 
   // Require authentication for models and compare pages
   if (isOnModels || isOnCompare) {
@@ -99,7 +103,7 @@ export default async function proxy(req: NextRequest) {
     return;
   }
 
-  // Require authentication for all chat routes including home page
+  // Require authentication for chat routes
   if (isOnChat) {
     if (!isLoggedIn) {
       return NextResponse.redirect(new URL("/login", url));
