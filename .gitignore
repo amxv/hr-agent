@@ -16,6 +16,14 @@ next-env.d.ts
 
 # misc
 .DS_Store
+.claude/
+.cursor/
+.github/
+.vscode/
+.mcp.json
+.env.local.backup
+gg/
+tmp/
 *.pem
 
 # debug

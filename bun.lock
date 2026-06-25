@@ -2,7 +2,7 @@
   "lockfileVersion": 1,
   "workspaces": {
     "": {
-      "name": "sparka-ai",
+      "name": "agentdune",
       "dependencies": {
         "@ai-models/vercel-gateway": "workspace:*",
         "@ai-sdk-tools/devtools": "^0.8.4",

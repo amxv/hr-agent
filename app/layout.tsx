@@ -9,13 +9,13 @@ import { ThemeProvider } from "@/components/theme-provider";
 import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
-  metadataBase: new URL("https://sparka.ai"),
+  metadataBase: new URL("https://hr-agent.zue.ai"),
   title: "AgentDune Chat",
   description:
     "Build your own multi-model AI chat app with 120+ models, authentication, streaming, and advanced features.",
   openGraph: {
     siteName: "AgentDune Chat",
-    url: "https://sparka.ai",
+    url: "https://hr-agent.zue.ai",
     title: "AgentDune Chat",
     description:
       "Build your own multi-model AI chat app with 120+ models, authentication, streaming, and advanced features.",

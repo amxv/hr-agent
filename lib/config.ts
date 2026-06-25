@@ -46,7 +46,7 @@ export type SiteConfig = {
 };
 
 export const siteConfig: SiteConfig = {
-  githubUrl: "https://github.com/amxv/agentdune-chat",
+  githubUrl: "https://github.com/amxv/hr-agent",
   appPrefix: "agentdune",
 
   appName: "AgentDune Chat",

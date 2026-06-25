@@ -1,7 +1,5 @@
 <div align="center">
 
-<img src="public/icon.svg" alt="AgentDune Chat" width="64" height="64">
-
 # AgentDune Chat
 
 ### Production-Ready Multi-Model AI Chat Platform
@@ -10,13 +8,9 @@ Enterprise-grade AI chat platform with 120+ models, document RAG, admin panels, 
 
 **Next.js 15 • Vercel AI SDK v5 • Better Auth • Drizzle ORM • PostgreSQL**
 
-[**Live Demo**](https://agentdune.com)
+[**Live Demo**](https://hr-agent.zue.ai)
 
 </div>
-
----
-
-![agentdune_gif_demo](https://github.com/user-attachments/assets/34a03eed-58fa-4b1e-b453-384351b1c08c)
 
 ## Overview
 
@@ -247,7 +241,7 @@ Visit [http://localhost:3000](http://localhost:3000) to see your app.
 ### Project Structure
 
 ```
-agentdune-chat/
+hr-agent/
 ├── app/                      # Next.js App Router
 │   ├── (admin)/             # Admin route group
 │   │   └── api/documents/   # Document upload APIs
@@ -277,10 +271,6 @@ agentdune-chat/
 │   ├── env.ts              # Environment config
 │   └── config.ts           # App configuration
 ├── trpc/                    # tRPC routers
-├── gg/                      # Feature specs
-│   └── features/
-│       ├── 002-document-rag/
-│       └── 003-hr-tools-admin-integration/
 └── [config files]
 ```
 
@@ -479,13 +469,6 @@ Unified interface across providers:
 - xAI: Custom reasoning extraction
 - Models get two variants: standard and reasoning-enabled
 
-## Feature Specifications
-
-Detailed specifications are available in `gg/features/`:
-
-- **002-document-rag** - Complete Document RAG system specification with semantic search, citations, and admin management
-- **003-hr-tools-admin-integration** - HR tools integration with RBAC and mock data
-
 ## Roadmap
 
 - [ ] Dark mode support
@@ -516,6 +499,10 @@ Built with amazing open-source technologies:
 
 **[⬆ back to top](#agentdune-chat)**
 
-Made with ❤️ by [AgentDune](https://agentdune.com)
+Made with ❤️ by [AgentDune](https://hr-agent.zue.ai)
+
+## License
+
+Apache License 2.0. See [LICENSE](LICENSE).
 
 </div>
