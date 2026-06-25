@@ -34,8 +34,6 @@ The broader assistant platform provides:
 - ⚡ **Resumable streaming** for network resilience
 - 🧠 **Reasoning model support** across multiple providers
 
-Designed for internal AI assistants, customer support, and AI-powered automation.
-
 ## Features
 
 ### 👩‍💼 Core HR Workflows
@@ -508,7 +506,6 @@ Built with amazing open-source technologies:
 
 **[⬆ back to top](#hr-agent)**
 
-Made with ❤️ by [HR Agent](https://hr-agent.zue.ai)
 
 ## License
 
