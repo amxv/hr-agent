@@ -1,7 +1,7 @@
 {
-  "name": "AgentDune Chat",
-  "short_name": "AgentDune Chat",
-  "description": "Build your own multi-model AI chat app with 120+ models, authentication, streaming, and advanced features.",
+  "name": "HR Agent",
+  "short_name": "HR Agent",
+  "description": "Enterprise HR AI assistant for employee self-service, benefits, leave balances, HR cases, approvals, and audit trails.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#ffffff",

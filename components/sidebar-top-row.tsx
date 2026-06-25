@@ -24,14 +24,14 @@ export function SidebarTopRow() {
     >
       <span className="flex cursor-pointer items-center gap-2 rounded-md p-1 font-semibold text-lg group-data-[collapsible=icon]:w-fit group-data-[state=expanded]:hover:bg-muted">
         <Image
-          alt="AgentDune Chat"
+          alt="HR Agent"
           className="h-6 w-6 shrink-0"
           height={24}
           src={mounted && theme === "dark" ? "/icon-dark.svg" : "/icon.svg"}
           width={24}
         />
         <span className="overflow-hidden whitespace-nowrap transition-opacity duration-150 ease-in-out group-data-[collapsible=icon]:w-0 group-data-[collapsible=icon]:opacity-0 group-data-[collapsible=icon]:delay-0 group-data-[state=expanded]:delay-100">
-          AgentDune Chat
+          HR Agent
         </span>
       </span>
     </Link>

@@ -10,15 +10,15 @@ import { env } from "@/lib/env";
 
 export const metadata: Metadata = {
   metadataBase: new URL("https://hr-agent.zue.ai"),
-  title: "AgentDune Chat",
+  title: "HR Agent",
   description:
-    "Build your own multi-model AI chat app with 120+ models, authentication, streaming, and advanced features.",
+    "Enterprise HR AI assistant for employee self-service, leave balances, benefits, HR cases, approvals, audit trails, and SLA-aware operations.",
   openGraph: {
-    siteName: "AgentDune Chat",
+    siteName: "HR Agent",
     url: "https://hr-agent.zue.ai",
-    title: "AgentDune Chat",
+    title: "HR Agent",
     description:
-      "Build your own multi-model AI chat app with 120+ models, authentication, streaming, and advanced features.",
+      "Enterprise HR AI assistant for employee self-service, leave balances, benefits, HR cases, approvals, audit trails, and SLA-aware operations.",
   },
 };
 

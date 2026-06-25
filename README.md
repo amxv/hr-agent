@@ -1,10 +1,10 @@
 <div align="center">
 
-# AgentDune Chat
+# HR Agent
 
-### Production-Ready Multi-Model AI Chat Platform
+### Enterprise HR AI Assistant
 
-Enterprise-grade AI chat platform with 120+ models, document RAG, admin panels, and advanced AI capabilities.
+Employee self-service assistant for leave balances, benefits, HR cases, approvals, audit trails, and SLA-aware workflows.
 
 **Next.js 15 • Vercel AI SDK v5 • Better Auth • Drizzle ORM • PostgreSQL**
 
@@ -14,7 +14,19 @@ Enterprise-grade AI chat platform with 120+ models, document RAG, admin panels, 
 
 ## Overview
 
-**AgentDune Chat** is a production-ready, enterprise-grade AI chat platform with sophisticated conversational AI capabilities. This platform provides a complete solution with advanced features including:
+**HR Agent** is an enterprise HR assistant built for internal employee self-service and HR operations. It gives employees and managers a conversational interface for common HR workflows while preserving role-based access, case handling, auditability, and operational controls.
+
+This repository is HR-first in how it is packaged and presented. Under the hood, it is built on a reusable multi-model assistant platform, which is why you will also see broader chat, document, and model infrastructure in the codebase. Those platform capabilities support the HR product; they are not separate “demo” add-ons.
+
+The product centers on:
+
+- 🧾 **Employee self-service** for leave balances, benefits, and policy questions
+- 🎫 **HR case workflows** for intake, status tracking, and follow-up
+- 👥 **Manager and HR tools** for team availability, approvals, and people lookup
+- 🔐 **Enterprise controls** including RBAC, audit trails, authentication, and admin oversight
+- 📚 **Knowledge-backed answers** via document retrieval and organization-specific content
+
+The broader assistant platform provides:
 
 - 🏢 **Admin panel** with user and document management
 - 📚 **Document RAG system** with semantic search and citations
@@ -28,17 +40,23 @@ Designed for internal AI assistants, customer support, and AI-powered automation
 
 ## Features
 
-### 🤖 Core Chat Features
+### 👩‍💼 Core HR Workflows
 
-- **120+ AI Models** - Access Claude (Opus 4.1, Sonnet 4.5), GPT-5, Gemini 2.5, Grok 3, Llama, and more through Vercel AI Gateway
-- **Streaming Responses** - Real-time message streaming with markdown rendering
-- **Chat Branching** - Explore alternative conversation paths
-- **Model Comparison** - Side-by-side model evaluation
-- **Follow-up Suggestions** - AI-generated conversation starters
+- **Leave Balance** - Check balances, accruals, and simple projections
+- **Benefits Info** - Query plans, enrollment windows, and policy details
+- **HR Cases** - Create and manage HR support tickets
+- **Team Availability** - Review team coverage and approvals
+- **People Search** - Find employees and org context with role-aware access
+
+### 🏢 Enterprise HR Platform
+
+- **Streaming Assistant UI** - Real-time responses with markdown rendering
 - **Multimodal Input** - Text, images, PDFs, and document attachments
-- **Vote System** - Upvote/downvote messages for feedback
+- **Follow-up Suggestions** - AI-generated next steps for employees and HR teams
+- **Chat History** - Persistent conversations and session continuity
+- **Role-Aware Experiences** - Different capabilities for employees, managers, and HR users
 
-### 🏢 Enterprise Features
+### 🏢 Administration and Governance
 
 #### Admin Panel
 - **User Management** - Create, edit, ban users, reset passwords, impersonate accounts
@@ -67,7 +85,7 @@ Designed for internal AI assistants, customer support, and AI-powered automation
 - **Budget-Based Filtering** - Dynamically enable/disable tools based on remaining budget
 - **Timeout Protection** - Auto-release reserved credits on errors
 
-### 🚀 Advanced AI Capabilities
+### 🚀 Underlying Assistant Platform Capabilities
 
 #### AI Tools
 - **Deep Research** - Multi-step autonomous research with web search and synthesis (50 credits)
@@ -81,13 +99,6 @@ Designed for internal AI assistants, customer support, and AI-powered automation
 - **Cross-Provider Reasoning** - Unified interface for reasoning across OpenAI, Anthropic, Google, and xAI
 - **Thinking Visualization** - Display model reasoning process
 - **Token Budgets** - Configurable thinking limits per provider
-
-#### Demo HR Tools
-- **Leave Balance** - Check leave balances and projections (2 credits)
-- **Benefits Info** - Query benefits and plan information (2 credits)
-- **HR Case** - Create and manage HR support tickets (3 credits)
-- **Team Availability** - Team calendar and approvals (3 credits, manager-only)
-- **People Search** - Directory search and org context (2 credits, HR-only)
 
 ### 🎨 User Experience
 
@@ -497,9 +508,9 @@ Built with amazing open-source technologies:
 
 <div align="center">
 
-**[⬆ back to top](#agentdune-chat)**
+**[⬆ back to top](#hr-agent)**
 
-Made with ❤️ by [AgentDune](https://hr-agent.zue.ai)
+Made with ❤️ by [HR Agent](https://hr-agent.zue.ai)
 
 ## License
 

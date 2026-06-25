@@ -5,7 +5,7 @@ import { env } from "@/lib/env";
 import { formatNumberCompact } from "@/lib/utils/format-number-compact";
 
 export const OG_SIZE = { width: 1200, height: 630 } as const;
-export const OG_SITE_NAME = "AgentDune Chat";
+export const OG_SITE_NAME = "HR Agent";
 
 export function getBaseUrl(): string {
   return `http://${env.VERCEL_PROJECT_PRODUCTION_URL ?? "localhost:3000"}`;

@@ -9,14 +9,14 @@ import { ModelsHeader } from "./models-header";
 const totalModels = allModels.length;
 const totalProviders = providers.length;
 
-const pageTitle = "Models | AgentDune Chat";
-const pageDescription = `Browse ${totalModels} models across ${totalProviders} providers from Vercel AI Gateway in AgentDune Chat. Filter and compare by provider, context window, and pricing.`;
+const pageTitle = "Models | HR Agent";
+const pageDescription = `Browse ${totalModels} models across ${totalProviders} providers available in HR Agent. Filter and compare by provider, context window, and pricing.`;
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   keywords: [
-    "AgentDune Chat",
+    "HR Agent",
     "Vercel AI Gateway",
     "models",
     "LLM",

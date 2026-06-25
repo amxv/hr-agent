@@ -49,12 +49,12 @@ export const siteConfig: SiteConfig = {
   githubUrl: "https://github.com/amxv/hr-agent",
   appPrefix: "agentdune",
 
-  appName: "AgentDune Chat",
+  appName: "HR Agent",
   organization: {
-    name: "AgentDune Chat Ltd",
+    name: "Zue AI",
     contact: {
-      privacyEmail: "privacy@agentdune.com",
-      legalEmail: "legal@agentdune.com",
+      privacyEmail: "privacy@zue.ai",
+      legalEmail: "legal@zue.ai",
     },
   },
   services: {

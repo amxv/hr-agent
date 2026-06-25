@@ -52,7 +52,7 @@ export async function generateMetadata(
     return `${prov} ${m.name}`.trim();
   };
 
-  const siteName = "AgentDune Chat";
+  const siteName = "HR Agent";
   const a = displayName(model?.id ?? modelId);
 
   const benchmarksSuffix = ENABLE_PERFORMANCE_COPY ? " & Benchmarks" : "";

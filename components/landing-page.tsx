@@ -88,14 +88,14 @@ function StickyNav() {
       <div className="mx-auto flex max-w-6xl items-center justify-between px-6 py-4">
         <Link className="flex items-center gap-2" href="/">
           <Image
-            alt="AgentDune"
+            alt="HR Agent"
             className="size-7"
             height={28}
             src={mounted && theme === "dark" ? "/icon-dark.svg" : "/icon.svg"}
             width={28}
           />
           <span className="font-semibold text-lg tracking-tight">
-            AgentDune
+            HR Agent
           </span>
         </Link>
 
@@ -143,7 +143,7 @@ function HeroSection() {
 
         <FadeUp delay={0.15}>
           <p className="mx-auto mt-6 max-w-2xl text-lg text-muted-foreground leading-relaxed sm:text-xl">
-            AgentDune HR Agent is a conversational AI assistant that handles
+            HR Agent is a conversational AI assistant that handles
             leave balances, benefits questions, case filing, and team
             scheduling&nbsp;&mdash; with enterprise-grade access controls and
             full audit trails.
@@ -235,7 +235,7 @@ function SolutionSection() {
         <div className="mt-10 space-y-6 text-muted-foreground leading-relaxed">
           <FadeUp delay={0.1}>
             <p>
-              AgentDune HR Agent gives your employees a single place to ask HR
+              HR Agent gives your employees a single place to ask HR
               questions and get accurate, policy-aware answers&nbsp;&mdash;
               instantly. Employees type a question in plain language. The agent
               understands the context, checks the right data source, and
@@ -529,7 +529,7 @@ function UseCasesSection() {
       <div className="mx-auto max-w-4xl px-6">
         <FadeUp>
           <h2 className="text-center font-display text-3xl tracking-tight sm:text-4xl">
-            Where AgentDune HR Agent fits.
+            Where HR Agent fits.
           </h2>
         </FadeUp>
 
@@ -640,7 +640,7 @@ function FinalCTASection() {
 
         <FadeUp delay={0.1}>
           <p className="mx-auto mt-6 max-w-xl text-muted-foreground leading-relaxed">
-            AgentDune HR Agent turns your HR knowledge, policies, and employee
+            HR Agent turns your HR knowledge, policies, and employee
             data into an always-available conversational assistant&nbsp;&mdash;
             with the access controls, audit trails, and compliance features your
             organization requires.
@@ -684,14 +684,14 @@ function Footer() {
       <div className="mx-auto flex max-w-6xl flex-col items-center justify-between gap-6 px-6 sm:flex-row">
         <div className="flex items-center gap-2">
           <Image
-            alt="AgentDune"
+            alt="HR Agent"
             className="size-5"
             height={20}
             src={mounted && theme === "dark" ? "/icon-dark.svg" : "/icon.svg"}
             width={20}
           />
           <span className="text-muted-foreground text-sm">
-            &copy; {new Date().getFullYear()} AgentDune. All rights reserved.
+            &copy; {new Date().getFullYear()} HR Agent. All rights reserved.
           </span>
         </div>
 

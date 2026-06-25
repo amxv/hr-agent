@@ -4,15 +4,15 @@ import { ModelsProvider } from "@/app/(models)/models/models-store-context";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { ModelsResults } from "./models-results";
 
-const pageTitle = "Models | AgentDune Chat";
+const pageTitle = "Models | HR Agent";
 const pageDescription =
-  "Browse models across providers form Vercel AI Gateway in AgentDune Chat. Filter and compare by provider, context window, and pricing.";
+  "Browse models across providers available in HR Agent. Filter and compare by provider, context window, and pricing.";
 
 export const metadata: Metadata = {
   title: pageTitle,
   description: pageDescription,
   keywords: [
-    "AgentDune Chat",
+    "HR Agent",
     "Vercel AI Gateway",
     "models",
     "LLM",

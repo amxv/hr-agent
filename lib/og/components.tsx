@@ -83,7 +83,7 @@ export function OGFooter({
     >
       {/* biome-ignore lint/performance/noImgElement: next/image isn't available in OG rendering */}
       <img
-        alt="AgentDune Chat icon"
+        alt="HR Agent icon"
         height={iconSize}
         src={appIconUrl}
         width={iconSize}

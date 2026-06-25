@@ -38,16 +38,16 @@ function PureModelsHeader({ className }: { className?: string }) {
         className
       )}
     >
-      <Link aria-label="AgentDune Chat home" className="py-2" href="/chat">
+      <Link aria-label="HR Agent home" className="py-2" href="/chat">
         <span className="flex h-9 cursor-pointer items-center gap-2 rounded-md px-2 font-semibold text-lg hover:bg-muted">
           <Image
-            alt="AgentDune Chat"
+            alt="HR Agent"
             className="size-6"
             height={24}
             src="/icon.svg"
             width={24}
           />
-          <span className="hidden sm:inline">AgentDune Chat</span>
+          <span className="hidden sm:inline">HR Agent</span>
         </span>
       </Link>
 

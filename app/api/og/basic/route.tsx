@@ -79,7 +79,7 @@ export async function GET(req: Request) {
         <OGFooter
           appIconUrl={appIcon}
           containerTw="mt-auto"
-          siteName={"AgentDune Chat"}
+          siteName={"HR Agent"}
         />
       </OGCard>
     </OGContainer>,

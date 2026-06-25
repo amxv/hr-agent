@@ -46,7 +46,7 @@ export async function generateMetadata(
     return `${provider} ${model.name}`.trim();
   };
 
-  const siteName = "AgentDune Chat";
+  const siteName = "HR Agent";
   const perfSuffix = ENABLE_PERFORMANCE_COPY ? " & Performance" : "";
 
   const buildCompareList = () => {
@@ -62,7 +62,7 @@ export async function generateMetadata(
 
   const compareList = buildCompareList();
 
-  let title = `AI Model Comparison: Pricing, Specs${perfSuffix} | AgentDune Chat`;
+  let title = `AI Model Comparison: Pricing, Specs${perfSuffix} | HR Agent`;
   let description = `Compare AI models by ${compareList}.`;
 
   const keywordsBase = [
