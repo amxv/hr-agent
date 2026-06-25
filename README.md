@@ -16,8 +16,6 @@ Employee self-service assistant for leave balances, benefits, HR cases, approval
 
 **HR Agent** is an enterprise HR assistant built for internal employee self-service and HR operations. It gives employees and managers a conversational interface for common HR workflows while preserving role-based access, case handling, auditability, and operational controls.
 
-This repository is HR-first in how it is packaged and presented. Under the hood, it is built on a reusable multi-model assistant platform, which is why you will also see broader chat, document, and model infrastructure in the codebase. Those platform capabilities support the HR product; they are not separate “demo” add-ons.
-
 The product centers on:
 
 - 🧾 **Employee self-service** for leave balances, benefits, and policy questions
