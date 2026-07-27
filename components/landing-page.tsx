@@ -12,6 +12,7 @@ import {
   FileText,
   Fingerprint,
   Gauge,
+  Github,
   Menu,
   MessagesSquare,
   Search,
@@ -145,6 +146,7 @@ function Navigation() {
           <a href="#roles">Roles</a>
           <a href="#governance">Governance</a>
           <a href="#faq">FAQ</a>
+          <a href="https://github.com/amxv/hr-agent" target="_blank" rel="noreferrer">GitHub</a>
         </nav>
         <div className="nav-actions">
           <Link className="text-link desktop-only" href="/login">Sign in</Link>
@@ -167,6 +169,7 @@ function Navigation() {
             <a href="#roles" onClick={() => setOpen(false)}>Roles</a>
             <a href="#governance" onClick={() => setOpen(false)}>Governance</a>
             <a href="#faq" onClick={() => setOpen(false)}>FAQ</a>
+            <a href="https://github.com/amxv/hr-agent" target="_blank" rel="noreferrer" onClick={() => setOpen(false)}>GitHub</a>
             <Link href="/login">Sign in</Link>
           </motion.nav>
         ) : null}
@@ -184,7 +187,7 @@ function Hero() {
       <div className="page-shell hero-layout">
         <div className="hero-copy">
           <motion.div className="kicker" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6 }}>
-            <span className="live-dot" /> Enterprise HR, conversationally
+            <span className="live-dot" /> Open-source enterprise HR, conversationally
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 28 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.85, ease }}>
             The shortest path<br />to an HR answer is<br /><em>asking for it.</em>
@@ -195,8 +198,10 @@ function Hero() {
           <motion.div className="hero-actions" initial={{ opacity: 0, y: 18 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.7, delay: 0.22, ease }}>
             <Link className="button" href="/register">Try the assistant <ArrowRight /></Link>
             <a className="button button--ghost" href="#product">See how it works</a>
+            <a className="button button--ghost" href="https://github.com/amxv/hr-agent" target="_blank" rel="noreferrer"><Github /> View on GitHub</a>
           </motion.div>
           <motion.div className="trust-line" initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.8, delay: 0.38 }}>
+            <span><Github /> Open source</span>
             <span><ShieldCheck /> Role-aware access</span>
             <span><BadgeCheck /> Citation-backed answers</span>
             <span><Clock3 /> SLA-aware cases</span>
@@ -398,8 +403,8 @@ function FinalCTA() {
   return (
     <section className="final-cta">
       <div className="page-shell final-cta-inner">
-        <Reveal><span className="section-index">HR should feel this simple</span><h2>Stop sending people<br />into the portal.</h2><p>Bring the data, documents, permissions, and actions to the conversation instead.</p></Reveal>
-        <Reveal className="final-action" delay={0.1}><Link className="button button--light" href="/register">Open HR Agent <ArrowRight /></Link><span>No credit card required</span></Reveal>
+        <Reveal><span className="section-index">Open source by design</span><h2>Use it. Inspect it.<br />Make it yours.</h2><p>HR Agent is open source, so teams can study the architecture, self-host the product, and extend it around their own systems and policies.</p></Reveal>
+        <Reveal className="final-action" delay={0.1}><a className="button button--light" href="https://github.com/amxv/hr-agent" target="_blank" rel="noreferrer"><Github /> Explore the source</a><span>Available on GitHub</span></Reveal>
       </div>
     </section>
   );
@@ -407,7 +412,7 @@ function FinalCTA() {
 
 function Footer() {
   return (
-    <footer className="site-footer"><div className="page-shell footer-inner"><Wordmark /><p>Enterprise HR AI assistant for self-service and operations.</p><div><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/login">Sign in</Link></div><span>© {new Date().getFullYear()} HR Agent</span></div></footer>
+    <footer className="site-footer"><div className="page-shell footer-inner"><Wordmark /><p>Open-source enterprise HR AI for self-service and operations.</p><div><a href="https://github.com/amxv/hr-agent" target="_blank" rel="noreferrer">GitHub</a><Link href="/privacy">Privacy</Link><Link href="/terms">Terms</Link><Link href="/login">Sign in</Link></div><span>© {new Date().getFullYear()} HR Agent</span></div></footer>
   );
 }
 
